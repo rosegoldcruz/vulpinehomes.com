@@ -263,7 +263,7 @@ export default function HomePage() {
                 num: "1", 
                 title: "Visualize Your Kitchen", 
                 desc: "Preview your transformation before any work begins.", 
-                image: "/marketing/Love-your-kitchen.jpeg", 
+                image: "/marketing/love-your-kitchen.jpeg", 
                 gradient: "from-[#FF8A3D] to-[#FF6B35]" 
               },
               { 
