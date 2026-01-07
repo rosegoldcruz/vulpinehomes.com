@@ -1,0 +1,49 @@
+name: Weekly Blog
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Every Monday at 09:00 UTC (weekly cadence)
+  workflow_dispatch: {}
+
+jobs:
+  generate:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps (if any)
+        run: |
+          if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+            npm ci --ignore-scripts
+          elif [ -f package.json ]; then
+            npm i --ignore-scripts
+          fi
+
+      - name: Generate weekly blog
+        env:
+          DEEP_SEEK_API_KEY: ${{ secrets.DEEP_SEEK_API_KEY }}
+        run: |
+          node -e "require('fs').existsSync('./content') || require('fs').mkdirSync('./content');"
+          node -e "require('fs').existsSync('./content/blog') || require('fs').mkdirSync('./content/blog', { recursive: true });"
+          npx --yes tsx scripts/generateWeeklyBlog.ts || exit 1
+
+      - name: Commit changes if any
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name "vulpine-bot"
+            git config user.email "vulpine-bot@users.noreply.github.com"
+            git add content/blog .blog-state.json || true
+            git commit -m "chore(blog): weekly auto-generated post"
+            git push
+          else
+            echo "No changes to commit"
+          fi

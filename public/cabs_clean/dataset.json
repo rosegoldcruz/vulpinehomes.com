@@ -1,0 +1,208 @@
+{
+  "doors": {
+    "shaker_slide": [
+      "doors/shaker_slide/Flour-Slide_Kitchen-800x421.jpg",
+      "doors/shaker_slide/Storm-Slide_Kitchen-800x421.jpg",
+      "doors/shaker_slide/Espresso-Walnut-Slide_Kitchen-800x421.jpg",
+      "doors/shaker_slide/Graphite-Slide_Kitchen-800x421.jpg"
+    ],
+    "fusion_slide": [
+      "doors/fusion_slide/Espresso-Walnut-Slide_Kitchen.jpg",
+      "doors/fusion_slide/Espresso-Walnut-Fusion-Slide-800x421.jpg",
+      "doors/fusion_slide/Fusion-Fan-600x404.png",
+      "doors/fusion_slide/Flour-Fusion-Slide_Kitchen-800x421.jpg",
+      "doors/fusion_slide/Storm-Fusion-Slide_Kitchen-800x421.jpg",
+      "doors/fusion_slide/Graphite-Fusion-Slide_Kitchen-800x421.jpg"
+    ],
+    "fusion_shaker": [
+      "doors/fusion_shaker/Slate-Fusion-Shaker_Kitchen-800x421.jpg",
+      "doors/fusion_shaker/Graphite-Fusion-Shaker_Kitchen-800x421.jpg",
+      "doors/fusion_shaker/Latte-Walnut-Fusion-Shaker_Kitchen-800x421.jpg",
+      "doors/fusion_shaker/Mist-Fusion-Shaker_Kitchen-800x421.jpg",
+      "doors/fusion_shaker/Storm-Fusion-Shaker_Kitchen-800x421.jpg",
+      "doors/fusion_shaker/Espresso-Walnut-Fusion-Shaker-800x421.jpg",
+      "doors/fusion_shaker/Flour-Fusion-Shaker_Kitchen-800x421.jpg"
+    ],
+    "slab": [
+      "doors/slab/Wheat-Oak-Slab-800x421.jpg",
+      "doors/slab/Urban-Teak-Slab_Kitchen-800x421.jpg",
+      "doors/slab/Flour-Slab_Kitchen-800x421.jpg",
+      "doors/slab/Mist-Slab_Kitchen-800x421.jpg",
+      "doors/slab/Platinum-Teak-Slab_Kitchen-800x421.jpg",
+      "doors/slab/Latte-Walnut-Slab_Kitchen-800x421.jpg",
+      "doors/slab/Snow-Gloss-Slab_Kitchen-800x421.jpg",
+      "doors/slab/Storm-Slab_Kitchen-800x421.jpg",
+      "doors/slab/Graphite-Slab_Kitchen-800x421.jpg",
+      "doors/slab/Slate-Slab_Kitchen-800x421.jpg",
+      "doors/slab/Espresso-Walnut-Slab-800x421.jpg"
+    ]
+  },
+  "hardware": {
+    "loft": {
+      "rose_gold": [
+        "hardware/loft/Loft_RoseGold.png",
+        "hardware/loft/Loft_RoseGold_size 15-16 inch knob .png",
+        "hardware/loft/Loft_RoseGold_size 4 5-8 inch .png",
+        "hardware/loft/Loft_RoseGold_size 5 7-8 inch .png",
+        "hardware/loft/Loft_RoseGold_with_knob.png"
+      ],
+      "satin_nickel": [
+        "hardware/loft/Loft_SatinNickel.png",
+        "hardware/loft/Loft_SatinNickel_size 15-16 inch knob .png",
+        "hardware/loft/Loft_SatinNickel_size 4 5-8 inch  .png",
+        "hardware/loft/Loft_SatinNickel_size 5 7-8 inch .png",
+        "hardware/loft/Loft_SatinNickel_with_knob.png"
+      ],
+      "matte_black": [
+        "hardware/loft/Loft_MatteBlack.png",
+        "hardware/loft/Loft_MatteBlack_size 15-16 inch knob .png",
+        "hardware/loft/Loft_MatteBlack_size 4 5-8 inch .png",
+        "hardware/loft/Loft_MatteBlack_size 5 7-8 inch .png",
+        "hardware/loft/Loft_MatteBlack__with_knob.png"
+      ],
+      "chrome": [
+        "hardware/loft/Loft_Chrome_1.png.png",
+        "hardware/loft/Loft_Chrome_size 15-16 inch knob.png",
+        "hardware/loft/Loft_Chrome_size 4 5-8 inch .png",
+        "hardware/loft/Loft_Chrome_size 5 7-8 inch .png",
+        "hardware/loft/Loft_Chrome_with_knob.png"
+      ]
+    },
+    "cottage": {
+      "chrome": [
+        "hardware/cottage/Cottage__Chrome.png",
+        "hardware/cottage/Cottage__Chrome_Size1 7-32 Inch Knob .png",
+        "hardware/cottage/Cottage__Chrome_Size4 3-4 Inches.png",
+        "hardware/cottage/Cottage__Chrome_Size6 1-6 Inches .png",
+        "hardware/cottage/Cottage__Chrome_with_knob.png"
+      ],
+      "rose_gold": [
+        "hardware/cottage/Cottage_RoseGold_.png.png",
+        "hardware/cottage/Cottage_RoseGold__K.png",
+        "hardware/cottage/Cottage_RoseGold_96 .png",
+        "hardware/cottage/Cottage_RoseGold_128-1.png",
+        "hardware/cottage/Cottage_RoseGold_with_knob.png"
+      ],
+      "matte_black": [
+        "hardware/cottage/Cottage__SatinNickel.png",
+        "hardware/cottage/Cottage__SatinNickel_Size1 7-32 Inch Knob .png",
+        "hardware/cottage/Cottage__SatinNickel_Size4 3-4 Inches .png",
+        "hardware/cottage/Cottage__SatinNickel_Size6 1-6 Inches .png",
+        "hardware/cottage/Cottage__SatinNickel_with_knob.png"
+      ],
+      "satin_nickel": [
+        "hardware/cottage/Cottage__SatinNickel.png",
+        "hardware/cottage/Cottage__SatinNickel_Size1 7-32 Inch Knob .png",
+        "hardware/cottage/Cottage__SatinNickel_Size4 3-4 Inches .png",
+        "hardware/cottage/Cottage__SatinNickel_Size6 1-6 Inches .png",
+        "hardware/cottage/Cottage__SatinNickel_with_knob.png"
+      ]
+    },
+    "arch": {
+      "satinnickel": [
+        "hardware/arch/Arch_SatinNickel.png",
+        "hardware/arch/Arch_SatinNickel-Size 1in 7-16 - Edited.png",
+        "hardware/arch/Arch_SatinNickel_Size 6 Inches - Edited.png",
+        "hardware/arch/Arch_SatinNickel-Size 7 1-8in - Edited.png",
+        "hardware/arch/Arch_SatinNickel_with_tpull.png"
+      ],
+      "rosegold": [
+        "hardware/arch/Arch_RoseGold.png",
+        "hardware/arch/Arch_RoseGoldSize 1in 7-16 - Edited.png",
+        "hardware/arch/Arch_RoseGold_Size 6 Inches - Edited.png",
+        "hardware/arch/Arch_RoseGold_-Size 7 1-8in - Edited.png",
+        "hardware/arch/Arch_RoseGold_with_tpull.png"
+      ],
+      "chrome": [
+        "hardware/arch/arch_chrome.png",
+        "hardware/arch/arch_chrome_Size 1in 7-16.png",
+        "hardware/arch/arch_chrome_6in.png",
+        "hardware/arch/arch_chrome_7 1-8in.png",
+        "hardware/arch/arch_chrome_with_tpull.png"
+      ],
+      "matteblack": [
+        "hardware/arch/Arch_MatteBlack.png",
+        "hardware/arch/Arch_MatteBlack_Size 1in 7-16 - Edited.png",
+        "hardware/arch/Arch_MatteBlack_Size 6 Inches - Edited.png",
+        "hardware/arch/Arch_MatteBlack_Size 7 1-8in - Edited.png",
+        "hardware/arch/Arch_MatteBlack_with _tpull.png"
+      ]
+    },
+    "artisan": {
+      "rose_gold": [
+        "hardware/artisan/Artisan_RoseGold.png",
+        "hardware/artisan/Artisan_RoseGold_Size1 7-32 Inch Knob - Edited.png",
+        "hardware/artisan/Artisan_RoseGold_Size4 3-4 Inches - Edited.png",
+        "hardware/artisan/Artisan_RoseGold_Size6 1-6 Inches - Edited.png",
+        "hardware/artisan/Artisan_RoseGold_with_knob.png.png"
+      ],
+      "satin_nickel": [
+        "hardware/artisan/Artisan_SatinNickel.png",
+        "hardware/artisan/Artisan_SatinNickel_Size1 7-32 Inch Knob .png",
+        "hardware/artisan/Artisan_SatinNickel_Size4 3-4 Inches .png",
+        "hardware/artisan/Artisan_SatinNickel_Size6 1-6 Inches.png",
+        "hardware/artisan/Artisan_SatinNickel_with_knob.png.png"
+      ],
+      "chrome": [
+        "hardware/artisan/Artisan_Chrome.png",
+        "hardware/artisan/Artisan_Chrome_Size1 7-32 Inch.png",
+        "hardware/artisan/Artisan_Chrome_Size4 3-4 Inches.png",
+        "hardware/artisan/Artisan_Chrome_6 1-16 Inches - Edited.png",
+        "hardware/artisan/Artisan_Chrome_with_tpull.png.png"
+      ],
+      "matte_black": [
+        "hardware/artisan/Artisan_MatteBlack.png",
+        "hardware/artisan/Artisan_MatteBlack_Size1 7-32 Inch Knob - Edited.png",
+        "hardware/artisan/Artisan_MatteBlack_Size4 3-4 Inches - Edited.png",
+        "hardware/artisan/Artisan_MatteBlack_Size6 1-6-16 Inches - Edited.png",
+        "hardware/artisan/Artisan_MatteBlack_with_knob.png.png"
+      ]
+    },
+    "bar": {
+      "matte_black": [
+        "hardware/bar/Bar-pulls-black .png",
+        "hardware/bar/Bar-Black-Matte-Round-Knob-on-Shaker.png",
+        "hardware/bar/Bar-Black-Matte-Pull-4.5-on-Shaker - Edited.png",
+        "hardware/bar/Bar-Black-Matte-Pull-6.0-on-Shaker.png",
+        "hardware/bar/Bar-matte-black-tpull.png"
+      ],
+      "satin_nickel": [
+        "hardware/bar/BarPull_SatinNickel.png",
+        "hardware/bar/BarPull_t_SatinNickel.png",
+        "hardware/bar/BarPull_SatinNickel_scale.png",
+        "hardware/bar/Satin-Nickle-Round-Knob .png",
+        "hardware/bar/BarPull_SatinNickel_with_tpull.png"
+      ]
+    },
+    "square": {
+      "rose_gold": [
+        "hardware/square/Square_RoseGold.png",
+        "hardware/square/Square_RoseGold_Size 15-16 Inch.png",
+        "hardware/square/Square_RoseGold_Size 4 1-4 Inches .png",
+        "hardware/square/Square_RoseGold_.png",
+        "hardware/square/Square_RoseGold_with_knob.png"
+      ],
+      "satin_nickel": [
+        "hardware/square/Square_SatinNickel.png",
+        "hardware/square/Square_SatinNickel_Size 15-16 Inch .png",
+        "hardware/square/Square_SatinNickel_Size 4 1-4 Inches .png",
+        "hardware/square/Square_SatinNickel_Size 5 7-16 Inches.png",
+        "hardware/square/Square_SatinNickel__with_knob.png"
+      ],
+      "chrome": [
+        "hardware/square/Square_chrome.png",
+        "hardware/square/Square_chrome_Size 15-16 Inch .png",
+        "hardware/square/Square_chrome_Size 4 1-4 Inches .png",
+        "hardware/square/Square_chrome_Size 5 7-16 Inches .png",
+        "hardware/square/Square_chrome__with_knob.png"
+      ],
+      "matte_black": [
+        "hardware/square/Square_MatteBlack.png",
+        "hardware/square/Square_MatteBlack_Size 15-16 Inch .png",
+        "hardware/square/Square_MatteBlack_Size 4 1-4 Inches .png",
+        "hardware/square/Square_MatteBlack_Size 5 7-16 Inches .png",
+        "hardware/square/Square_MatteBlack__with_knob.png"
+      ]
+    }
+  }
+}
