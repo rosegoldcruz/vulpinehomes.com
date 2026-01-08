@@ -4,46 +4,80 @@ import { GLTFLoader } from "https://cdn.skypack.dev/three@0.155.0/examples/jsm/l
 const videoEl = document.getElementById("camera");
 const canvasEl = document.getElementById("scene");
 
-function startVideoStream() {
+if (!videoEl || !canvasEl) {
+  console.error("Camera video or canvas element not found.");
+}
+
+/* =========================
+   START CAMERA (MOBILE SAFE)
+   ========================= */
+async function startCamera() {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    console.error("Camera access is not supported in this browser.");
+    console.error("getUserMedia not supported");
     return;
   }
 
-  navigator.mediaDevices
-    .getUserMedia({
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: {
         facingMode: { ideal: "environment" },
         width: { ideal: window.innerWidth },
-        height: { ideal: window.innerHeight },
-      },
-    })
-    .then((stream) => {
-      videoEl.srcObject = stream;
-    })
-    .catch((err) => {
-      console.error("Unable to access camera:", err);
+        height: { ideal: window.innerHeight }
+      }
     });
+
+    videoEl.srcObject = stream;
+
+    // iOS SAFARI REQUIRES THIS
+    videoEl.onloadedmetadata = () => {
+      videoEl
+        .play()
+        .then(() => {
+          console.log("Camera started");
+        })
+        .catch(err => {
+          console.error("Video play failed:", err);
+        });
+    };
+
+  } catch (err) {
+    console.error("Camera access denied or failed:", err);
+  }
 }
 
-function initThree() {
-  const renderer = new THREE.WebGLRenderer({ canvas: canvasEl, alpha: true, antialias: true });
+/* =========================
+   THREE.JS SETUP
+   ========================= */
+function startThree() {
+  const renderer = new THREE.WebGLRenderer({
+    canvas: canvasEl,
+    alpha: true,
+    antialias: true
+  });
+
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   const scene = new THREE.Scene();
 
-  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0, 1.5, 4);
+  const camera = new THREE.PerspectiveCamera(
+    45,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100
+  );
+  camera.position.set(0, 1.6, 4);
 
-  const hemiLight = new THREE.HemisphereLight(0xffffff, 0x333333, 1.2);
-  scene.add(hemiLight);
+  /* LIGHTING */
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x333333, 1.3);
+  scene.add(hemi);
 
-  const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-  dirLight.position.set(3, 6, 2);
-  scene.add(dirLight);
+  const dir = new THREE.DirectionalLight(0xffffff, 1);
+  dir.position.set(3, 6, 2);
+  scene.add(dir);
 
+  /* LOAD FOX */
   const loader = new GLTFLoader();
   let mixer = null;
 
@@ -51,48 +85,59 @@ function initThree() {
     "/fox.glb",
     (gltf) => {
       const fox = gltf.scene;
+
       fox.scale.set(1.3, 1.3, 1.3);
       fox.position.set(0, -1.2, 0);
+
       fox.traverse((child) => {
         if (child.isMesh) {
-          child.castShadow = true;
+          child.castShadow = false;
+          child.frustumCulled = false;
         }
       });
+
       scene.add(fox);
 
       mixer = new THREE.AnimationMixer(fox);
-      const idleClip = gltf.animations.find((clip) => clip.name.toLowerCase().includes("idle")) || gltf.animations[0];
-      if (idleClip) {
-        mixer.clipAction(idleClip).play();
+      const idle =
+        gltf.animations.find(a =>
+          a.name.toLowerCase().includes("idle")
+        ) || gltf.animations[0];
+
+      if (idle) {
+        mixer.clipAction(idle).play();
       }
     },
     undefined,
-    (error) => {
-      console.error("Failed to load fox model:", error);
+    (err) => {
+      console.error("Failed to load fox.glb:", err);
     }
   );
 
   const clock = new THREE.Clock();
 
-  function onResize() {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    renderer.setSize(width, height);
-    camera.aspect = width / height;
+  function resize() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
     camera.updateProjectionMatrix();
   }
 
-  window.addEventListener("resize", onResize);
+  window.addEventListener("resize", resize);
 
-  function render() {
-    requestAnimationFrame(render);
+  function animate() {
+    requestAnimationFrame(animate);
     const delta = clock.getDelta();
     if (mixer) mixer.update(delta);
     renderer.render(scene, camera);
   }
 
-  render();
+  animate();
 }
 
-startVideoStream();
-initThree();
+/* =========================
+   BOOT SEQUENCE
+   ========================= */
+startCamera();
+startThree();
