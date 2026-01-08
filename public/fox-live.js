@@ -1,77 +1,140 @@
-import * as THREE from "https://cdn.skypack.dev/three@0.155.0";
-import { GLTFLoader } from "https://cdn.skypack.dev/three@0.155.0/examples/jsm/loaders/GLTFLoader.js";
+import * as THREE from "https://unpkg.com/three@0.155.0/build/three.module.js";
+import { GLTFLoader } from "https://unpkg.com/three@0.155.0/examples/jsm/loaders/GLTFLoader.js";
 
-const video = document.getElementById("camera");
-const canvas = document.getElementById("scene");
-const startOverlay = document.getElementById("start");
-const startBtn = document.getElementById("startBtn");
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("[fox-live] DOMContentLoaded fired");
 
-let mixer;
+  const video = document.getElementById("camera");
+  const canvas = document.getElementById("scene");
+  const startOverlay = document.getElementById("start");
+  const startBtn = document.getElementById("startBtn");
+  const errorEl = document.getElementById("error");
 
-startBtn.addEventListener("click", async () => {
-  startOverlay.remove();
-  await startCamera();
-  startThree();
-});
-
-async function startCamera() {
-  const stream = await navigator.mediaDevices.getUserMedia({
-    audio: false,
-    video: { facingMode: { ideal: "environment" } }
-  });
-
-  video.srcObject = stream;
-  await video.play();
-}
-
-function startThree() {
-  const renderer = new THREE.WebGLRenderer({
-    canvas,
-    alpha: true,
-    antialias: true
-  });
-
-  renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.setSize(window.innerWidth, window.innerHeight);
-
-  const scene = new THREE.Scene();
-
-  const camera = new THREE.PerspectiveCamera(
-    45,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    100
-  );
-  camera.position.set(0, 1.6, 4);
-
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x333333, 1.3));
-
-  const dir = new THREE.DirectionalLight(0xffffff, 1);
-  dir.position.set(3, 6, 2);
-  scene.add(dir);
-
-  const loader = new GLTFLoader();
-
-  loader.load("/fox.glb", (gltf) => {
-    const fox = gltf.scene;
-    fox.scale.set(1.3, 1.3, 1.3);
-    fox.position.set(0, -1.2, 0);
-    scene.add(fox);
-
-    mixer = new THREE.AnimationMixer(fox);
-    const idle =
-      gltf.animations.find(a => a.name.toLowerCase().includes("idle")) ||
-      gltf.animations[0];
-    mixer.clipAction(idle).play();
-  });
-
-  const clock = new THREE.Clock();
-
-  function animate() {
-    requestAnimationFrame(animate);
-    if (mixer) mixer.update(clock.getDelta());
-    renderer.render(scene, camera);
+  if (!startBtn) {
+    console.error("[fox-live] startBtn not found");
+    return;
   }
 
-  animate();
-}
+  console.log("[fox-live] startBtn found, attaching click listener");
+
+  let mixer = null;
+
+  startBtn.addEventListener("click", async () => {
+    console.log("[fox-live] Button clicked");
+
+    try {
+      await startCamera();
+      console.log("[fox-live] Camera started");
+      startOverlay.style.display = "none";
+      initThree();
+    } catch (err) {
+      console.error("[fox-live] Failed to start:", err);
+      if (errorEl) {
+        errorEl.textContent = "Camera error: " + (err.message || err);
+      }
+    }
+  });
+
+  async function startCamera() {
+    console.log("[fox-live] Requesting camera access");
+
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      throw new Error("Camera API not supported");
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: false,
+      video: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      }
+    });
+
+    console.log("[fox-live] Got media stream");
+
+    video.srcObject = stream;
+    video.setAttribute("playsinline", "");
+    video.muted = true;
+
+    await video.play();
+    console.log("[fox-live] Video playing");
+  }
+
+  function initThree() {
+    console.log("[fox-live] Initializing Three.js");
+
+    const renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+      alpha: true,
+      antialias: true
+    });
+
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(
+      45,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      100
+    );
+    camera.position.set(0, 1.6, 4);
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x333333, 1.3));
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+    dirLight.position.set(3, 6, 2);
+    scene.add(dirLight);
+
+    const loader = new GLTFLoader();
+
+    loader.load(
+      "/fox.glb",
+      (gltf) => {
+        console.log("[fox-live] Fox model loaded");
+
+        const fox = gltf.scene;
+        fox.scale.set(1.3, 1.3, 1.3);
+        fox.position.set(0, -1.2, 0);
+        scene.add(fox);
+
+        mixer = new THREE.AnimationMixer(fox);
+
+        const idleClip =
+          gltf.animations.find((a) => a.name.toLowerCase().includes("idle")) ||
+          gltf.animations[0];
+
+        if (idleClip) {
+          mixer.clipAction(idleClip).play();
+          console.log("[fox-live] Playing animation:", idleClip.name);
+        }
+      },
+      undefined,
+      (err) => {
+        console.error("[fox-live] Failed to load fox.glb:", err);
+      }
+    );
+
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (mixer) {
+        mixer.update(clock.getDelta());
+      }
+      renderer.render(scene, camera);
+    }
+
+    animate();
+    console.log("[fox-live] Render loop started");
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  }
+});
