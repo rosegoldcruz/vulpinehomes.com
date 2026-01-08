@@ -81,18 +81,12 @@ export default function HomePage() {
             Installation by the experienced team at Freedom Kitchen & Bath.
           </FadeIn>
 
-          <FadeIn delay={0.4} className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-2xl px-4">
+          <FadeIn delay={0.4} className="flex justify-center items-center w-full px-4">
             <Link
-              href="/visualizer"
-              className="group inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-full text-white transition-all w-full sm:w-auto hover:-translate-y-1 bg-gradient-to-r from-[#9333ea] via-[#db2777] to-[#FF8A3D] shadow-lg shadow-purple-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8A3D]/70"
+              href="/fox-live"
+              className="group inline-flex items-center justify-center px-10 py-4 text-lg font-semibold rounded-full text-white transition-all hover:-translate-y-1 bg-gradient-to-r from-[#FF6B35] via-[#FF8A3D] to-[#FFB347] shadow-lg shadow-orange-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#FF8A3D]/70"
             >
-              Try the Kitchen Visualizer
-            </Link>
-            <Link
-              href="#advisors"
-              className="group inline-flex items-center justify-center px-8 py-4 text-lg font-semibold rounded-full text-white/90 border border-white/20 transition-all w-full sm:w-auto hover:bg-white/10 hover:-translate-y-1"
-            >
-              Talk to a Project Advisor
+              Meet the Fox in Your Kitchen
             </Link>
           </FadeIn>
         </FadeIn>
