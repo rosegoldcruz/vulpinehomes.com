@@ -10,6 +10,7 @@ import {
   type HardwareStyleId,
   type HardwareFinishId
 } from "./promptGenerator";
+import { refaceCabinetsWithGemini, type DoorStyleId as GeminiDoorStyleId } from "./geminiService";
 import sharp from "sharp";
 
 // Normalize image orientation based on EXIF data to prevent rotation issues
@@ -62,30 +63,33 @@ function humanizeSelection(value: string | null | undefined, fallback: string): 
     .join(" ");
 }
 
-// Color ID to hex mapping for AEON prompt generator
+// Vulpine color definitions with hex and wood grain info
+type VulpineColor = { hex: string; name: string; isWoodGrain: boolean };
+
+const VULPINE_COLORS: Record<string, VulpineColor> = {
+  "flour": { hex: "#f5f5f0", name: "Flour", isWoodGrain: false },
+  "storm": { hex: "#5a6670", name: "Storm", isWoodGrain: false },
+  "graphite": { hex: "#3d3d3d", name: "Graphite", isWoodGrain: false },
+  "espresso-walnut": { hex: "#3c2415", name: "Espresso Walnut", isWoodGrain: true },
+  "slate": { hex: "#708090", name: "Slate", isWoodGrain: false },
+  "mist": { hex: "#c8c8c8", name: "Mist", isWoodGrain: false },
+  "latte-walnut": { hex: "#a67b5b", name: "Latte Walnut", isWoodGrain: true },
+  "nimbus-oak": { hex: "#9e8b7d", name: "Nimbus Oak", isWoodGrain: true },
+  "sable-oak": { hex: "#5c4033", name: "Sable Oak", isWoodGrain: true },
+  "urban-teak": { hex: "#8b7355", name: "Urban Teak", isWoodGrain: true },
+  "platinum-teak": { hex: "#b8a88a", name: "Platinum Teak", isWoodGrain: true },
+  "snow-gloss": { hex: "#fffafa", name: "Snow Gloss", isWoodGrain: false },
+  "wheat-oak": { hex: "#d4a574", name: "Wheat Oak", isWoodGrain: true },
+};
+
+// Get color info from Vulpine color map
+function getColorInfo(colorId: string): VulpineColor {
+  return VULPINE_COLORS[colorId] || { hex: "#FFFFFF", name: "Flour", isWoodGrain: false };
+}
+
+// Legacy function for backward compatibility
 function getColorHex(colorId: string): string {
-  const colorMap: Record<string, string> = {
-    "classic-white": "#FFFFFF",
-    "light-gray": "#C0C0C0",
-    "medium-gray": "#808080",
-    "dark-gray": "#505050",
-    "flat-gray": "#3A3A3A",
-    "wood-grain-gray": "#9E9E9E",
-    "classic-dark-brown": "#3E2723",
-    "earthy-brown": "#6D4C41",
-    "medium-gray-tone": "#808080",
-    "dark-gray-tone": "#505050",
-    "lighter-gray": "#C0C0C0",
-    "gray-wood-grain": "#9E9E9E",
-    "popular-medium-gray": "#757575",
-    "taupe-wood-grain": "#8D6E63",
-    "walnut-wood": "#5D4037",
-    "deep-flat-gray": "#3A3A3A",
-    "modern-earthy-brown": "#6D4C41",
-    "solid-gray": "#808080",
-    "navy-blue": "#1E3A5F",
-  };
-  return colorMap[colorId] || "#FFFFFF";
+  return getColorInfo(colorId).hex;
 }
 
 async function uploadToSupabaseBucket(params: {
@@ -146,7 +150,41 @@ async function runSegmentation(imageUrl: string) {
   }
 }
 
-// Single-stage kitchen edit using google/nano-banana on Replicate
+// Gemini-based cabinet refacing using geometry replacement
+async function runGeminiRefacing(params: {
+  imageBuffer: Buffer;
+  style: string | null;
+  color: string | null;
+  hardwareStyle: string | null;
+  hardwareColor: string | null;
+}): Promise<string> {
+  const { imageBuffer, style, color, hardwareStyle, hardwareColor } = params;
+  
+  // Map style to Gemini door style ID
+  const doorStyleMap: Record<string, GeminiDoorStyleId> = {
+    "shaker": "shaker",
+    "shaker-slide": "shaker-slide",
+    "slab": "slab",
+    "fusion-shaker": "fusion-shaker",
+    "fusion-slide": "fusion-slide",
+  };
+  
+  const doorStyle = doorStyleMap[style || "shaker"] || "shaker";
+  const colorInfo = getColorInfo(color || "flour");
+  
+  const base64Result = await refaceCabinetsWithGemini(imageBuffer, {
+    doorStyle,
+    colorName: colorInfo.name,
+    colorHex: colorInfo.hex,
+    isWoodGrain: colorInfo.isWoodGrain,
+    hardwareStyle: hardwareStyle || "Arch",
+    hardwareFinish: hardwareColor || "Satin Nickel",
+  });
+  
+  return base64Result;
+}
+
+// Legacy nano-banana function kept for fallback
 async function runNanoBananaEdit(params: { originalUrl: string; positive: string }) {
   const { originalUrl, positive } = params;
 
@@ -419,10 +457,27 @@ export async function runVisualizerPipeline(
     enhanced_prompt = result.enhanced_prompt;
   }
 
-  // 3) Single-stage edit with google/nano-banana
-  const finalUrl = await runNanoBananaEdit({
-    originalUrl,
-    positive: enhanced_prompt,
+  // 3) Single-stage edit with Gemini (geometry replacement)
+  console.log("🧠 Running Gemini cabinet refacing...");
+  const geminiResultBase64 = await runGeminiRefacing({
+    imageBuffer: normalizedBuffer,
+    style,
+    color,
+    hardwareStyle,
+    hardwareColor,
+  });
+  
+  // Upload Gemini result to Supabase
+  const geminiBuffer = Buffer.from(
+    geminiResultBase64.replace(/^data:image\/\w+;base64,/, ""),
+    "base64"
+  );
+  const finalPath = `${imageId}/final.jpg`;
+  const finalUrl = await uploadToSupabaseBucket({
+    bucket: "visualizations",
+    path: finalPath,
+    data: geminiBuffer,
+    contentType: "image/jpeg",
   });
 
   // 4) Database operations: ONE lead per submission

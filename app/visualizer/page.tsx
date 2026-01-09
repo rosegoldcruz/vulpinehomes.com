@@ -1,4 +1,4 @@
-import AeonHybridPage from "./AeonHybridPage";
+import CabinetVisionPage from "./CabinetVisionPage";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function VisualizerPage() {
-  return <AeonHybridPage />;
+  return <CabinetVisionPage />;
 }
