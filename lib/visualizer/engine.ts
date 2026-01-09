@@ -1,17 +1,10 @@
-// lib/visualizer/engine.ts
-
 import { supabaseServer } from "../supabaseServer";
-import { replicate } from "../replicateClient";
-import { enhanceCabinetPrompt } from "../promptEnhancer";
-import { 
-  buildKitchenRefacingPrompt, 
-  analyzeKitchenImage,
-  type DoorStyleId,
-  type HardwareStyleId,
-  type HardwareFinishId
-} from "./promptGenerator";
 import { refaceCabinetsWithGemini, type DoorStyleId as GeminiDoorStyleId } from "./geminiService";
 import sharp from "sharp";
+
+export type DoorStyleId = "slab" | "shaker" | "shaker-slide" | "fusion-shaker" | "fusion-slide";
+export type HardwareStyleId = "loft" | "bar" | "arch" | "artisan" | "cottage" | "square";
+export type HardwareFinishId = "rose_gold" | "chrome" | "black" | "nickel" | "satinnickel" | "gold" | "bronze";
 
 // Normalize image orientation based on EXIF data to prevent rotation issues
 async function normalizeImageOrientation(file: File): Promise<{ buffer: Buffer; contentType: string }> {
@@ -44,9 +37,6 @@ export type VisualizerInput = {
 
 export type VisualizerOutput = {
   originalUrl: string;
-  maskUrl?: string;
-  fluxResultUrl?: string;
-  styleResultUrl?: string;
   finalUrl: string;
   sessionId: string; // Return session ID for batch processing
   leadId: string; // Return lead ID for reference
@@ -117,39 +107,6 @@ async function uploadToSupabaseBucket(params: {
   return publicUrlData.publicUrl;
 }
 
-// Grounded-SAM segmentation: get cabinet mask
-async function runSegmentation(imageUrl: string) {
-  const model = process.env.REPLICATE_GROUNDED_SAM_MODEL;
-  if (!model) {
-    console.warn("⚠️ REPLICATE_GROUNDED_SAM_MODEL not set, skipping segmentation");
-    return null;
-  }
-
-  try {
-    const res = (await replicate.run(
-      model as `${string}/${string}` | `${string}/${string}:${string}`,
-      {
-        input: {
-          image: imageUrl,
-          text_prompt: "kitchen cabinets",
-          box_threshold: 0.3,
-          text_threshold: 0.25,
-        },
-      },
-    )) as any;
-
-    const maskUrl: string | undefined = res?.masks?.[0] ?? res?.output?.[0];
-    if (!maskUrl) {
-      console.warn("⚠️ Grounded-SAM did not return a mask, skipping segmentation");
-      return null;
-    }
-    return maskUrl;
-  } catch (err) {
-    console.error("⚠️ Segmentation failed, continuing without mask:", err);
-    return null;
-  }
-}
-
 // Gemini-based cabinet refacing using geometry replacement
 async function runGeminiRefacing(params: {
   imageBuffer: Buffer;
@@ -182,163 +139,6 @@ async function runGeminiRefacing(params: {
   });
   
   return base64Result;
-}
-
-// Legacy nano-banana function kept for fallback
-async function runNanoBananaEdit(params: { originalUrl: string; positive: string }) {
-  const { originalUrl, positive } = params;
-
-  // We consolidate on a single high-quality image editing model
-  const model = "google/nano-banana";
-
-  const input = {
-    prompt: positive,
-    image_input: [originalUrl],
-    output_format: "jpg",
-  };
-
-  const output = (await replicate.run(
-    model as `${string}/${string}` | `${string}/${string}:${string}`,
-    { input },
-  )) as any;
-
-  let outUrl: string | undefined;
-
-  if (typeof output === "string") {
-    outUrl = output;
-  } else if (Array.isArray(output)) {
-    const first = output[0];
-    if (typeof first === "string") {
-      outUrl = first;
-    } else if (first && typeof first.url === "function") {
-      outUrl = first.url();
-    }
-  } else if (output && typeof output.url === "function") {
-    outUrl = output.url();
-  } else if (typeof output?.uri === "string") {
-    outUrl = output.uri;
-  }
-
-  if (!outUrl) {
-    throw new Error("google/nano-banana did not return an image URL");
-  }
-
-  return outUrl;
-}
-
-// Flux img2img on cabinet mask (or full image if no mask)
-async function runFluxCabinetRedesign(params: {
-  imageUrl: string;
-  maskUrl: string | null;
-  positive: string;
-  negative: string;
-}) {
-  const fluxModel = process.env.REPLICATE_FLUX_FILL_MODEL;
-  const { imageUrl, maskUrl, positive, negative } = params;
-
-  // Fallback to SDXL if Flux model not set
-  const model = fluxModel || "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b";
-  
-  try {
-    const input: any = {
-      image: imageUrl,
-      prompt: positive,
-      negative_prompt: negative,
-      guidance_scale: 7.5,
-      num_inference_steps: 30,
-      strength: 0.75,
-    };
-
-    // Only add mask if we have one
-    if (maskUrl) {
-      input.mask = maskUrl;
-    }
-
-    const res = (await replicate.run(
-      model as `${string}/${string}` | `${string}/${string}:${string}`,
-      { input },
-    )) as any;
-
-    const outUrl: string | undefined = Array.isArray(res) ? res[0] : res?.output?.[0] ?? res;
-    if (!outUrl) throw new Error("Image generation did not return a URL");
-    return outUrl;
-  } catch (err) {
-    console.error("⚠️ Flux/SDXL generation failed:", err);
-    throw err;
-  }
-}
-
-// Optional ControlNet style enforcement
-async function runControlNetStylePass(params: {
-  imageUrl: string;
-  positive: string;
-  negative: string;
-  style: string | null;
-}) {
-  const model = process.env.REPLICATE_SDXL_CONTROLNET_MODEL;
-  if (!model) {
-    console.warn("⚠️ REPLICATE_SDXL_CONTROLNET_MODEL not set, skipping ControlNet");
-    return params.imageUrl;
-  }
-  const { imageUrl, positive, negative, style } = params;
-
-  try {
-    const loraMap: Record<string, string> = {
-      shaker: "Shaker-Cabinets-LoRA",
-      modern: "Modern-Kitchen-LoRA",
-      coastal: "Coastal-Interior-LoRA",
-      traditional: "Traditional-Kitchen-LoRA",
-    };
-
-    const styleKey = style?.toLowerCase() ?? "";
-    const loraName =
-      loraMap[styleKey] ??
-      "Shaker-Cabinets-LoRA"; // default to shaker-style if unknown
-
-    const res = (await replicate.run(
-      model as `${string}/${string}` | `${string}/${string}:${string}`,
-      {
-        input: {
-          image: imageUrl,
-          prompt: positive + `, interior design style: ${style ?? "modern shaker"}`,
-          negative_prompt: negative,
-          lora: loraName,
-          control_mode: "balanced",
-          steps: 20,
-        },
-      },
-    )) as any;
-
-    const outUrl: string | undefined = Array.isArray(res) ? res[0] : res?.output?.[0];
-    if (!outUrl) {
-      console.warn("⚠️ ControlNet did not return an image, using input");
-      return imageUrl;
-    }
-    return outUrl;
-  } catch (err) {
-    console.error("⚠️ ControlNet failed, using input image:", err);
-    return imageUrl;
-  }
-}
-
-// Optional Instant-ID hook (kept minimal)
-async function maybeRunInstantId(params: {
-  baseImageUrl: string;
-}) {
-  const model = process.env.REPLICATE_INSTANT_ID_MODEL;
-  if (!model) return params.baseImageUrl;
-
-  const res = (await replicate.run(
-    model as `${string}/${string}` | `${string}/${string}:${string}`,
-    {
-      input: {
-        image: params.baseImageUrl,
-      },
-    },
-  )) as any;
-
-  const outUrl: string | undefined = Array.isArray(res) ? res[0] : res?.output?.[0];
-  return outUrl ?? params.baseImageUrl;
 }
 
 export async function runVisualizerPipeline(
@@ -377,85 +177,18 @@ export async function runVisualizerPipeline(
     contentType,
   });
 
-  // 2) AEON Universal Prompt Generator
-  // Analyze the kitchen image for intelligent prompt generation
-  const useAeonPromptGenerator = process.env.USE_AEON_PROMPT_GENERATOR !== "false";
+  // 2) Generate prompt description for record-keeping
+  // We use the new AEON Universal Prompt Generator logic to create a descriptive string
+  // even though Gemini handles the actual generation logic internally.
+  const doorStyleId: DoorStyleId = (style as DoorStyleId) || "shaker";
+  const hwStyleId: HardwareStyleId = (hardwareStyle as HardwareStyleId) || "loft";
+  const hwFinishId: HardwareFinishId = (hardwareColor?.toLowerCase().replace(/\s+/g, "") as HardwareFinishId) || "satinnickel";
   
-  let enhanced_prompt: string;
+  const colorText = humanizeSelection(color, "Classic White");
+  const colorHex = getColorHex(color || "classic-white");
   
-  if (useAeonPromptGenerator) {
-    // Use the new AEON Universal Prompt Generator
-    const analysis = await analyzeKitchenImage(originalUrl);
-    
-    // Map style strings to DoorStyleId
-    const doorStyleId: DoorStyleId = (style as DoorStyleId) || "shaker";
-    const hwStyleId: HardwareStyleId = (hardwareStyle as HardwareStyleId) || "loft";
-    const hwFinishId: HardwareFinishId = (hardwareColor?.toLowerCase().replace(/\s+/g, "") as HardwareFinishId) || "satinnickel";
-    
-    // Get color info
-    const colorText = humanizeSelection(color, "Classic White");
-    const colorHex = getColorHex(color || "classic-white");
-    
-    enhanced_prompt = buildKitchenRefacingPrompt({
-      imageDescription: analysis.imageDescription,
-      doorStyle: doorStyleId,
-      colorHex,
-      colorName: colorText,
-      hardwareStyle: hwStyleId,
-      hardwareFinish: hwFinishId,
-      drawersMissing: analysis.drawersMissing,
-      isAngledPhoto: analysis.isAngledPhoto,
-      hasArchedDoors: analysis.hasArchedDoors,
-      lighting: analysis.lighting,
-      needsCleanup: analysis.needsCleanup,
-      warpedPerspective: analysis.warpedPerspective,
-    });
-    
-    console.log("🦊 AEON Prompt Generated with analysis:", {
-      drawersMissing: analysis.drawersMissing,
-      isAngledPhoto: analysis.isAngledPhoto,
-      hasArchedDoors: analysis.hasArchedDoors,
-      lighting: analysis.lighting,
-    });
-  } else {
-    // Fallback to legacy prompt enhancement
-    const doorStyleMap: Record<string, string> = {
-      "shaker": "Shaker Classic cabinet doors",
-      "shaker-slide": "Shaker Slide cabinet doors",
-      "slab": "Slab flat-panel cabinet doors",
-      "fusion-shaker": "Fusion Shaker cabinet doors",
-      "fusion-slide": "Fusion Slide cabinet doors",
-    };
-
-    const styleText =
-      (style && doorStyleMap[style]) ||
-      humanizeSelection(style, "Shaker Classic cabinet doors");
-    const colorText = humanizeSelection(color, "Classic White");
-    const hardwareSelectionRaw =
-      (hardware && hardware.trim()) ||
-      [hardwareColor, hardwareStyle].filter(Boolean).join(" ");
-    const hardwareText = humanizeSelection(
-      hardwareSelectionRaw || null,
-      "Satin Nickel",
-    );
-
-    const basePrompt =
-      `Replace all existing kitchen cabinet doors and drawer fronts with new ${colorText} ${styleText}, and install ${hardwareText} knobs and pulls on every door and drawer. ` +
-      "Keep the cabinet boxes, countertops, appliances, backsplash, flooring, walls, windows, lighting, and layout unchanged.";
-
-    const mergedUserPrompt =
-      userPrompt && userPrompt.trim().length > 0
-        ? `${basePrompt} ${userPrompt.trim()}`
-        : basePrompt;
-
-    const result = await enhanceCabinetPrompt({
-      userPrompt: mergedUserPrompt,
-      style: styleText,
-      color: colorText,
-      hardware: hardwareText,
-    });
-    enhanced_prompt = result.enhanced_prompt;
-  }
+  // Simple prompt construction for DB record
+  const enhanced_prompt = `Reface kitchen cabinets with ${doorStyleId} style in ${colorText} (${colorHex}). Hardware: ${hwStyleId} in ${hwFinishId}. ${userPrompt || ""}`;
 
   // 3) Single-stage edit with Gemini (geometry replacement)
   console.log("🧠 Running Gemini cabinet refacing...");
@@ -463,8 +196,8 @@ export async function runVisualizerPipeline(
     imageBuffer: normalizedBuffer,
     style,
     color,
-    hardwareStyle,
-    hardwareColor,
+    hardwareStyle: hardwareStyle || null,
+    hardwareColor: hardwareColor || null,
   });
   
   // Upload Gemini result to Supabase
