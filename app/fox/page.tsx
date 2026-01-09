@@ -57,7 +57,7 @@ export default function FoxAR() {
     const loader = new GLTFLoader();
     loader.load("/models/fox.glb", (gltf) => {
       fox.current.setModel(gltf.scene, gltf.animations);
-      gltf.scene.scale.set(0.6, 0.6, 0.6);
+      gltf.scene.scale.set(0.25, 0.25, 0.25);
       gltf.scene.visible = false;
       scene.add(gltf.scene);
     });

@@ -7,6 +7,7 @@ import { useEffect, useState, Suspense } from "react";
 import { FadeIn, SlideUp, StaggerContainer, ScaleOnHover } from "@/app/components/ui/Motion";
 import { HomepageLinking } from "./components/linking/InternalLinking";
 import { CTAButton } from "./components/CTAButton";
+import CountUp from "./components/CountUp";
 
 function SuccessToast() {
   const searchParams = useSearchParams();
@@ -117,6 +118,45 @@ export default function HomePage() {
               </FadeIn>
             ))}
           </StaggerContainer>
+        </div>
+      </section>
+
+      {/* Statistics Section */}
+      <section className="py-12 border-b border-white/10" style={{ background: '#0f0f18' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {/* Stat 1 */}
+            <div className="flex flex-col items-center">
+              <div className="text-3xl sm:text-4xl font-bold text-[#FF8A3D] mb-2">
+                <CountUp to={10} duration={2} />+
+              </div>
+              <div className="text-xs sm:text-sm uppercase tracking-widest text-white/60">Years Experience</div>
+            </div>
+
+            {/* Stat 2 */}
+            <div className="flex flex-col items-center">
+              <div className="text-3xl sm:text-4xl font-bold text-[#FF8A3D] mb-2">
+                <CountUp to={500} duration={2} />+
+              </div>
+              <div className="text-xs sm:text-sm uppercase tracking-widest text-white/60">Kitchens Transformed</div>
+            </div>
+
+            {/* Stat 3 */}
+            <div className="flex flex-col items-center">
+              <div className="text-3xl sm:text-4xl font-bold text-[#FF8A3D] mb-2">
+                <CountUp to={3} duration={1.5} />-<CountUp to={5} duration={2} />
+              </div>
+              <div className="text-xs sm:text-sm uppercase tracking-widest text-white/60">Days Average</div>
+            </div>
+
+            {/* Stat 4 */}
+            <div className="flex flex-col items-center">
+              <div className="text-3xl sm:text-4xl font-bold text-[#FF8A3D] mb-2">
+                <CountUp to={100} duration={2} />%
+              </div>
+              <div className="text-xs sm:text-sm uppercase tracking-widest text-white/60">Satisfaction</div>
+            </div>
+          </div>
         </div>
       </section>
 
