@@ -245,20 +245,20 @@ export default function KitchenVisualizer({
   // ============ RENDER: UPLOAD STAGE ============
   if (stage === "upload") {
     return (
-      <div className={`bg-slate-900 rounded-3xl p-8 ${className}`}>
+      <div className={`bg-slate-950 rounded-3xl p-8 ${className}`}>
         <div className="text-center mb-8">
           <h2 className="text-3xl font-bold text-white mb-2">See Your New Kitchen</h2>
-          <p className="text-slate-400">Upload a photo to get started</p>
+          <p className="text-slate-300">Upload a photo to get started</p>
         </div>
 
         <div
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-slate-600 rounded-2xl p-12 cursor-pointer hover:border-orange-500 transition-colors"
+          className="border-2 border-dashed border-slate-700 rounded-2xl p-12 cursor-pointer hover:border-orange-500 transition-colors"
         >
           <div className="text-center">
             <div className="text-5xl mb-4">📸</div>
             <p className="text-white font-medium mb-2">Click to upload your kitchen photo</p>
-            <p className="text-slate-500 text-sm">JPG, PNG up to 10MB</p>
+            <p className="text-slate-400 text-sm">JPG, PNG up to 10MB</p>
           </div>
         </div>
 
@@ -276,19 +276,19 @@ export default function KitchenVisualizer({
   // ============ RENDER: CONFIGURE STAGE ============
   if (stage === "configure") {
     return (
-      <div className={`bg-slate-900 rounded-3xl p-6 ${className}`}>
+      <div className={`bg-slate-950 rounded-3xl p-6 ${className}`}>
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Preview */}
           <div>
             <h3 className="text-white font-semibold mb-3">Your Kitchen</h3>
-            <div className="aspect-video rounded-xl overflow-hidden bg-slate-800">
+            <div className="aspect-video rounded-xl overflow-hidden bg-slate-900">
               {previewUrl && (
                 <img src={previewUrl} alt="Kitchen preview" className="w-full h-full object-cover" />
               )}
             </div>
             <button
               onClick={handleReset}
-              className="mt-3 text-sm text-slate-400 hover:text-white transition-colors"
+              className="mt-3 text-sm text-slate-300 hover:text-white transition-colors"
             >
               ← Upload different photo
             </button>
@@ -307,7 +307,7 @@ export default function KitchenVisualizer({
                     className={`p-3 rounded-xl text-left transition-all ${
                       config.doorStyle === style.id
                         ? "bg-orange-500 text-white"
-                        : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                        : "bg-slate-900 text-slate-200 hover:bg-slate-800"
                     }`}
                   >
                     <div className="font-medium text-sm">{style.label}</div>
@@ -328,14 +328,14 @@ export default function KitchenVisualizer({
                     className={`w-10 h-10 rounded-full border-2 transition-all ${
                       config.colorHex === color.hex
                         ? "border-orange-500 scale-110"
-                        : "border-slate-600 hover:border-slate-400"
+                        : "border-slate-700 hover:border-slate-500"
                     }`}
                     style={{ backgroundColor: color.hex }}
                     title={color.name}
                   />
                 ))}
               </div>
-              <p className="text-slate-400 text-xs mt-1">{config.colorName}</p>
+              <p className="text-slate-300 text-xs mt-1">{config.colorName}</p>
             </div>
 
             {/* Hardware Style */}
@@ -349,7 +349,7 @@ export default function KitchenVisualizer({
                     className={`px-4 py-2 rounded-full text-sm transition-all ${
                       config.hardwareStyle === hw.id
                         ? "bg-orange-500 text-white"
-                        : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                        : "bg-slate-900 text-slate-200 hover:bg-slate-800"
                     }`}
                   >
                     {hw.label}
@@ -369,7 +369,7 @@ export default function KitchenVisualizer({
                     className={`px-4 py-2 rounded-full text-sm transition-all ${
                       config.hardwareFinish === finish.id
                         ? "bg-orange-500 text-white"
-                        : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                        : "bg-slate-900 text-slate-200 hover:bg-slate-800"
                     }`}
                   >
                     {finish.label}
@@ -386,7 +386,7 @@ export default function KitchenVisualizer({
                   type="text"
                   value={config.name}
                   onChange={(e) => setConfig((prev) => ({ ...prev, name: e.target.value }))}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
                   placeholder="Full name"
                 />
               </div>
@@ -396,7 +396,7 @@ export default function KitchenVisualizer({
                   type="tel"
                   value={config.phone}
                   onChange={(e) => setConfig((prev) => ({ ...prev, phone: e.target.value }))}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
+                  className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm"
                   placeholder="(555) 123-4567"
                 />
               </div>
@@ -426,16 +426,16 @@ export default function KitchenVisualizer({
   // ============ RENDER: LOADING STAGE ============
   if (stage === "loading") {
     return (
-      <div className={`bg-slate-900 rounded-3xl p-12 text-center ${className}`}>
+      <div className={`bg-slate-950 rounded-3xl p-12 text-center ${className}`}>
         <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center text-4xl animate-pulse"
           style={{ background: "linear-gradient(135deg, rgba(255, 138, 61, 0.25) 0%, rgba(255, 107, 53, 0.15) 100%)" }}>
           🏠
         </div>
         
         <h2 className="text-2xl font-bold text-white mb-2">{loadingMessage}</h2>
-        <p className="text-slate-400 mb-8">This usually takes 15-30 seconds</p>
+        <p className="text-slate-300 mb-8">This usually takes 15-30 seconds</p>
 
-        <div className="max-w-md mx-auto bg-slate-800 rounded-full h-2 overflow-hidden mb-4">
+        <div className="max-w-md mx-auto bg-slate-900 rounded-full h-2 overflow-hidden mb-4">
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{
@@ -444,7 +444,7 @@ export default function KitchenVisualizer({
             }}
           />
         </div>
-        <p className="text-slate-500 text-sm">{Math.round(loadingProgress)}% complete</p>
+        <p className="text-slate-400 text-sm">{Math.round(loadingProgress)}% complete</p>
       </div>
     );
   }
@@ -452,7 +452,7 @@ export default function KitchenVisualizer({
   // ============ RENDER: RESULT STAGE ============
   if (stage === "result" && result) {
     return (
-      <div className={`bg-slate-900 rounded-3xl p-6 ${className}`}>
+      <div className={`bg-slate-950 rounded-3xl p-6 ${className}`}>
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold text-white mb-4"
             style={{ background: "linear-gradient(135deg, #FF8A3D, #FF6B35)" }}>
@@ -510,7 +510,7 @@ export default function KitchenVisualizer({
         <div className="flex gap-4 justify-center">
           <button
             onClick={handleReset}
-            className="px-6 py-3 rounded-xl bg-slate-800 text-white font-medium hover:bg-slate-700 transition-colors"
+            className="px-6 py-3 rounded-xl bg-slate-900 text-white font-medium hover:bg-slate-800 transition-colors"
           >
             ← Try Different Options
           </button>
