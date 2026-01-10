@@ -102,7 +102,7 @@ function Uploader({ onUpload }: { onUpload: (base64s: string[], files: File[]) =
 
   return (
     <div 
-      className="border-2 border-dashed border-slate-300 rounded-[3rem] p-16 text-center bg-white hover:border-[#f07c3c] hover:bg-orange-50/10 transition-all cursor-pointer group"
+      className="border-2 border-dashed border-slate-700 rounded-[3rem] p-16 text-center bg-slate-900 hover:border-[#f07c3c] hover:bg-slate-800 transition-all cursor-pointer group"
       onClick={() => fileInputRef.current?.click()}
     >
       <input 
@@ -114,16 +114,16 @@ function Uploader({ onUpload }: { onUpload: (base64s: string[], files: File[]) =
         onChange={handleFileChange} 
       />
       <div className="flex flex-col items-center gap-6">
-        <div className="w-20 h-20 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-[#f07c3c] group-hover:text-white transition-all duration-300">
+        <div className="w-20 h-20 bg-slate-800 text-slate-400 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-[#f07c3c] group-hover:text-white transition-all duration-300">
           <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
         <div className="space-y-2">
-          <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">Upload Your Kitchen Photos</h3>
-          <p className="text-slate-500 font-medium">Select multiple angles to visualize the full transformation.</p>
+          <h3 className="text-2xl font-black text-white uppercase tracking-tight">Upload Your Kitchen Photos</h3>
+          <p className="text-slate-300 font-medium">Select multiple angles to visualize the full transformation.</p>
         </div>
-        <button className="bg-slate-900 text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#f07c3c] transition-colors shadow-lg">
+        <button className="bg-[#f07c3c] text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#d96a2e] transition-colors shadow-lg">
           Select Photos
         </button>
       </div>
@@ -150,7 +150,7 @@ function ComparisonSlider({ original, modified }: { original: string; modified: 
   return (
     <div 
       ref={containerRef}
-      className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl cursor-col-resize select-none border-4 border-white"
+      className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl cursor-col-resize select-none border-4 border-slate-800"
       onMouseMove={onMouseMove}
       onTouchMove={onTouchMove}
     >
@@ -212,9 +212,9 @@ function SelectionPanel({
   };
 
   return (
-    <div className="bg-white rounded-[3rem] shadow-2xl border border-slate-100 overflow-hidden flex flex-col max-h-[calc(100vh-8rem)]">
+    <div className="bg-slate-900 rounded-[3rem] shadow-2xl border border-slate-800 overflow-hidden flex flex-col max-h-[calc(100vh-8rem)]">
       {/* Tabs */}
-      <div className="flex border-b border-slate-100 flex-shrink-0">
+      <div className="flex border-b border-slate-800 flex-shrink-0">
         {[
           { id: "door", label: "1. Style" },
           { id: "finish", label: "2. Color" },
@@ -225,8 +225,8 @@ function SelectionPanel({
             onClick={() => setActiveTab(tab.id as "door" | "finish" | "hardware")}
             className={`flex-1 py-4 text-[10px] font-black uppercase tracking-widest transition-colors ${
               activeTab === tab.id 
-                ? "bg-slate-900 text-white" 
-                : "bg-white text-slate-400 hover:text-slate-900"
+                ? "bg-[#f07c3c] text-white" 
+                : "bg-slate-800 text-slate-400 hover:text-slate-200"
             }`}
           >
             {tab.label}
@@ -238,7 +238,7 @@ function SelectionPanel({
         {/* DOOR SELECTION */}
         {activeTab === "door" && (
           <div className="space-y-6">
-            <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Select Door Profile</h3>
+            <h3 className="text-xl font-black text-white uppercase tracking-tight">Select Door Profile</h3>
             <div className="grid grid-cols-1 gap-4">
               {DOOR_STYLES.map((style) => (
                 <button
@@ -247,7 +247,7 @@ function SelectionPanel({
                   className={`relative group overflow-hidden rounded-2xl border-4 transition-all text-left h-32 ${
                     selections.doorStyle === style.id
                       ? "border-[#f07c3c] shadow-lg scale-[1.02]" 
-                      : "border-white shadow-md hover:border-slate-200"
+                      : "border-slate-800 shadow-md hover:border-slate-700"
                   }`}
                 >
                   <img src={style.src} alt={style.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
@@ -264,7 +264,7 @@ function SelectionPanel({
                 </button>
               ))}
             </div>
-            <button onClick={() => setActiveTab("finish")} className="w-full py-4 bg-slate-100 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 mt-4">
+            <button onClick={() => setActiveTab("finish")} className="w-full py-4 bg-slate-800 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 mt-4">
               Next: Finish →
             </button>
           </div>
@@ -273,9 +273,9 @@ function SelectionPanel({
         {/* FINISH SELECTION */}
         {activeTab === "finish" && (
           <div className="space-y-6">
-            <div className="flex justify-between items-end border-b border-slate-50 pb-4">
-              <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Select Finish</h3>
-              <span className="text-[10px] font-bold text-slate-400">{selections.doorStyle}</span>
+            <div className="flex justify-between items-end border-b border-slate-800 pb-4">
+              <h3 className="text-xl font-black text-white uppercase tracking-tight">Select Finish</h3>
+              <span className="text-[10px] font-bold text-slate-500">{selections.doorStyle}</span>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {availableFinishes.map((finish) => (
@@ -284,27 +284,27 @@ function SelectionPanel({
                   onClick={() => onChange({ finish })}
                   className={`flex items-center gap-3 p-2 rounded-xl border-2 transition-all text-left ${
                     selections.finish.id === finish.id 
-                      ? "border-[#f07c3c] bg-orange-50/20" 
-                      : "border-slate-100 hover:border-slate-200"
+                      ? "border-[#f07c3c] bg-orange-500/10" 
+                      : "border-slate-800 hover:border-slate-700"
                   }`}
                 >
                   <div 
-                    className="w-12 h-12 rounded-lg flex-shrink-0 shadow-sm border border-slate-200"
+                    className="w-12 h-12 rounded-lg flex-shrink-0 shadow-sm border border-slate-700"
                     style={{ 
                       backgroundColor: finish.hex,
                       backgroundImage: finish.isWoodGrain ? `repeating-linear-gradient(90deg, ${finish.hex}, ${finish.hex} 2px, transparent 2px, transparent 4px)` : undefined
                     }}
                   />
                   <div>
-                    <div className={`text-xs font-black uppercase leading-none mb-1 ${selections.finish.id === finish.id ? "text-[#f07c3c]" : "text-slate-900"}`}>
+                    <div className={`text-xs font-black uppercase leading-none mb-1 ${selections.finish.id === finish.id ? "text-[#f07c3c]" : "text-white"}`}>
                       {finish.name}
                     </div>
-                    <div className="text-[9px] text-slate-400 font-medium leading-none">{finish.isWoodGrain ? "Wood Grain" : "Solid"}</div>
+                    <div className="text-[9px] text-slate-500 font-medium leading-none">{finish.isWoodGrain ? "Wood Grain" : "Solid"}</div>
                   </div>
                 </button>
               ))}
             </div>
-            <button onClick={() => setActiveTab("hardware")} className="w-full py-4 bg-slate-100 text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-200 mt-4">
+            <button onClick={() => setActiveTab("hardware")} className="w-full py-4 bg-slate-800 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 mt-4">
               Next: Hardware →
             </button>
           </div>
@@ -313,11 +313,11 @@ function SelectionPanel({
         {/* HARDWARE SELECTION */}
         {activeTab === "hardware" && (
           <div className="space-y-6">
-            <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">Hardware</h3>
+            <h3 className="text-xl font-black text-white uppercase tracking-tight">Hardware</h3>
             
             <div className="space-y-6">
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest ml-1">Style</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Style</label>
                 <div className="grid grid-cols-3 gap-3">
                   {HARDWARE_CATALOG.map(h => (
                     <button
@@ -325,18 +325,18 @@ function SelectionPanel({
                       onClick={() => onChange({ hardwareStyle: h.name, hardwareFinish: h.finishes[0] })}
                       className={`py-3 px-2 rounded-xl text-center border-2 transition-all ${
                         selections.hardwareStyle === h.name 
-                          ? "border-[#f07c3c] bg-orange-50/20" 
-                          : "border-slate-100 hover:border-slate-200"
+                          ? "border-[#f07c3c] bg-orange-500/10" 
+                          : "border-slate-800 hover:border-slate-700"
                       }`}
                     >
-                      <div className="text-[10px] font-black uppercase">{h.name}</div>
+                      <div className="text-[10px] font-black uppercase text-white">{h.name}</div>
                     </button>
                   ))}
                 </div>
               </div>
 
               <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-300 uppercase tracking-widest ml-1">Finish</label>
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Finish</label>
                 <div className="flex flex-wrap gap-2">
                   {selectedHardware.finishes.map(f => (
                     <button
@@ -344,8 +344,8 @@ function SelectionPanel({
                       onClick={() => onChange({ hardwareFinish: f })}
                       className={`px-4 py-3 rounded-lg text-[9px] font-black uppercase border-2 transition-all ${
                         selections.hardwareFinish === f 
-                          ? "border-slate-900 bg-slate-900 text-white shadow-lg" 
-                          : "border-slate-100 text-slate-400 hover:border-slate-300"
+                          ? "border-[#f07c3c] bg-[#f07c3c] text-white shadow-lg" 
+                          : "border-slate-800 text-slate-400 hover:border-slate-700"
                       }`}
                     >
                       {f}
@@ -360,7 +360,7 @@ function SelectionPanel({
               disabled={isLoading}
               className={`w-full py-5 mt-4 rounded-xl font-black uppercase tracking-[0.2em] text-xs shadow-xl transition-all ${
                 isLoading 
-                  ? "bg-slate-100 text-slate-400 cursor-not-allowed" 
+                  ? "bg-slate-800 text-slate-600 cursor-not-allowed" 
                   : "bg-[#f07c3c] text-white hover:bg-[#d96a2e] active:scale-[0.98]"
               }`}
             >
@@ -406,39 +406,39 @@ function LeadCaptureModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-[2rem] p-8 max-w-md w-full shadow-2xl">
-        <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight mb-2">Before We Visualize</h2>
-        <p className="text-slate-500 mb-6">Enter your info so we can send you your transformation results.</p>
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <div className="bg-slate-900 rounded-[2rem] p-8 max-w-md w-full shadow-2xl border border-slate-800">
+        <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Before We Visualize</h2>
+        <p className="text-slate-300 mb-6">Enter your info so we can send you your transformation results.</p>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Full Name</label>
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Full Name</label>
             <input 
               type="text" 
               value={name} 
               onChange={(e) => setName(e.target.value)} 
-              className="w-full px-4 py-3 rounded-xl border-2 border-slate-100 focus:border-[#f07c3c] outline-none transition-colors"
+              className="w-full px-4 py-3 rounded-xl border-2 border-slate-800 bg-slate-950 text-white focus:border-[#f07c3c] outline-none transition-colors"
               placeholder="John Smith"
             />
           </div>
           <div>
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Phone</label>
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Phone</label>
             <input 
               type="tel" 
               value={phone} 
               onChange={(e) => setPhone(e.target.value)} 
-              className="w-full px-4 py-3 rounded-xl border-2 border-slate-100 focus:border-[#f07c3c] outline-none transition-colors"
+              className="w-full px-4 py-3 rounded-xl border-2 border-slate-800 bg-slate-950 text-white focus:border-[#f07c3c] outline-none transition-colors"
               placeholder="(555) 123-4567"
             />
           </div>
           <div>
-            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Email</label>
+            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Email</label>
             <input 
               type="email" 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
-              className="w-full px-4 py-3 rounded-xl border-2 border-slate-100 focus:border-[#f07c3c] outline-none transition-colors"
+              className="w-full px-4 py-3 rounded-xl border-2 border-slate-800 bg-slate-950 text-white focus:border-[#f07c3c] outline-none transition-colors"
               placeholder="john@email.com"
             />
           </div>
@@ -450,7 +450,7 @@ function LeadCaptureModal({
             disabled={isLoading}
             className={`w-full py-4 rounded-xl font-black uppercase tracking-widest text-sm transition-all ${
               isLoading 
-                ? "bg-slate-100 text-slate-400" 
+                ? "bg-slate-800 text-slate-600" 
                 : "bg-[#f07c3c] text-white hover:bg-[#d96a2e]"
             }`}
           >
@@ -567,26 +567,26 @@ export default function CabinetVisionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fffcf9] flex flex-col font-['Inter']">
+    <div className="min-h-screen bg-slate-950 flex flex-col font-['Inter']">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-2xl border-b border-slate-50 sticky top-0 z-50">
+      <header className="bg-slate-900/80 backdrop-blur-2xl border-b border-slate-800 sticky top-0 z-50">
         <div className="container mx-auto px-4 h-28 flex items-center justify-between">
           <a href="/" className="flex items-center gap-5 group cursor-default">
             <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center shadow-2xl shadow-slate-200 group-hover:rotate-6 transition-transform duration-500">
               <span className="text-white font-black text-2xl">V</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-black text-3xl text-slate-900 leading-none tracking-tighter uppercase">Vulpine</span>
+              <span className="font-black text-3xl text-white leading-none tracking-tighter uppercase">Vulpine</span>
               <span className="font-black text-[11px] text-[#f07c3c] tracking-[0.5em] leading-none uppercase mt-1">Homes</span>
             </div>
           </a>
           
           <div className="flex items-center gap-8">
             <div className="hidden xl:block text-right">
-              <p className="text-[10px] font-black text-slate-300 uppercase tracking-widest leading-none mb-1">Direct Support</p>
-              <p className="text-base font-black text-slate-900 leading-none tracking-tight">(480) 364 8205</p>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Direct Support</p>
+              <p className="text-base font-black text-white leading-none tracking-tight">(480) 364 8205</p>
             </div>
-            <a href="tel:480-364-8205" className="bg-slate-900 text-white px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-[#f07c3c] transition-all shadow-xl shadow-slate-100 active:scale-95">
+            <a href="tel:480-364-8205" className="bg-[#f07c3c] text-white px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-[#d96a2e] transition-all shadow-xl shadow-orange-500/20 active:scale-95">
               Book Appointment
             </a>
           </div>
@@ -598,8 +598,8 @@ export default function CabinetVisionPage() {
           {vizState.originalImages.length === 0 ? (
             <div className="max-w-3xl mx-auto py-16 space-y-12">
               <div className="text-center space-y-4">
-                <h2 className="text-5xl font-black text-slate-900 tracking-tighter uppercase">Visualizer</h2>
-                <p className="text-xl text-slate-500 font-medium">Upload photos of your existing kitchen to start.</p>
+                <h2 className="text-5xl font-black text-white tracking-tighter uppercase">Visualizer</h2>
+                <p className="text-xl text-slate-300 font-medium">Upload photos of your existing kitchen to start.</p>
               </div>
               <Uploader onUpload={handleUpload} />
             </div>
@@ -607,7 +607,7 @@ export default function CabinetVisionPage() {
             <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
               {/* Left Column: Visualizer Window */}
               <div className="xl:col-span-8 space-y-6">
-                <div className="bg-slate-900 rounded-[3rem] p-4 shadow-2xl relative overflow-hidden border-[12px] border-white ring-1 ring-slate-100">
+                <div className="bg-slate-900 rounded-[3rem] p-4 shadow-2xl relative overflow-hidden border-[12px] border-slate-800 ring-1 ring-slate-700">
                   <div className="relative aspect-video rounded-[2.5rem] overflow-hidden bg-black">
                     {vizState.modifiedImages[vizState.currentImageIndex] ? (
                       <ComparisonSlider 
@@ -654,7 +654,7 @@ export default function CabinetVisionPage() {
                       className={`relative w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden border-4 transition-all ${
                         vizState.currentImageIndex === idx 
                           ? "border-[#f07c3c] shadow-lg scale-105" 
-                          : "border-white opacity-60 hover:opacity-100"
+                          : "border-slate-800 opacity-60 hover:opacity-100"
                       }`}
                     >
                       <img src={img} alt={`Photo ${idx + 1}`} className="w-full h-full object-cover" />
@@ -665,7 +665,7 @@ export default function CabinetVisionPage() {
                   ))}
                   <button 
                     onClick={() => setVizState({ originalImages: [], modifiedImages: {}, currentImageIndex: 0, isLoading: false, error: null })}
-                    className="w-24 h-24 flex-shrink-0 rounded-2xl border-4 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400 hover:border-[#f07c3c] hover:text-[#f07c3c] bg-white transition-colors"
+                    className="w-24 h-24 flex-shrink-0 rounded-2xl border-4 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500 hover:border-[#f07c3c] hover:text-[#f07c3c] bg-slate-900 transition-colors"
                   >
                     <span className="text-2xl font-black">+</span>
                     <span className="text-[9px] font-black uppercase">New</span>
@@ -688,20 +688,20 @@ export default function CabinetVisionPage() {
                   isLoading={vizState.isLoading}
                 />
                 
-                <div className="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm">
-                  <h4 className="text-[10px] font-black text-slate-300 uppercase tracking-widest mb-4">Current Specification</h4>
+                <div className="bg-slate-900 p-8 rounded-[3rem] border border-slate-800 shadow-sm">
+                  <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Current Specification</h4>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-xs font-bold text-slate-500">Door</span>
-                      <span className="text-xs font-black text-slate-900 uppercase">{selections.doorStyle}</span>
+                      <span className="text-xs font-bold text-slate-400">Door</span>
+                      <span className="text-xs font-black text-white uppercase">{selections.doorStyle}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-xs font-bold text-slate-500">Color</span>
-                      <span className="text-xs font-black text-slate-900 uppercase">{selections.finish.name}</span>
+                      <span className="text-xs font-bold text-slate-400">Color</span>
+                      <span className="text-xs font-black text-white uppercase">{selections.finish.name}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-xs font-bold text-slate-500">Hardware</span>
-                      <span className="text-xs font-black text-slate-900 uppercase">{selections.hardwareStyle}</span>
+                      <span className="text-xs font-bold text-slate-400">Hardware</span>
+                      <span className="text-xs font-black text-white uppercase">{selections.hardwareStyle}</span>
                     </div>
                   </div>
                 </div>
