@@ -572,13 +572,11 @@ export default function CabinetVisionPage() {
       <header className="bg-slate-900/80 backdrop-blur-2xl border-b border-slate-800 sticky top-0 z-50">
         <div className="container mx-auto px-4 h-28 flex items-center justify-between">
           <a href="/" className="flex items-center gap-5 group cursor-default">
-            <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center shadow-2xl shadow-slate-200 group-hover:rotate-6 transition-transform duration-500">
-              <span className="text-white font-black text-2xl">V</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-black text-3xl text-white leading-none tracking-tighter uppercase">Vulpine</span>
-              <span className="font-black text-[11px] text-[#f07c3c] tracking-[0.5em] leading-none uppercase mt-1">Homes</span>
-            </div>
+            <img 
+              src="/marketing/Textvulpine.png" 
+              alt="Vulpine Homes" 
+              className="h-12 w-auto object-contain"
+            />
           </a>
           
           <div className="flex items-center gap-8">
