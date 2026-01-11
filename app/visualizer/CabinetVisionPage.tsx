@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import Navigation from "../components/Navigation";
 
 // =============== TYPES ===============
 type DoorStyle = "shaker" | "shaker-slide" | "slab" | "fusion-shaker" | "fusion-slide";
@@ -568,30 +569,11 @@ export default function CabinetVisionPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col font-['Inter']">
-      {/* Header */}
-      <header className="bg-slate-900/80 backdrop-blur-2xl border-b border-slate-800 sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-28 flex items-center justify-between">
-          <a href="/" className="flex items-center gap-5 group cursor-default">
-            <img 
-              src="/marketing/Textvulpine.png" 
-              alt="Vulpine Homes" 
-              className="h-12 w-auto object-contain"
-            />
-          </a>
-          
-          <div className="flex items-center gap-8">
-            <div className="hidden xl:block text-right">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none mb-1">Direct Support</p>
-              <p className="text-base font-black text-white leading-none tracking-tight">(480) 364 8205</p>
-            </div>
-            <a href="tel:480-364-8205" className="bg-[#f07c3c] text-white px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest hover:bg-[#d96a2e] transition-all shadow-xl shadow-orange-500/20 active:scale-95">
-              Book Appointment
-            </a>
-          </div>
-        </div>
-      </header>
+      {/* Navigation */}
+      <Navigation />
       
-      <main className="flex-1 container mx-auto px-4 py-8 lg:px-8">
+      {/* Main Content - add top padding to account for fixed nav */}
+      <main className="flex-1 container mx-auto px-4 py-8 lg:px-8 pt-24">
         <div className="max-w-[1400px] mx-auto">
           {vizState.originalImages.length === 0 ? (
             <div className="max-w-3xl mx-auto py-16 space-y-12">
