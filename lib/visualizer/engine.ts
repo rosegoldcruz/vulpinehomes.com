@@ -1,5 +1,4 @@
 import { supabaseServer } from "../supabaseServer";
-import { refaceCabinetsWithGemini, type DoorStyleId as GeminiDoorStyleId } from "./geminiService";
 import sharp from "sharp";
 
 export type DoorStyleId = "slab" | "shaker" | "shaker-slide" | "fusion-shaker" | "fusion-slide";
@@ -107,29 +106,21 @@ async function uploadToSupabaseBucket(params: {
   return publicUrlData.publicUrl;
 }
 
-// Gemini-based cabinet refacing using geometry replacement
-async function runGeminiRefacing(params: {
-  imageBuffer: Buffer;
+// Get cabinet parameters from Gemini (JSON only, no image generation)
+async function getCabinetParameters(params: {
   style: string | null;
   color: string | null;
   hardwareStyle: string | null;
   hardwareColor: string | null;
-}): Promise<string> {
-  const { imageBuffer, style, color, hardwareStyle, hardwareColor } = params;
+}): Promise<any> {
+  const { style, color, hardwareStyle, hardwareColor } = params;
   
-  // Map style to Gemini door style ID
-  const doorStyleMap: Record<string, GeminiDoorStyleId> = {
-    "shaker": "shaker",
-    "shaker-slide": "shaker-slide",
-    "slab": "slab",
-    "fusion-shaker": "fusion-shaker",
-    "fusion-slide": "fusion-slide",
-  };
+  const { extractCabinetParameters } = await import('./geminiService');
   
-  const doorStyle = doorStyleMap[style || "shaker"] || "shaker";
+  const doorStyle = (style as DoorStyleId) || "shaker";
   const colorInfo = getColorInfo(color || "flour");
   
-  const base64Result = await refaceCabinetsWithGemini(imageBuffer, {
+  const parameters = await extractCabinetParameters({
     doorStyle,
     colorName: colorInfo.name,
     colorHex: colorInfo.hex,
@@ -138,7 +129,7 @@ async function runGeminiRefacing(params: {
     hardwareFinish: hardwareColor || "Satin Nickel",
   });
   
-  return base64Result;
+  return parameters;
 }
 
 export async function runVisualizerPipeline(
@@ -178,8 +169,6 @@ export async function runVisualizerPipeline(
   });
 
   // 2) Generate prompt description for record-keeping
-  // We use the new AEON Universal Prompt Generator logic to create a descriptive string
-  // even though Gemini handles the actual generation logic internally.
   const doorStyleId: DoorStyleId = (style as DoorStyleId) || "shaker";
   const hwStyleId: HardwareStyleId = (hardwareStyle as HardwareStyleId) || "loft";
   const hwFinishId: HardwareFinishId = (hardwareColor?.toLowerCase().replace(/\s+/g, "") as HardwareFinishId) || "satinnickel";
@@ -190,28 +179,22 @@ export async function runVisualizerPipeline(
   // Simple prompt construction for DB record
   const enhanced_prompt = `Reface kitchen cabinets with ${doorStyleId} style in ${colorText} (${colorHex}). Hardware: ${hwStyleId} in ${hwFinishId}. ${userPrompt || ""}`;
 
-  // 3) Single-stage edit with Gemini (geometry replacement)
-  console.log("🧠 Running Gemini cabinet refacing...");
-  const geminiResultBase64 = await runGeminiRefacing({
-    imageBuffer: normalizedBuffer,
+  // 3) Get cabinet parameters from Gemini (server-side only, returns JSON)
+  console.log("🧠 Extracting cabinet parameters from Gemini...");
+  const parameters = await getCabinetParameters({
     style,
     color,
     hardwareStyle: hardwareStyle || null,
     hardwareColor: hardwareColor || null,
   });
   
-  // Upload Gemini result to Supabase
-  const geminiBuffer = Buffer.from(
-    geminiResultBase64.replace(/^data:image\/\w+;base64,/, ""),
-    "base64"
-  );
-  const finalPath = `${imageId}/final.jpg`;
-  const finalUrl = await uploadToSupabaseBucket({
-    bucket: "visualizations",
-    path: finalPath,
-    data: geminiBuffer,
-    contentType: "image/jpeg",
-  });
+  console.log("✅ Parameters extracted:", parameters);
+  
+  // 4) For now, return the original image as "final" since we're doing parameter-based rendering
+  // In production, you would apply these parameters client-side to render the new cabinets
+  const finalUrl = originalUrl; // TODO: Apply parameters client-side
+  
+  // Store parameters in enhanced_prompt for now (could add a parameters field to schema)
 
   // 4) Database operations: ONE lead per submission
   let leadId: string;

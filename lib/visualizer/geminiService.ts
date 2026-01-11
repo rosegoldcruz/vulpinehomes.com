@@ -1,7 +1,10 @@
 // lib/visualizer/geminiService.ts
-// Gemini 2.5 Flash-based cabinet refacing service
+// Vertex AI-based cabinet parameter extraction service
+// Uses service account authentication (ADC) - NO API KEYS
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { VertexAI } from '@google-cloud/vertexai';
+import path from 'path';
+import fs from 'fs';
 
 export type DoorStyleId = "shaker" | "shaker-slide" | "slab" | "fusion-shaker" | "fusion-slide";
 
@@ -14,165 +17,172 @@ export interface RefacingSelections {
   hardwareFinish: string;
 }
 
-function getGeometrySpecs(doorStyle: DoorStyleId): string {
-  switch (doorStyle) {
-    case "shaker":
-      return `
-      IF DOOR_STYLE = SHAKER CLASSIC:
-      - Outer frame thickness: 3/4"
-      - Frame edges: sharp 90-degree square
-      - Center panel: flat, recessed 1/4"
-      - No bevels
-      - No raised molding
-      - Visible internal shadow where panel recess meets frame
-      `;
-    case "shaker-slide":
-      return `
-      IF DOOR_STYLE = SHAKER SLIDE:
-      - Slim frame construction
-      - Frame width ratio: 0.12
-      - Flat center panel recessed 0.15 depth units
-      - Inner edge: micro-bevel only
-      - Modern minimalist geometry
-      `;
-    case "fusion-shaker":
-      return `
-      IF DOOR_STYLE = FUSION SHAKER:
-      - Hybrid topology: SLAB drawer front (flat plane) above SHAKER door.
-      - Door: Outer frame 3/4", flat recessed center panel.
-      - Drawer: Single flat plane, no recess.
-      - Original geometry must be eliminated.
-      `;
-    case "fusion-slide":
-      return `
-      IF DOOR_STYLE = FUSION SLIDE:
-      - Hybrid topology: SLAB drawer front (flat plane) above SLIDE door.
-      - Door: Slim frame (0.12 ratio), micro-bevel edge.
-      - Drawer: Single flat plane, no recess.
-      - Original geometry must be eliminated.
-      `;
-    case "slab":
-      return `
-      IF DOOR_STYLE = SLAB:
-      - Single flat plane
-      - Thickness: 3/4"
-      - No recessed panels
-      - No raised panels
-      - No interior molding
-      - Completely erase all original door geometry
-      `;
-    default:
-      return "";
-  }
+export interface CabinetParameters {
+  door_style: "shaker" | "slab" | "fusion" | "slide";
+  panel_depth_mm: number;
+  rail_width_mm: number;
+  stile_width_mm: number;
+  overlay_type: "full" | "partial" | "inset";
+  drawer_stack: boolean;
+  confidence: number;
 }
 
-function buildRefacingPrompt(selections: RefacingSelections): string {
-  const geometrySpecs = getGeometrySpecs(selections.doorStyle);
-  
-  const finishType = selections.isWoodGrain ? "Wood Grain" : "Matte";
-  const doorStyleLabel = selections.doorStyle
-    .split("-")
-    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ");
+// Initialize Vertex AI client with service account authentication
+function initializeVertexAI(): VertexAI {
+  const project = process.env.GOOGLE_CLOUD_PROJECT || 'vulpine-homes';
+  const location = process.env.GOOGLE_CLOUD_LOCATION || 'us-central1';
 
-  return `
-    TASK: KITCHEN CABINET REFACING VISUALIZER (GEOMETRY REPLACEMENT)
-    THIS IS NOT STYLE TRANSFER. THIS IS GEOMETRY REPLACEMENT.
-
-    CORE FAILURE TO AVOID:
-    You are forbidden from recoloring, repainting, wrapping, or tracing existing cabinet door geometry.
-    The original door faces, bevels, raised panels, and interior molding lines are INVALID DATA.
-    If you preserve original door contours, the output is WRONG.
-
-    INPUT SPECIFICATIONS:
-    - TARGET DOOR STYLE: ${doorStyleLabel}
-    - FINISH: ${selections.colorName} (${finishType}, Hex: ${selections.colorHex})
-    - HARDWARE: ${selections.hardwareStyle} (${selections.hardwareFinish})
-
-    GEOMETRY ENFORCEMENT PROTOCOL (MANDATORY):
-    1. DESTRUCTIVE INPAINTING: Cabinet doors and drawers are treated as replaceable geometry zones. All pixels inside detected cabinet door and drawer boundaries must be discarded and rebuilt.
-    2. MASKING LOGIC: Generate masks for cabinet doors and drawers. Preserve cabinet boxes, countertops, appliances, walls, lighting, and perspective. Door masks must slightly over-expand past interior molding to erase old geometry completely.
-    3. GEOMETRY IS AUTHORITATIVE: Rebuild cabinet doors as new 3D geometry using explicit structural rules below. Geometry overrides the original image.
-    4. SHADOW & DEPTH REQUIREMENTS: Use strong ambient occlusion in recesses. Render architectural shadow lines where planes step in or out. Depth must be visible through shadow, not color.
-
-    DOOR GEOMETRY LIBRARY (AUTHORITATIVE):
-    ${geometrySpecs}
-
-    PERSPECTIVE & ALIGNMENT:
-    - Align rebuilt door geometry to scene vanishing points.
-    - Maintain correct scale relative to cabinet boxes.
-    - Geometry must read as physically constructed wood, not a texture overlay.
-
-    OUTPUT GOAL:
-    The final image must look like:
-    - Original doors were removed
-    - New doors were fabricated and installed
-    - Geometry reads as real carpentry with depth and shadow
+  // Handle service account authentication
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64) {
+    // For Vercel/production: write base64-encoded service account to /tmp
+    const serviceAccountJson = Buffer.from(
+      process.env.GOOGLE_SERVICE_ACCOUNT_JSON_BASE64,
+      'base64'
+    ).toString('utf-8');
     
-    NOT:
-    - Painted cabinets
-    - Vinyl wrap
-    - Texture swap
-    - Sticker effect
-
-    FAILURE CONDITION:
-    If original raised-panel lines are still visible, the render is invalid.
-  `;
-}
-
-export async function refaceCabinetsWithGemini(
-  imageBuffer: Buffer,
-  selections: RefacingSelections
-): Promise<string> {
-  const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error("GOOGLE_GEMINI_API_KEY environment variable is not set");
+    const credPath = '/tmp/google-credentials.json';
+    fs.writeFileSync(credPath, serviceAccountJson);
+    process.env.GOOGLE_APPLICATION_CREDENTIALS = credPath;
   }
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+  // GOOGLE_APPLICATION_CREDENTIALS should now be set
+  // either from env var or from the file we just wrote
+  return new VertexAI({ project, location });
+}
 
-  const prompt = buildRefacingPrompt(selections);
-  const base64Image = imageBuffer.toString("base64");
+function buildParameterExtractionPrompt(selections: RefacingSelections): string {
+  return `TASK: EXTRACT CABINET DOOR PARAMETERS FROM USER SELECTION
+
+You are a cabinet design parameter extraction system.
+Your ONLY job is to return structured JSON parameters.
+
+USER SELECTED:
+- Door Style: ${selections.doorStyle}
+- Color: ${selections.colorName} (${selections.colorHex})
+- Is Wood Grain: ${selections.isWoodGrain}
+- Hardware: ${selections.hardwareStyle} ${selections.hardwareFinish}
+
+OUTPUT FORMAT (JSON ONLY - NO MARKDOWN, NO TEXT):
+{
+  "door_style": "shaker" | "slab" | "fusion" | "slide",
+  "panel_depth_mm": number (3-12),
+  "rail_width_mm": number (40-120),
+  "stile_width_mm": number (40-120),
+  "overlay_type": "full" | "partial" | "inset",
+  "drawer_stack": boolean,
+  "confidence": number (0-1)
+}
+
+MAPPING RULES:
+- "shaker" → door_style: "shaker", panel_depth_mm: 6.35, rail/stile: 76.2mm
+- "shaker-slide" → door_style: "slide", panel_depth_mm: 4, rail/stile: 60mm
+- "slab" → door_style: "slab", panel_depth_mm: 0, rail/stile: 0
+- "fusion-shaker" → door_style: "fusion", panel_depth_mm: 6.35, drawer_stack: true
+- "fusion-slide" → door_style: "fusion", panel_depth_mm: 4, drawer_stack: true
+
+Return ONLY the JSON object. No explanation. No markdown.`;
+}
+
+export async function extractCabinetParameters(
+  selections: RefacingSelections
+): Promise<CabinetParameters> {
+  const vertexAI = initializeVertexAI();
+  
+  const model = vertexAI.getGenerativeModel({
+    model: 'gemini-2.0-flash-exp',
+  });
+
+  const prompt = buildParameterExtractionPrompt(selections);
 
   try {
-    // Use generateContent with proper configuration for API key auth
-    const result = await model.generateContent({
+    const request = {
       contents: [{
-        role: "user",
-        parts: [
-          {
-            inlineData: {
-              mimeType: "image/jpeg",
-              data: base64Image,
-            },
-          },
-          { text: prompt },
-        ],
+        role: 'user',
+        parts: [{ text: prompt }]
       }],
       generationConfig: {
-        temperature: 0.4,
-        topK: 32,
-        topP: 1,
-        maxOutputTokens: 4096,
+        temperature: 0.1,
+        topK: 1,
+        topP: 0.95,
+        maxOutputTokens: 256,
+        responseMimeType: 'application/json', // FORCE JSON OUTPUT
       },
-    });
+    };
 
+    const result = await model.generateContent(request);
     const response = result.response;
-    const parts = response.candidates?.[0]?.content?.parts || [];
+    const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    // Look for inline image data in response
-    for (const part of parts) {
-      if ("inlineData" in part && part.inlineData) {
-        const imageData = part.inlineData.data;
-        const mimeType = part.inlineData.mimeType || "image/png";
-        return `data:${mimeType};base64,${imageData}`;
-      }
+    if (!text) {
+      throw new Error('No response from Gemini');
     }
 
-    throw new Error("Gemini did not return an image in the response");
+    // Parse JSON response
+    const parameters: CabinetParameters = JSON.parse(text);
+    
+    // Validate required fields
+    if (!parameters.door_style || typeof parameters.panel_depth_mm !== 'number') {
+      throw new Error('Invalid parameter structure from Gemini');
+    }
+
+    return parameters;
   } catch (error) {
-    console.error("Gemini AI Service Error:", error);
-    throw error;
+    console.error('Vertex AI Parameter Extraction Error:', error);
+    
+    // Fallback: return deterministic parameters based on door style
+    return getDeterministicParameters(selections.doorStyle);
   }
+}
+
+// Deterministic fallback if Gemini fails
+function getDeterministicParameters(doorStyle: DoorStyleId): CabinetParameters {
+  const parameterMap: Record<DoorStyleId, CabinetParameters> = {
+    "shaker": {
+      door_style: "shaker",
+      panel_depth_mm: 6.35,
+      rail_width_mm: 76.2,
+      stile_width_mm: 76.2,
+      overlay_type: "full",
+      drawer_stack: false,
+      confidence: 1.0
+    },
+    "shaker-slide": {
+      door_style: "slide",
+      panel_depth_mm: 3.8,
+      rail_width_mm: 60,
+      stile_width_mm: 60,
+      overlay_type: "full",
+      drawer_stack: false,
+      confidence: 1.0
+    },
+    "slab": {
+      door_style: "slab",
+      panel_depth_mm: 0,
+      rail_width_mm: 0,
+      stile_width_mm: 0,
+      overlay_type: "full",
+      drawer_stack: false,
+      confidence: 1.0
+    },
+    "fusion-shaker": {
+      door_style: "fusion",
+      panel_depth_mm: 6.35,
+      rail_width_mm: 76.2,
+      stile_width_mm: 76.2,
+      overlay_type: "full",
+      drawer_stack: true,
+      confidence: 1.0
+    },
+    "fusion-slide": {
+      door_style: "fusion",
+      panel_depth_mm: 3.8,
+      rail_width_mm: 60,
+      stile_width_mm: 60,
+      overlay_type: "full",
+      drawer_stack: true,
+      confidence: 1.0
+    }
+  };
+
+  return parameterMap[doorStyle] || parameterMap["shaker"];
 }
