@@ -212,7 +212,7 @@ export default function AboutPage() {
                 />
               </div>
               <h4 className="text-2xl font-bold italic text-white">Daniel Cruz</h4>
-              <p className="text-gray-500 text-sm mb-4">Advisor & Technology Architect</p>
+              <p className="text-gray-500 text-sm mb-4">Design, Coordination, Oversight</p>
               <div className="flex gap-3 justify-center">
                 <a href="tel:4803648205" className="px-4 py-2 bg-white/5 hover:bg-orange-500 border border-white/10 rounded-lg text-sm transition-all">
                   📞 Call
@@ -235,7 +235,7 @@ export default function AboutPage() {
                 />
               </div>
               <h4 className="text-2xl font-bold italic text-white">Mike Musonda</h4>
-              <p className="text-gray-500 text-sm mb-4">Advisor & Master Installer</p>
+              <p className="text-gray-500 text-sm mb-4">Planning, Client Experience, and Oversight</p>
               <div className="flex gap-3 justify-center">
                 <a href="tel:6026223828" className="px-4 py-2 bg-white/5 hover:bg-orange-500 border border-white/10 rounded-lg text-sm transition-all">
                   📞 Call

@@ -20,15 +20,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
           {/* Brand & Contact */}
           <div>
-            <div className="flex items-center gap-3 mb-6">
+            <div className="mb-6">
               <Image
-                src="/logos/vulpines-official-logo.png"
+                src="/marketing/Textvulpine.png"
                 alt="Vulpine Homes"
-                width={50}
-                height={50}
+                width={200}
+                height={60}
                 className="object-contain"
               />
-              <span className="text-white font-bold text-2xl">VULPINE HOMES</span>
             </div>
             <p className="text-white/60 mb-8 max-w-md">
               Modernizing Phoenix kitchens with intelligence and integrity. 
