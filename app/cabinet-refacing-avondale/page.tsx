@@ -20,7 +20,7 @@ export default function CabinetRefacingAvondalePage() {
         url="https://vulpinehomes.com/cabinet-refacing-avondale"
         areaServed="Avondale AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f] pt-16">
+      <main className="min-h-screen bg-[#0a0a0f]">
         <Navigation />
 
         <section className="relative pt-16">

@@ -20,7 +20,7 @@ export default function CabinetRefacingVerradoPage() {
         url="https://vulpinehomes.com/cabinet-refacing-verrado"
         areaServed="Verrado AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f] pt-16">
+      <main className="min-h-screen bg-[#0a0a0f]">
         <Navigation />
 
         <section className="relative pt-16">

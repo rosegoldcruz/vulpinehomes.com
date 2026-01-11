@@ -21,7 +21,7 @@ export default function CabinetRefacingNorthScottsdalePage() {
         url="https://vulpinehomes.com/cabinet-refacing-north-scottsdale"
         areaServed="North Scottsdale AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f] pt-16">
+      <main className="min-h-screen bg-[#0a0a0f]">
         <Navigation />
 
         {/* Hero Section */}

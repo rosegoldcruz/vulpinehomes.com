@@ -23,7 +23,7 @@ export default function CabinetRefacingSurprisePage() {
         url="https://vulpinehomes.com/cabinet-refacing-surprise"
         areaServed="Surprise AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f] pt-16">
+      <main className="min-h-screen bg-[#0a0a0f]">
         <Navigation />
 
         {/* Hero */}

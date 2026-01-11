@@ -21,7 +21,7 @@ export default function CabinetRefacingChandlerPage() {
         url="https://vulpinehomes.com/cabinet-refacing-chandler"
         areaServed="Chandler AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f] pt-16">
+      <main className="min-h-screen bg-[#0a0a0f]">
         <Navigation />
 
         <section className="relative pt-16">

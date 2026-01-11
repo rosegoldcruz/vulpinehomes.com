@@ -208,7 +208,7 @@ export default function VulpineKitchenQuotePage() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white selection:bg-orange-500/30 pt-16">
+    <main className="min-h-screen bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white selection:bg-orange-500/30">
       {/* Background Ambience */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-orange-600/10 rounded-full blur-[120px]" />

@@ -19,7 +19,7 @@ export default function KitchenCabinetRefacingPage() {
         description="Complete kitchen cabinet refacing services including custom doors, drawer fronts, veneer, and hardware installation."
         url="https://vulpinehomes.com/kitchen-cabinet-refacing"
       />
-      <main className="min-h-screen bg-[#0a0a0f] pt-16">
+      <main className="min-h-screen bg-[#0a0a0f]">
         <Navigation />
 
         {/* Hero */}

@@ -21,7 +21,7 @@ export default function CabinetRefacingGlendalePage() {
         url="https://vulpinehomes.com/cabinet-refacing-glendale"
         areaServed="Glendale AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f] pt-16">
+      <main className="min-h-screen bg-[#0a0a0f]">
         <Navigation />
 
         <section className="relative pt-16">

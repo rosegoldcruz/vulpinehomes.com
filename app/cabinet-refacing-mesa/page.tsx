@@ -21,7 +21,7 @@ export default function CabinetRefacingMesaPage() {
         url="https://vulpinehomes.com/cabinet-refacing-mesa"
         areaServed="Mesa AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f] pt-16">
+      <main className="min-h-screen bg-[#0a0a0f]">
         <Navigation />
 
         {/* Hero */}
