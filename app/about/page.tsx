@@ -4,6 +4,18 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "About Vulpine Homes | Luxury Kitchens. Real Contractors. Half the Headache.",
+  description:
+    "Vulpine Homes combines 42 years of expertise with modern technology to deliver stunning cabinet refacing in days, not weeks.",
+};
+
+export default function AboutPage() {
+  return (
+    <main className="min-h-screen bg-[#050505] text-white">
+      {/* Hero Section - Split Layout */}
+      <section className="relative min-h-[80vh] overflow-hidden">
+        <div className="absolute inset-0">
+          <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+            <source src="/vids/milli.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/90 via-[#050505]/70 to-[#050505]" />
         </div>

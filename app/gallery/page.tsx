@@ -97,6 +97,19 @@ export default function GalleryPage() {
     if (!touchStart || !touchEnd) return;
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+    if (isLeftSwipe) goNext();
+    if (isRightSwipe) goPrev();
+  };
+
+  return (
+    <main className="min-h-screen bg-[#0a0a0f]">
+      {/* Header */}
+      <section className="pt-24 pb-12 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-orange-500/20 rounded-full blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-amber-500/15 rounded-full blur-[100px]" />
+        </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <FadeIn className="text-center">
