@@ -43,16 +43,18 @@ export default function Navigation() {
             <CTAButton className="ml-2" />
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile menu button - Enhanced visibility */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-white/80 hover:text-white"
+            className="md:hidden p-3 rounded-lg bg-[#FF8A3D] hover:bg-[#FF6B35] text-white transition-all shadow-lg"
+            aria-label="Toggle mobile menu"
+            aria-expanded={mobileMenuOpen ? "true" : "false"}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
               {mobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
               )}
             </svg>
           </button>
@@ -61,7 +63,7 @@ export default function Navigation() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0a0a0f]/98 backdrop-blur-md border-t border-white/10">
+        <div className="md:hidden bg-[#0a0a0f]/98 backdrop-blur-md border-t border-white/10 animate-in slide-in-from-top duration-200">
           <div className="px-4 py-3 space-y-1">
             {NAV_ITEMS.map((item) => (
               <Link
