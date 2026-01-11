@@ -21,7 +21,7 @@ export default function CabinetRefacingNorthPhoenixPage() {
         url="https://vulpinehomes.com/cabinet-refacing-north-phoenix"
         areaServed="North Phoenix AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f]">
+      <main className="min-h-screen bg-[#0a0a0f] pt-16">
         <Navigation />
 
         {/* Hero Section */}

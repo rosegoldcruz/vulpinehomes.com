@@ -21,7 +21,7 @@ export default function CabinetRefacingGilbertPage() {
         url="https://vulpinehomes.com/cabinet-refacing-gilbert"
         areaServed="Gilbert AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f]">
+      <main className="min-h-screen bg-[#0a0a0f] pt-16">
         <Navigation />
 
         <section className="relative pt-16">

@@ -38,7 +38,7 @@ export default function AreasServedPage() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white">
+    <main className="min-h-screen bg-[#0a0a0f] text-white pt-16">
       <Navigation />
 
       {/* Hero Section with Video */}

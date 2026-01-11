@@ -21,7 +21,7 @@ export default function CabinetRefacingBuckeyePage() {
         url="https://vulpinehomes.com/cabinet-refacing-buckeye"
         areaServed="Buckeye AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f]">
+      <main className="min-h-screen bg-[#0a0a0f] pt-16">
         <Navigation />
 
         {/* Hero */}

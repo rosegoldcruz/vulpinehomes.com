@@ -5,18 +5,6 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Phoenix Kitchen Remodeling Services | Cabinet Refacing & Design",
-  description:
-    "Full-service kitchen remodeling and cabinet refacing in Phoenix. ROC-licensed partners. Fast, clean execution. Get a quote in 24 hours.",
-};
-
-export default function ServicesPage() {
-  return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white">
-      {/* Hero Section with Video */}
-      <section className="relative min-h-screen overflow-hidden">
-        {/* Video Background */}
-        <div className="absolute inset-0">
-          <video autoPlay muted loop playsInline className="w-full h-full object-cover">
             <source src="/vids/hero.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f]/80 via-[#0a0a0f]/60 to-[#0a0a0f]" />

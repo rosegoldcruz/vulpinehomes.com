@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mobile Nav Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        background: #0a0a0f;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <nav
+      class="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-md border-b border-white/10"
+    >
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <!-- Logo -->
+          <a href="/" class="flex items-center gap-2">
+            <img
+              src="/marketing/Textvulpine.png"
+              alt="Vulpine Homes"
+              class="h-14 w-auto object-contain"
+            />
+          </a>
+
+          <!-- Desktop Navigation (hidden on mobile) -->
+          <div class="hidden md:flex items-center gap-4">
+            <div class="flex items-center gap-1">
+              <a
+                href="/services"
+                class="px-5 py-2 text-sm font-medium text-white/90"
+                >Services</a
+              >
+              <a
+                href="/products"
+                class="px-5 py-2 text-sm font-medium text-white/90"
+                >Products</a
+              >
+              <a
+                href="/visualizer"
+                class="px-5 py-2 text-sm font-medium text-white/90"
+                >Visualizer</a
+              >
+              <a
+                href="/blog"
+                class="px-5 py-2 text-sm font-medium text-white/90"
+                >Blog</a
+              >
+              <a
+                href="/about"
+                class="px-5 py-2 text-sm font-medium text-white/90"
+                >About</a
+              >
+            </div>
+          </div>
+
+          <!-- Mobile menu button -->
+          <button
+            id="mobileMenuBtn"
+            class="md:hidden p-2 text-white/80 hover:text-white"
+          >
+            <svg
+              id="hamburger"
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+            <svg
+              id="close"
+              class="w-6 h-6 hidden"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile menu -->
+      <div
+        id="mobileMenu"
+        class="hidden md:hidden bg-[#0a0a0f]/98 backdrop-blur-md border-t border-white/10"
+      >
+        <div class="px-4 py-3 space-y-1">
+          <a
+            href="/services"
+            class="block px-4 py-3 text-sm font-medium text-white/90 hover:text-[#FF8A3D] hover:bg-white/5 rounded-lg transition-colors uppercase tracking-wide"
+            >Services</a
+          >
+          <a
+            href="/products"
+            class="block px-4 py-3 text-sm font-medium text-white/90 hover:text-[#FF8A3D] hover:bg-white/5 rounded-lg transition-colors uppercase tracking-wide"
+            >Products</a
+          >
+          <a
+            href="/visualizer"
+            class="block px-4 py-3 text-sm font-medium text-white/90 hover:text-[#FF8A3D] hover:bg-white/5 rounded-lg transition-colors uppercase tracking-wide"
+            >Visualizer</a
+          >
+          <a
+            href="/blog"
+            class="block px-4 py-3 text-sm font-medium text-white/90 hover:text-[#FF8A3D] hover:bg-white/5 rounded-lg transition-colors uppercase tracking-wide"
+            >Blog</a
+          >
+          <a
+            href="/about"
+            class="block px-4 py-3 text-sm font-medium text-white/90 hover:text-[#FF8A3D] hover:bg-white/5 rounded-lg transition-colors uppercase tracking-wide"
+            >About</a
+          >
+
+          <!-- Mobile Call & Text -->
+          <div class="flex gap-2 pt-3">
+            <a
+              href="tel:4803648205"
+              class="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+            >
+              <span>📞</span> Call
+            </a>
+            <a
+              href="sms:4803648205"
+              class="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+            >
+              <span>💬</span> Text
+            </a>
+          </div>
+          <div class="pt-3">
+            <a
+              href="/get-quote"
+              class="w-full block text-center px-6 py-3 bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35] text-white font-semibold rounded-xl"
+              >Get Free Quote</a
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Sticky Mobile Call/Text Bar -->
+      <div
+        class="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[#0a0a0f]/95 backdrop-blur-md border-t border-white/10 p-2"
+      >
+        <div class="flex gap-2">
+          <a
+            href="tel:4803648205"
+            class="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35] rounded-xl shadow-lg"
+          >
+            <span>📞</span> Call Now
+          </a>
+          <a
+            href="sms:4803648205"
+            class="flex-1 flex items-center justify-center gap-2 px-4 py-3 text-sm font-semibold text-white border border-white/20 rounded-xl"
+          >
+            <span>💬</span> Text Us
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Some content to show scroll -->
+    <div class="pt-20 pb-24 px-4">
+      <h1 class="text-white text-3xl font-bold mb-4">Mobile Navigation Test</h1>
+      <p class="text-white/80 mb-4">
+        Resize your browser to mobile width or open on mobile device.
+      </p>
+      <p class="text-white/80 mb-4">
+        Click the hamburger menu button in the top right to open the mobile
+        menu.
+      </p>
+      <div class="bg-white/5 border border-white/10 rounded-lg p-6">
+        <h2 class="text-white text-xl font-semibold mb-2">
+          Expected behavior:
+        </h2>
+        <ul class="text-white/80 space-y-2 list-disc list-inside">
+          <li>
+            On desktop (width > 768px): Navigation links visible in header,
+            hamburger hidden
+          </li>
+          <li>
+            On mobile (width < 768px): Hamburger menu visible in top right, nav
+            links hidden until menu opened
+          </li>
+          <li>Clicking hamburger opens/closes mobile menu</li>
+          <li>
+            Mobile menu contains: Services, Products, Visualizer, Blog, About,
+            Call, Text, Get Free Quote
+          </li>
+          <li>Sticky call/text bar at bottom on mobile</li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      const btn = document.getElementById("mobileMenuBtn");
+      const menu = document.getElementById("mobileMenu");
+      const hamburger = document.getElementById("hamburger");
+      const close = document.getElementById("close");
+
+      btn.addEventListener("click", () => {
+        menu.classList.toggle("hidden");
+        hamburger.classList.toggle("hidden");
+        close.classList.toggle("hidden");
+      });
+    </script>
+  </body>
+</html>

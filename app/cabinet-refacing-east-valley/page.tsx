@@ -21,7 +21,7 @@ export default function CabinetRefacingEastValleyPage() {
         url="https://vulpinehomes.com/cabinet-refacing-east-valley"
         areaServed="East Valley AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f]">
+      <main className="min-h-screen bg-[#0a0a0f] pt-16">
         <Navigation />
 
         {/* Hero Section */}

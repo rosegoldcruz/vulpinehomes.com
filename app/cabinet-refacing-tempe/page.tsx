@@ -21,7 +21,7 @@ export default function CabinetRefacingTempePage() {
         url="https://vulpinehomes.com/cabinet-refacing-tempe"
         areaServed="Tempe AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f]">
+      <main className="min-h-screen bg-[#0a0a0f] pt-16">
         <Navigation />
 
         {/* Hero */}

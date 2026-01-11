@@ -73,7 +73,7 @@ export default function FAQPage() {
   return (
     <>
       <FAQSchema faqs={faqs} />
-      <main className="min-h-screen bg-[#0a0a0f]">
+      <main className="min-h-screen bg-[#0a0a0f] pt-16">
         <Navigation />
 
         {/* Hero */}

@@ -21,7 +21,7 @@ export default function CabinetRefacingWestValleyPage() {
         url="https://vulpinehomes.com/cabinet-refacing-west-valley"
         areaServed="West Valley AZ"
       />
-      <main className="min-h-screen bg-[#0a0a0f]">
+      <main className="min-h-screen bg-[#0a0a0f] pt-16">
         <Navigation />
 
         {/* Hero Section */}

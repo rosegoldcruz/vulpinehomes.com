@@ -80,18 +80,6 @@ function DoorStyleCircle({ door, isSelected, onClick }: {
       </h3>
     </button>
   );
-}
-
-export default function ProductsPage() {
-  const [selectedDoor, setSelectedDoor] = useState(doorStyles[0]);
-
-  return (
-    <main className="min-h-screen bg-[#0a0a0f]">
-      {/* Structured Data: Product List */}
-      <ProductListSchema
-        products={[
-          { name: "Shaker Classic", image: "/marketing/Storm-Shaker-Drawer-10.png", url: "https://vulpinehomes.com/products#door-styles" },
-          { name: "Shaker Slide", image: "/marketing/Storm-Slide-Door-Drawer-5.png", url: "https://vulpinehomes.com/products#door-styles" },
           { name: "Fusion Shaker", image: "/marketing/Shaker-Storm-Fusion_vert-1.png", url: "https://vulpinehomes.com/products#door-styles" },
           { name: "Fusion Slide", image: "/marketing/Storm-Slide-Door-Drawer-5.png", url: "https://vulpinehomes.com/products#door-styles" },
           { name: "Slab", image: "/marketing/Storm-Slab-Door-Drawer-3.png", url: "https://vulpinehomes.com/products#door-styles" },
