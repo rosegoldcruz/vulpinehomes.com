@@ -136,15 +136,27 @@ export async function refaceCabinetsWithGemini(
   const base64Image = imageBuffer.toString("base64");
 
   try {
-    const result = await model.generateContent([
-      {
-        inlineData: {
-          mimeType: "image/jpeg",
-          data: base64Image,
-        },
+    // Use generateContent with proper configuration for API key auth
+    const result = await model.generateContent({
+      contents: [{
+        role: "user",
+        parts: [
+          {
+            inlineData: {
+              mimeType: "image/jpeg",
+              data: base64Image,
+            },
+          },
+          { text: prompt },
+        ],
+      }],
+      generationConfig: {
+        temperature: 0.4,
+        topK: 32,
+        topP: 1,
+        maxOutputTokens: 4096,
       },
-      { text: prompt },
-    ]);
+    });
 
     const response = result.response;
     const parts = response.candidates?.[0]?.content?.parts || [];
