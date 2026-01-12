@@ -1,32 +1,35 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import Navigation from "../components/Navigation";
 
 // =============== TYPES ===============
 type DoorStyle = "shaker" | "shaker-slide" | "slab" | "fusion-shaker" | "fusion-slide";
-type DrawerFront = "matching" | "slab";
 
 interface FinishOption {
   id: string;
   name: string;
   hex: string;
   isWoodGrain: boolean;
+  doorImage: string; // Path to full kitchen image for this finish
+  doorDetailImage: string; // Path to close-up door PNG
   availableFor: DoorStyle[];
 }
 
-interface HardwareStyle {
+interface HardwareOption {
   id: string;
   name: string;
-  finishes: string[];
+  finish: string;
+  finishId: string;
+  thumbnail: string; // Main hardware image
+  withKnob: string; // Hardware with knob combo
 }
 
 interface UserSelections {
   doorStyle: DoorStyle;
-  drawerFront: DrawerFront;
   finish: FinishOption;
-  hardwareStyle: string;
-  hardwareFinish: string;
+  hardware: HardwareOption;
 }
 
 interface VisualizerState {
@@ -37,41 +40,83 @@ interface VisualizerState {
   error: string | null;
 }
 
-// =============== CONSTANTS ===============
-const DOOR_STYLES = [
-  { id: "shaker" as DoorStyle, name: "Shaker Classic", desc: "The timeless 5-piece door style with a wide color palette.", src: "/marketing/Storm-Shaker_Kitchen.jpg" },
-  { id: "shaker-slide" as DoorStyle, name: "Shaker Slide", desc: "A modern take on Shaker with a streamlined profile.", src: "/marketing/Storm-Slide_Kitchen-800x421.jpg" },
-  { id: "fusion-shaker" as DoorStyle, name: "Fusion Shaker", desc: "Combines Shaker doors with slab drawer fronts for a transitional look.", src: "/marketing/Storm-Fusion-Shaker_Kitchen.jpg" },
-  { id: "fusion-slide" as DoorStyle, name: "Fusion Slide", desc: "Slide profile doors mixed with modern slab drawers.", src: "/marketing/Storm-Fusion-Slide_Kitchen.jpg" },
-  { id: "slab" as DoorStyle, name: "Slab", desc: "Minimalist flat doors available in our largest variety of finishes.", src: "/marketing/Storm-Slab_Kitchen-800x421.jpg" },
+// =============== DOOR STYLES WITH IMAGES ===============
+const DOOR_STYLES: { id: DoorStyle; name: string; desc: string; heroImage: string }[] = [
+  { 
+    id: "shaker", 
+    name: "Shaker Classic", 
+    desc: "Timeless 5-piece door with clean lines",
+    heroImage: "/cabs_clean/doors/shaker_classic/Storm-Shaker_Kitchen.jpg"
+  },
+  { 
+    id: "shaker-slide", 
+    name: "Shaker Slide", 
+    desc: "Modern Shaker with streamlined profile",
+    heroImage: "/cabs_clean/doors/shaker_slide/Storm-Slide_Kitchen-800x421.jpg"
+  },
+  { 
+    id: "fusion-shaker", 
+    name: "Fusion Shaker", 
+    desc: "Shaker doors with slab drawer fronts",
+    heroImage: "/cabs_clean/doors/fusion_shaker/Storm-Fusion-Shaker_Kitchen-800x421.jpg"
+  },
+  { 
+    id: "fusion-slide", 
+    name: "Fusion Slide", 
+    desc: "Slide doors with modern slab drawers",
+    heroImage: "/cabs_clean/doors/fusion_slide/Storm-Fusion-Slide_Kitchen-800x421.jpg"
+  },
+  { 
+    id: "slab", 
+    name: "Slab", 
+    desc: "Minimalist flat panel, modern aesthetic",
+    heroImage: "/cabs_clean/doors/slab/Storm-Slab_Kitchen-800x421.jpg"
+  },
 ];
 
+// =============== FINISHES WITH REAL IMAGES ===============
 const FINISH_OPTIONS: FinishOption[] = [
-  // Core colors available on ALL styles
-  { id: "flour", name: "Flour", hex: "#f5f5f0", isWoodGrain: false, availableFor: ["shaker", "shaker-slide", "fusion-shaker", "fusion-slide", "slab"] },
-  { id: "storm", name: "Storm", hex: "#5a6670", isWoodGrain: false, availableFor: ["shaker", "shaker-slide", "fusion-shaker", "fusion-slide", "slab"] },
-  { id: "graphite", name: "Graphite", hex: "#3d3d3d", isWoodGrain: false, availableFor: ["shaker", "shaker-slide", "fusion-shaker", "fusion-slide", "slab"] },
-  { id: "espresso-walnut", name: "Espresso Walnut", hex: "#3c2415", isWoodGrain: true, availableFor: ["shaker", "shaker-slide", "fusion-shaker", "fusion-slide", "slab"] },
-  // Expanded palette for specific styles
-  { id: "slate", name: "Slate", hex: "#708090", isWoodGrain: false, availableFor: ["shaker", "fusion-shaker", "slab"] },
-  { id: "mist", name: "Mist", hex: "#c8c8c8", isWoodGrain: false, availableFor: ["shaker", "fusion-shaker", "slab"] },
-  { id: "latte-walnut", name: "Latte Walnut", hex: "#a67b5b", isWoodGrain: true, availableFor: ["shaker", "fusion-shaker", "slab"] },
-  { id: "nimbus-oak", name: "Nimbus Oak", hex: "#9e8b7d", isWoodGrain: true, availableFor: ["shaker", "slab"] },
-  { id: "sable-oak", name: "Sable Oak", hex: "#5c4033", isWoodGrain: true, availableFor: ["shaker", "slab"] },
+  // Shaker Classic finishes
+  { id: "flour", name: "Flour", hex: "#f5f5f0", isWoodGrain: false, doorImage: "/cabs_clean/doors/shaker_classic/Flour-Shaker_Kitchen.jpg", doorDetailImage: "/cabs_clean/doors/shaker_classic/shaker-classic-flour.png", availableFor: ["shaker", "shaker-slide", "fusion-shaker", "fusion-slide", "slab"] },
+  { id: "storm", name: "Storm", hex: "#5a6670", isWoodGrain: false, doorImage: "/cabs_clean/doors/shaker_classic/Storm-Shaker_Kitchen.jpg", doorDetailImage: "/cabs_clean/doors/shaker_classic/shaker-classic-storm.png", availableFor: ["shaker", "shaker-slide", "fusion-shaker", "fusion-slide", "slab"] },
+  { id: "graphite", name: "Graphite", hex: "#3d3d3d", isWoodGrain: false, doorImage: "/cabs_clean/doors/shaker_classic/Graphite-Shaker_Kitchen.jpg", doorDetailImage: "/cabs_clean/doors/shaker_classic/shaker-classic-graphite.png", availableFor: ["shaker", "shaker-slide", "fusion-shaker", "fusion-slide", "slab"] },
+  { id: "espresso-walnut", name: "Espresso Walnut", hex: "#3c2415", isWoodGrain: true, doorImage: "/cabs_clean/doors/shaker_classic/Espresso-Walnut-Shaker_Kitchen.jpg", doorDetailImage: "/cabs_clean/doors/shaker_classic/shaker-classic-espresso-walnut.png", availableFor: ["shaker", "shaker-slide", "fusion-shaker", "fusion-slide", "slab"] },
+  { id: "slate", name: "Slate", hex: "#708090", isWoodGrain: false, doorImage: "/cabs_clean/doors/shaker_classic/Slate-Shaker_Kitchen.jpg", doorDetailImage: "/cabs_clean/doors/shaker_classic/shaker-classic-slate.png", availableFor: ["shaker", "fusion-shaker", "slab"] },
+  { id: "mist", name: "Mist", hex: "#c8c8c8", isWoodGrain: false, doorImage: "/cabs_clean/doors/shaker_classic/Mist-Shaker_Kitchen.jpg", doorDetailImage: "/cabs_clean/doors/shaker_classic/shaker-classic-mist.png", availableFor: ["shaker", "fusion-shaker", "slab"] },
+  { id: "latte-walnut", name: "Latte Walnut", hex: "#a67b5b", isWoodGrain: true, doorImage: "/cabs_clean/doors/shaker_classic/Latte-Walnut-Shaker_Kitchen.jpg", doorDetailImage: "/cabs_clean/doors/shaker_classic/shaker-claassic-latte-walnut.png", availableFor: ["shaker", "fusion-shaker", "slab"] },
+  { id: "nimbus-oak", name: "Nimbus Oak", hex: "#9e8b7d", isWoodGrain: true, doorImage: "/cabs_clean/doors/shaker_classic/Nimbus-Oak-Shaker_Kitchen.jpg", doorDetailImage: "/cabs_clean/doors/shaker_classic/shaker-classic-nimbus-oak.png", availableFor: ["shaker", "slab"] },
+  { id: "sable-oak", name: "Sable Oak", hex: "#5c4033", isWoodGrain: true, doorImage: "/cabs_clean/doors/shaker_classic/Sable-Oak-Shaker.jpg", doorDetailImage: "/cabs_clean/doors/shaker_classic/shaker-classic-sable-oak.png", availableFor: ["shaker", "slab"] },
   // Slab exclusives
-  { id: "snow-gloss", name: "Snow Gloss", hex: "#fffafa", isWoodGrain: false, availableFor: ["slab"] },
-  { id: "urban-teak", name: "Urban Teak", hex: "#8b7355", isWoodGrain: true, availableFor: ["slab"] },
-  { id: "platinum-teak", name: "Platinum Teak", hex: "#b8a88a", isWoodGrain: true, availableFor: ["slab"] },
-  { id: "wheat-oak", name: "Wheat Oak", hex: "#d4a574", isWoodGrain: true, availableFor: ["slab"] },
+  { id: "snow-gloss", name: "Snow Gloss", hex: "#fffafa", isWoodGrain: false, doorImage: "/cabs_clean/doors/slab/Snow-Gloss-Slab_Kitchen-800x421.jpg", doorDetailImage: "/cabs_clean/doors/slab/slab-snow-gloss-white.png", availableFor: ["slab"] },
+  { id: "urban-teak", name: "Urban Teak", hex: "#8b7355", isWoodGrain: true, doorImage: "/cabs_clean/doors/slab/Urban-Teak-Slab_Kitchen-800x421.jpg", doorDetailImage: "/cabs_clean/doors/slab/slab-urban-teak.png", availableFor: ["slab"] },
+  { id: "platinum-teak", name: "Platinum Teak", hex: "#b8a88a", isWoodGrain: true, doorImage: "/cabs_clean/doors/slab/Platinum-Teak-Slab_Kitchen-800x421.jpg", doorDetailImage: "/cabs_clean/doors/slab/slab-platnum-teak.png", availableFor: ["slab"] },
+  { id: "wheat-oak", name: "Wheat Oak", hex: "#d4a574", isWoodGrain: true, doorImage: "/cabs_clean/doors/slab/Wheat-Oak-Slab-800x421.jpg", doorDetailImage: "/cabs_clean/doors/slab/slab-wheat-oak.png", availableFor: ["slab"] },
 ];
 
-const HARDWARE_CATALOG: HardwareStyle[] = [
-  { id: "arch", name: "Arch", finishes: ["Satin Nickel", "Chrome", "Matte Black", "Rose Gold"] },
-  { id: "artisan", name: "Artisan", finishes: ["Satin Nickel", "Chrome", "Matte Black", "Rose Gold"] },
-  { id: "cottage", name: "Cottage", finishes: ["Satin Nickel", "Chrome", "Matte Black", "Rose Gold"] },
-  { id: "bar", name: "Bar Pull", finishes: ["Satin Nickel", "Matte Black"] },
-  { id: "loft", name: "Loft", finishes: ["Satin Nickel", "Chrome", "Matte Black", "Rose Gold"] },
-  { id: "square", name: "Square", finishes: ["Satin Nickel", "Chrome", "Matte Black", "Rose Gold"] },
+// =============== HARDWARE WITH REAL IMAGES ===============
+const HARDWARE_OPTIONS: HardwareOption[] = [
+  // Arch
+  { id: "arch-satin", name: "Arch", finish: "Satin Nickel", finishId: "satin_nickel", thumbnail: "/cabs_clean/hardware/arch/Arch_SatinNickel.png", withKnob: "/cabs_clean/hardware/arch/Arch_SatinNickel_with_tpull.png" },
+  { id: "arch-chrome", name: "Arch", finish: "Chrome", finishId: "chrome", thumbnail: "/cabs_clean/hardware/arch/arch_chrome.png", withKnob: "/cabs_clean/hardware/arch/arch_chrome_with_tpull.png" },
+  { id: "arch-matte", name: "Arch", finish: "Matte Black", finishId: "matte_black", thumbnail: "/cabs_clean/hardware/arch/Arch_MatteBlack.png", withKnob: "/cabs_clean/hardware/arch/Arch_MatteBlack_with _tpull.png" },
+  { id: "arch-rose", name: "Arch", finish: "Rose Gold", finishId: "rose_gold", thumbnail: "/cabs_clean/hardware/arch/Arch_RoseGold.png", withKnob: "/cabs_clean/hardware/arch/Arch_RoseGold_with_tpull.png" },
+  // Bar
+  { id: "bar-matte", name: "Bar Pull", finish: "Matte Black", finishId: "matte_black", thumbnail: "/cabs_clean/hardware/bar/Bar-pulls-black .png", withKnob: "/cabs_clean/hardware/bar/Bar-matte-black-tpull.png" },
+  { id: "bar-satin", name: "Bar Pull", finish: "Satin Nickel", finishId: "satin_nickel", thumbnail: "/cabs_clean/hardware/bar/BarPull_SatinNickel.png", withKnob: "/cabs_clean/hardware/bar/BarPull_SatinNickel_with_tpull.png" },
+  // Cottage
+  { id: "cottage-chrome", name: "Cottage", finish: "Chrome", finishId: "chrome", thumbnail: "/cabs_clean/hardware/cottage/Cottage__Chrome.png", withKnob: "/cabs_clean/hardware/cottage/Cottage__Chrome_with_knob.png" },
+  { id: "cottage-satin", name: "Cottage", finish: "Satin Nickel", finishId: "satin_nickel", thumbnail: "/cabs_clean/hardware/cottage/Cottage__SatinNickel.png", withKnob: "/cabs_clean/hardware/cottage/Cottage__SatinNickel_with_knob.png" },
+  { id: "cottage-rose", name: "Cottage", finish: "Rose Gold", finishId: "rose_gold", thumbnail: "/cabs_clean/hardware/cottage/Cottage_RoseGold_.png.png", withKnob: "/cabs_clean/hardware/cottage/Cottage_RoseGold_with_knob.png" },
+  // Loft
+  { id: "loft-satin", name: "Loft", finish: "Satin Nickel", finishId: "satin_nickel", thumbnail: "/cabs_clean/hardware/loft/Loft_SatinNickel.png", withKnob: "/cabs_clean/hardware/loft/Loft_SatinNickel_with_knob.png" },
+  { id: "loft-chrome", name: "Loft", finish: "Chrome", finishId: "chrome", thumbnail: "/cabs_clean/hardware/loft/Loft_Chrome_1.png.png", withKnob: "/cabs_clean/hardware/loft/Loft_Chrome_with_knob.png" },
+  { id: "loft-matte", name: "Loft", finish: "Matte Black", finishId: "matte_black", thumbnail: "/cabs_clean/hardware/loft/Loft_MatteBlack.png", withKnob: "/cabs_clean/hardware/loft/Loft_MatteBlack__with_knob.png" },
+  { id: "loft-rose", name: "Loft", finish: "Rose Gold", finishId: "rose_gold", thumbnail: "/cabs_clean/hardware/loft/Loft_RoseGold.png", withKnob: "/cabs_clean/hardware/loft/Loft_RoseGold_with_knob.png" },
+  // Square
+  { id: "square-satin", name: "Square", finish: "Satin Nickel", finishId: "satin_nickel", thumbnail: "/cabs_clean/hardware/square/Square_SatinNickel.png", withKnob: "/cabs_clean/hardware/square/Square_SatinNickel__with_knob.png" },
+  { id: "square-chrome", name: "Square", finish: "Chrome", finishId: "chrome", thumbnail: "/cabs_clean/hardware/square/Square_chrome.png", withKnob: "/cabs_clean/hardware/square/Square_chrome__with_knob.png" },
+  { id: "square-matte", name: "Square", finish: "Matte Black", finishId: "matte_black", thumbnail: "/cabs_clean/hardware/square/Square_MatteBlack.png", withKnob: "/cabs_clean/hardware/square/Square_MatteBlack__with_knob.png" },
+  { id: "square-rose", name: "Square", finish: "Rose Gold", finishId: "rose_gold", thumbnail: "/cabs_clean/hardware/square/Square_RoseGold.png", withKnob: "/cabs_clean/hardware/square/Square_RoseGold_with_knob.png" },
 ];
 
 // =============== UPLOADER COMPONENT ===============
@@ -103,9 +148,10 @@ function Uploader({ onUpload }: { onUpload: (base64s: string[], files: File[]) =
 
   return (
     <div 
-      className="border-2 border-dashed border-slate-700 rounded-[3rem] p-16 text-center bg-slate-900 hover:border-[#f07c3c] hover:bg-slate-800 transition-all cursor-pointer group"
+      className="relative overflow-hidden border border-white/10 rounded-3xl bg-gradient-to-b from-white/5 to-transparent backdrop-blur-sm hover:border-[#FF8A3D]/50 transition-all cursor-pointer group"
       onClick={() => fileInputRef.current?.click()}
     >
+      <div className="absolute inset-0 bg-gradient-to-br from-[#FF8A3D]/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
       <input 
         type="file" 
         ref={fileInputRef} 
@@ -114,17 +160,17 @@ function Uploader({ onUpload }: { onUpload: (base64s: string[], files: File[]) =
         multiple
         onChange={handleFileChange} 
       />
-      <div className="flex flex-col items-center gap-6">
-        <div className="w-20 h-20 bg-slate-800 text-slate-400 rounded-full flex items-center justify-center group-hover:scale-110 group-hover:bg-[#f07c3c] group-hover:text-white transition-all duration-300">
-          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="relative flex flex-col items-center gap-8 p-16">
+        <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#FF8A3D] to-[#FF6B35] flex items-center justify-center shadow-2xl shadow-orange-500/30 group-hover:scale-110 transition-transform">
+          <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
-        <div className="space-y-2">
-          <h3 className="text-2xl font-black text-white uppercase tracking-tight">Upload Your Kitchen Photos</h3>
-          <p className="text-slate-300 font-medium">Select multiple angles to visualize the full transformation.</p>
+        <div className="text-center space-y-3">
+          <h3 className="text-3xl font-bold text-white">Upload Your Kitchen</h3>
+          <p className="text-white/60 text-lg max-w-md">Drag and drop or click to select photos of your current kitchen from multiple angles.</p>
         </div>
-        <button className="bg-[#f07c3c] text-white px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#d96a2e] transition-colors shadow-lg">
+        <button className="px-10 py-4 bg-white text-black font-bold rounded-full hover:bg-white/90 transition-colors shadow-lg">
           Select Photos
         </button>
       </div>
@@ -151,7 +197,7 @@ function ComparisonSlider({ original, modified }: { original: string; modified: 
   return (
     <div 
       ref={containerRef}
-      className="relative w-full aspect-video rounded-xl overflow-hidden shadow-2xl cursor-col-resize select-none border-4 border-slate-800"
+      className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-2xl cursor-col-resize select-none ring-1 ring-white/10"
       onMouseMove={onMouseMove}
       onTouchMove={onTouchMove}
     >
@@ -161,16 +207,16 @@ function ComparisonSlider({ original, modified }: { original: string; modified: 
         style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
       >
         <img src={modified} alt="Refaced" className="w-full h-full object-cover" />
-        <div className="absolute top-4 left-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-medium backdrop-blur-md">
-          Refaced
+        <div className="absolute top-4 left-4 bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35] text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+          ✨ After
         </div>
       </div>
 
       {/* Original Image (Bottom Layer) */}
       <div className="absolute inset-0 z-0">
         <img src={original} alt="Original" className="w-full h-full object-cover" />
-        <div className="absolute top-4 right-4 bg-black/60 text-white px-3 py-1 rounded-full text-xs font-medium backdrop-blur-md">
-          Original
+        <div className="absolute top-4 right-4 bg-black/60 text-white px-4 py-2 rounded-full text-sm font-medium backdrop-blur-md">
+          Before
         </div>
       </div>
 
@@ -179,8 +225,8 @@ function ComparisonSlider({ original, modified }: { original: string; modified: 
         className="absolute inset-y-0 z-20 w-1 bg-white shadow-xl"
         style={{ left: `${sliderPos}%` }}
       >
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center border-4 border-slate-100">
-          <svg className="w-6 h-6 text-slate-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center">
+          <svg className="w-6 h-6 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7l-4 4m0 0l4 4m-4-4h18m-4-11l4 4m0 0l-4 4m4-4H3" />
           </svg>
         </div>
@@ -189,186 +235,141 @@ function ComparisonSlider({ original, modified }: { original: string; modified: 
   );
 }
 
-// =============== SELECTION PANEL COMPONENT ===============
-function SelectionPanel({ 
-  selections, 
-  onChange, 
-  onVisualize, 
-  isLoading 
+// =============== PREMIUM PRODUCT CARD ===============
+function ProductCard({ 
+  image, 
+  title, 
+  subtitle, 
+  isSelected, 
+  onClick,
+  size = "normal"
 }: { 
-  selections: UserSelections; 
-  onChange: (updates: Partial<UserSelections>) => void; 
-  onVisualize: () => void; 
-  isLoading: boolean;
+  image: string; 
+  title: string; 
+  subtitle?: string; 
+  isSelected: boolean; 
+  onClick: () => void;
+  size?: "small" | "normal" | "large";
 }) {
-  const [activeTab, setActiveTab] = useState<"door" | "finish" | "hardware">("door");
-
-  const availableFinishes = FINISH_OPTIONS.filter(f => f.availableFor.includes(selections.doorStyle));
-  const selectedHardware = HARDWARE_CATALOG.find(h => h.name === selections.hardwareStyle) || HARDWARE_CATALOG[0];
-
-  const handleDoorChange = (style: DoorStyle) => {
-    const finishesForStyle = FINISH_OPTIONS.filter(f => f.availableFor.includes(style));
-    const currentFinishValid = finishesForStyle.find(f => f.id === selections.finish.id);
-    onChange({ doorStyle: style, finish: currentFinishValid || finishesForStyle[0] });
+  const sizeClasses = {
+    small: "h-20",
+    normal: "h-28",
+    large: "h-36"
   };
 
   return (
-    <div className="bg-slate-900 rounded-[3rem] shadow-2xl border border-slate-800 overflow-hidden flex flex-col max-h-[calc(100vh-8rem)]">
-      {/* Tabs */}
-      <div className="flex border-b border-slate-800 flex-shrink-0">
-        {[
-          { id: "door", label: "1. Style" },
-          { id: "finish", label: "2. Color" },
-          { id: "hardware", label: "3. Hardware" }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as "door" | "finish" | "hardware")}
-            className={`flex-1 py-4 text-[10px] font-black uppercase tracking-widest transition-colors ${
-              activeTab === tab.id 
-                ? "bg-[#f07c3c] text-white" 
-                : "bg-slate-800 text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+    <button
+      onClick={onClick}
+      className={`group relative w-full ${sizeClasses[size]} rounded-2xl overflow-hidden transition-all duration-300 ${
+        isSelected 
+          ? "ring-2 ring-[#FF8A3D] ring-offset-2 ring-offset-[#0a0a0f] scale-[1.02] shadow-xl shadow-orange-500/20" 
+          : "ring-1 ring-white/10 hover:ring-white/30"
+      }`}
+    >
+      <Image 
+        src={image} 
+        alt={title}
+        fill
+        className="object-cover transition-transform duration-500 group-hover:scale-105"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 p-3 text-left">
+        <div className="font-bold text-white text-sm leading-tight">{title}</div>
+        {subtitle && <div className="text-white/60 text-xs mt-0.5">{subtitle}</div>}
       </div>
+      {isSelected && (
+        <div className="absolute top-2 right-2 w-6 h-6 bg-[#FF8A3D] rounded-full flex items-center justify-center">
+          <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+      )}
+    </button>
+  );
+}
 
-      <div className="flex-1 overflow-y-auto p-6">
-        {/* DOOR SELECTION */}
-        {activeTab === "door" && (
-          <div className="space-y-6">
-            <h3 className="text-xl font-black text-white uppercase tracking-tight">Select Door Profile</h3>
-            <div className="grid grid-cols-1 gap-4">
-              {DOOR_STYLES.map((style) => (
-                <button
-                  key={style.id}
-                  onClick={() => handleDoorChange(style.id)}
-                  className={`relative group overflow-hidden rounded-2xl border-4 transition-all text-left h-32 ${
-                    selections.doorStyle === style.id
-                      ? "border-[#f07c3c] shadow-lg scale-[1.02]" 
-                      : "border-slate-800 shadow-md hover:border-slate-700"
-                  }`}
-                >
-                  <img src={style.src} alt={style.name} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/80 to-transparent" />
-                  <div className="absolute inset-0 p-5 flex flex-col justify-center">
-                    <div className="font-black text-white text-lg uppercase leading-none mb-1">{style.name}</div>
-                    <div className="text-[10px] text-white/80 font-medium max-w-[70%] leading-tight">{style.desc}</div>
-                    {selections.doorStyle === style.id && (
-                      <div className="absolute top-4 right-4 bg-[#f07c3c] text-white p-1 rounded-full">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                      </div>
-                    )}
-                  </div>
-                </button>
-              ))}
+// =============== HARDWARE THUMBNAIL ===============
+function HardwareThumbnail({ 
+  hardware, 
+  isSelected, 
+  onClick 
+}: { 
+  hardware: HardwareOption; 
+  isSelected: boolean; 
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`group relative w-full aspect-square rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-200 p-3 transition-all duration-300 ${
+        isSelected 
+          ? "ring-2 ring-[#FF8A3D] ring-offset-2 ring-offset-[#0a0a0f] scale-[1.02]" 
+          : "ring-1 ring-white/10 hover:ring-white/30"
+      }`}
+    >
+      <div className="relative w-full h-full">
+        <Image 
+          src={hardware.thumbnail} 
+          alt={`${hardware.name} ${hardware.finish}`}
+          fill
+          className="object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-lg"
+        />
+      </div>
+      {isSelected && (
+        <div className="absolute top-1 right-1 w-5 h-5 bg-[#FF8A3D] rounded-full flex items-center justify-center">
+          <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+      )}
+    </button>
+  );
+}
+
+// =============== LIVE PREVIEW PANEL ===============
+function LivePreviewPanel({ selections }: { selections: UserSelections }) {
+  return (
+    <div className="bg-gradient-to-b from-white/5 to-transparent rounded-2xl border border-white/10 overflow-hidden">
+      <div className="p-4 border-b border-white/10">
+        <h4 className="text-xs font-bold text-[#FF8A3D] uppercase tracking-widest">Live Preview</h4>
+      </div>
+      <div className="p-4 space-y-4">
+        {/* Door Preview */}
+        <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-900">
+          <Image 
+            src={selections.finish.doorImage} 
+            alt={`${selections.finish.name} Kitchen`}
+            fill
+            className="object-cover"
+          />
+          <div className="absolute bottom-2 left-2 right-2 flex justify-between items-end">
+            <div className="bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-lg">
+              <div className="text-xs text-white/60">Style</div>
+              <div className="text-sm font-bold text-white">{DOOR_STYLES.find(d => d.id === selections.doorStyle)?.name}</div>
             </div>
-            <button onClick={() => setActiveTab("finish")} className="w-full py-4 bg-slate-800 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 mt-4">
-              Next: Finish →
-            </button>
+            <div className="bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-lg text-right">
+              <div className="text-xs text-white/60">Finish</div>
+              <div className="text-sm font-bold text-white">{selections.finish.name}</div>
+            </div>
           </div>
-        )}
-
-        {/* FINISH SELECTION */}
-        {activeTab === "finish" && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-end border-b border-slate-800 pb-4">
-              <h3 className="text-xl font-black text-white uppercase tracking-tight">Select Finish</h3>
-              <span className="text-[10px] font-bold text-slate-500">{selections.doorStyle}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {availableFinishes.map((finish) => (
-                <button
-                  key={finish.id}
-                  onClick={() => onChange({ finish })}
-                  className={`flex items-center gap-3 p-2 rounded-xl border-2 transition-all text-left ${
-                    selections.finish.id === finish.id 
-                      ? "border-[#f07c3c] bg-orange-500/10" 
-                      : "border-slate-800 hover:border-slate-700"
-                  }`}
-                >
-                  <div 
-                    className="w-12 h-12 rounded-lg flex-shrink-0 shadow-sm border border-slate-700"
-                    style={{ 
-                      backgroundColor: finish.hex,
-                      backgroundImage: finish.isWoodGrain ? `repeating-linear-gradient(90deg, ${finish.hex}, ${finish.hex} 2px, transparent 2px, transparent 4px)` : undefined
-                    }}
-                  />
-                  <div>
-                    <div className={`text-xs font-black uppercase leading-none mb-1 ${selections.finish.id === finish.id ? "text-[#f07c3c]" : "text-white"}`}>
-                      {finish.name}
-                    </div>
-                    <div className="text-[9px] text-slate-500 font-medium leading-none">{finish.isWoodGrain ? "Wood Grain" : "Solid"}</div>
-                  </div>
-                </button>
-              ))}
-            </div>
-            <button onClick={() => setActiveTab("hardware")} className="w-full py-4 bg-slate-800 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 mt-4">
-              Next: Hardware →
-            </button>
+        </div>
+        
+        {/* Hardware Preview */}
+        <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10">
+          <div className="w-16 h-16 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg flex items-center justify-center p-2">
+            <Image 
+              src={selections.hardware.thumbnail} 
+              alt={selections.hardware.name}
+              width={48}
+              height={48}
+              className="object-contain drop-shadow"
+            />
           </div>
-        )}
-
-        {/* HARDWARE SELECTION */}
-        {activeTab === "hardware" && (
-          <div className="space-y-6">
-            <h3 className="text-xl font-black text-white uppercase tracking-tight">Hardware</h3>
-            
-            <div className="space-y-6">
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Style</label>
-                <div className="grid grid-cols-3 gap-3">
-                  {HARDWARE_CATALOG.map(h => (
-                    <button
-                      key={h.id}
-                      onClick={() => onChange({ hardwareStyle: h.name, hardwareFinish: h.finishes[0] })}
-                      className={`py-3 px-2 rounded-xl text-center border-2 transition-all ${
-                        selections.hardwareStyle === h.name 
-                          ? "border-[#f07c3c] bg-orange-500/10" 
-                          : "border-slate-800 hover:border-slate-700"
-                      }`}
-                    >
-                      <div className="text-[10px] font-black uppercase text-white">{h.name}</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Finish</label>
-                <div className="flex flex-wrap gap-2">
-                  {selectedHardware.finishes.map(f => (
-                    <button
-                      key={f}
-                      onClick={() => onChange({ hardwareFinish: f })}
-                      className={`px-4 py-3 rounded-lg text-[9px] font-black uppercase border-2 transition-all ${
-                        selections.hardwareFinish === f 
-                          ? "border-[#f07c3c] bg-[#f07c3c] text-white shadow-lg" 
-                          : "border-slate-800 text-slate-400 hover:border-slate-700"
-                      }`}
-                    >
-                      {f}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-            
-            <button
-              onClick={onVisualize}
-              disabled={isLoading}
-              className={`w-full py-5 mt-4 rounded-xl font-black uppercase tracking-[0.2em] text-xs shadow-xl transition-all ${
-                isLoading 
-                  ? "bg-slate-800 text-slate-600 cursor-not-allowed" 
-                  : "bg-[#f07c3c] text-white hover:bg-[#d96a2e] active:scale-[0.98]"
-              }`}
-            >
-              {isLoading ? "Processing..." : "Apply Updates"}
-            </button>
+          <div>
+            <div className="text-sm font-bold text-white">{selections.hardware.name}</div>
+            <div className="text-xs text-white/60">{selections.hardware.finish}</div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
@@ -408,38 +409,44 @@ function LeadCaptureModal({
 
   return (
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-slate-900 rounded-[2rem] p-8 max-w-md w-full shadow-2xl border border-slate-800">
-        <h2 className="text-2xl font-black text-white uppercase tracking-tight mb-2">Before We Visualize</h2>
-        <p className="text-slate-300 mb-6">Enter your info so we can send you your transformation results.</p>
+      <div className="bg-[#0a0a0f] rounded-3xl p-8 max-w-md w-full shadow-2xl border border-white/10">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FF8A3D] to-[#FF6B35] flex items-center justify-center mx-auto mb-6">
+          <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+        </div>
+        <h2 className="text-2xl font-bold text-white text-center mb-2">See Your Transformation</h2>
+        <p className="text-white/60 text-center mb-8">Enter your info and we'll generate your personalized kitchen visualization.</p>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Full Name</label>
+            <label className="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2">Full Name</label>
             <input 
               type="text" 
               value={name} 
               onChange={(e) => setName(e.target.value)} 
-              className="w-full px-4 py-3 rounded-xl border-2 border-slate-800 bg-slate-950 text-white focus:border-[#f07c3c] outline-none transition-colors"
+              className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/30 focus:border-[#FF8A3D] focus:ring-1 focus:ring-[#FF8A3D] outline-none transition-colors"
               placeholder="John Smith"
             />
           </div>
           <div>
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Phone</label>
+            <label className="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2">Phone</label>
             <input 
               type="tel" 
               value={phone} 
               onChange={(e) => setPhone(e.target.value)} 
-              className="w-full px-4 py-3 rounded-xl border-2 border-slate-800 bg-slate-950 text-white focus:border-[#f07c3c] outline-none transition-colors"
+              className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/30 focus:border-[#FF8A3D] focus:ring-1 focus:ring-[#FF8A3D] outline-none transition-colors"
               placeholder="(555) 123-4567"
             />
           </div>
           <div>
-            <label className="block text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Email</label>
+            <label className="block text-xs font-bold text-white/40 uppercase tracking-widest mb-2">Email</label>
             <input 
               type="email" 
               value={email} 
               onChange={(e) => setEmail(e.target.value)} 
-              className="w-full px-4 py-3 rounded-xl border-2 border-slate-800 bg-slate-950 text-white focus:border-[#f07c3c] outline-none transition-colors"
+              className="w-full px-4 py-3 rounded-xl border border-white/10 bg-white/5 text-white placeholder-white/30 focus:border-[#FF8A3D] focus:ring-1 focus:ring-[#FF8A3D] outline-none transition-colors"
               placeholder="john@email.com"
             />
           </div>
@@ -449,13 +456,13 @@ function LeadCaptureModal({
           <button 
             type="submit"
             disabled={isLoading}
-            className={`w-full py-4 rounded-xl font-black uppercase tracking-widest text-sm transition-all ${
+            className={`w-full py-4 rounded-xl font-bold text-lg transition-all ${
               isLoading 
-                ? "bg-slate-800 text-slate-600" 
-                : "bg-[#f07c3c] text-white hover:bg-[#d96a2e]"
+                ? "bg-white/10 text-white/40 cursor-not-allowed" 
+                : "bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35] text-white hover:shadow-lg hover:shadow-orange-500/30"
             }`}
           >
-            {isLoading ? "Visualizing..." : "Visualize My Kitchen"}
+            {isLoading ? "Generating..." : "Visualize My Kitchen →"}
           </button>
         </form>
       </div>
@@ -465,12 +472,11 @@ function LeadCaptureModal({
 
 // =============== MAIN PAGE COMPONENT ===============
 export default function CabinetVisionPage() {
+  const [activeStep, setActiveStep] = useState<1 | 2 | 3>(1);
   const [selections, setSelections] = useState<UserSelections>({
     doorStyle: "shaker",
-    drawerFront: "matching",
     finish: FINISH_OPTIONS[0],
-    hardwareStyle: HARDWARE_CATALOG[0].name,
-    hardwareFinish: HARDWARE_CATALOG[0].finishes[0],
+    hardware: HARDWARE_OPTIONS[0],
   });
 
   const [vizState, setVizState] = useState<VisualizerState>({
@@ -485,6 +491,14 @@ export default function CabinetVisionPage() {
   const [showLeadCapture, setShowLeadCapture] = useState(false);
   const [leadInfo, setLeadInfo] = useState({ name: "", phone: "", email: "" });
 
+  // Get available finishes for selected door style
+  const availableFinishes = FINISH_OPTIONS.filter(f => f.availableFor.includes(selections.doorStyle));
+
+  // Group hardware by style
+  const hardwareStyles = ["Arch", "Bar Pull", "Cottage", "Loft", "Square"];
+  const [selectedHardwareStyle, setSelectedHardwareStyle] = useState("Arch");
+  const filteredHardware = HARDWARE_OPTIONS.filter(h => h.name === selectedHardwareStyle);
+
   const handleUpload = (base64s: string[], uploadedFiles: File[]) => {
     setVizState({
       originalImages: base64s,
@@ -496,26 +510,29 @@ export default function CabinetVisionPage() {
     setFiles(uploadedFiles);
   };
 
+  const handleDoorStyleChange = (style: DoorStyle) => {
+    const finishesForStyle = FINISH_OPTIONS.filter(f => f.availableFor.includes(style));
+    const currentFinishValid = finishesForStyle.find(f => f.id === selections.finish.id);
+    setSelections(prev => ({ 
+      ...prev, 
+      doorStyle: style, 
+      finish: currentFinishValid || finishesForStyle[0] 
+    }));
+  };
+
   const handleVisualize = () => {
     if (vizState.originalImages.length === 0) return;
-    
-    // If we don't have lead info yet, show the modal
     if (!leadInfo.email) {
       setShowLeadCapture(true);
       return;
     }
-    
-    runVisualization();
+    runVisualizationWithLead(leadInfo.name, leadInfo.phone, leadInfo.email);
   };
 
   const handleLeadSubmit = (name: string, phone: string, email: string) => {
     setLeadInfo({ name, phone, email });
     setShowLeadCapture(false);
     runVisualizationWithLead(name, phone, email);
-  };
-
-  const runVisualization = async () => {
-    runVisualizationWithLead(leadInfo.name, leadInfo.phone, leadInfo.email);
   };
 
   const runVisualizationWithLead = async (name: string, phone: string, email: string) => {
@@ -531,9 +548,9 @@ export default function CabinetVisionPage() {
       fd.append("image", currentFile);
       fd.append("style", selections.doorStyle);
       fd.append("color", selections.finish.id);
-      fd.append("hardwareStyle", selections.hardwareStyle);
-      fd.append("hardwareColor", selections.hardwareFinish);
-      fd.append("hardware", `${selections.hardwareStyle} ${selections.hardwareFinish}`);
+      fd.append("hardwareStyle", selections.hardware.name);
+      fd.append("hardwareColor", selections.hardware.finish);
+      fd.append("hardware", `${selections.hardware.name} ${selections.hardware.finish}`);
       fd.append("name", name);
       fd.append("phone", phone);
       fd.append("email", email);
@@ -568,27 +585,57 @@ export default function CabinetVisionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col font-['Inter']">
-      {/* Navigation */}
+    <div className="min-h-screen bg-[#0a0a0f] flex flex-col">
       <Navigation />
       
-      {/* Main Content - add top padding to account for fixed nav */}
       <main className="flex-1 container mx-auto px-4 py-8 lg:px-8 pt-24">
-        <div className="max-w-[1400px] mx-auto">
+        <div className="max-w-[1600px] mx-auto">
           {vizState.originalImages.length === 0 ? (
-            <div className="max-w-3xl mx-auto py-16 space-y-12">
+            /* ========== UPLOAD STATE ========== */
+            <div className="max-w-4xl mx-auto py-12 space-y-12">
               <div className="text-center space-y-4">
-                <h2 className="text-5xl font-black text-white tracking-tighter uppercase">Visualizer</h2>
-                <p className="text-xl text-slate-300 font-medium">Upload photos of your existing kitchen to start.</p>
+                <h1 className="text-5xl md:text-6xl font-bold text-white">
+                  Kitchen <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35]">Visualizer</span>
+                </h1>
+                <p className="text-xl text-white/60 max-w-2xl mx-auto">
+                  Upload photos of your kitchen and see it transformed with premium cabinet doors and hardware.
+                </p>
               </div>
               <Uploader onUpload={handleUpload} />
+              
+              {/* Product Showcase */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
+                <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#FF8A3D]/20 to-transparent flex items-center justify-center mb-4">
+                    <span className="text-2xl">🚪</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">5 Door Styles</h3>
+                  <p className="text-white/60 text-sm">From classic Shaker to modern Slab profiles</p>
+                </div>
+                <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#FF8A3D]/20 to-transparent flex items-center justify-center mb-4">
+                    <span className="text-2xl">🎨</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">13+ Finishes</h3>
+                  <p className="text-white/60 text-sm">Premium colors and authentic wood grains</p>
+                </div>
+                <div className="bg-white/5 rounded-2xl p-6 border border-white/10">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#FF8A3D]/20 to-transparent flex items-center justify-center mb-4">
+                    <span className="text-2xl">✨</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">Designer Hardware</h3>
+                  <p className="text-white/60 text-sm">Curated pulls and knobs in 4 finishes</p>
+                </div>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
-              {/* Left Column: Visualizer Window */}
+            /* ========== CONFIGURATOR STATE ========== */
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+              {/* Left: Visualizer Preview */}
               <div className="xl:col-span-8 space-y-6">
-                <div className="bg-slate-900 rounded-[3rem] p-4 shadow-2xl relative overflow-hidden border-[12px] border-slate-800 ring-1 ring-slate-700">
-                  <div className="relative aspect-video rounded-[2.5rem] overflow-hidden bg-black">
+                {/* Main Preview */}
+                <div className="bg-black rounded-3xl p-2 shadow-2xl ring-1 ring-white/10">
+                  <div className="relative aspect-video rounded-2xl overflow-hidden">
                     {vizState.modifiedImages[vizState.currentImageIndex] ? (
                       <ComparisonSlider 
                         original={vizState.originalImages[vizState.currentImageIndex]} 
@@ -599,25 +646,23 @@ export default function CabinetVisionPage() {
                         <img 
                           src={vizState.originalImages[vizState.currentImageIndex]} 
                           alt="Current View" 
-                          className={`w-full h-full object-cover transition-all ${vizState.isLoading ? "opacity-50 blur-sm scale-105" : "opacity-80"}`} 
+                          className={`w-full h-full object-cover transition-all duration-500 ${vizState.isLoading ? "opacity-50 blur-sm scale-105" : ""}`} 
                         />
                         {vizState.isLoading ? (
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-center text-white px-6">
-                              <div className="relative w-20 h-20 mx-auto mb-6">
-                                <div className="absolute inset-0 border-4 border-[#f07c3c]/30 rounded-full" />
-                                <div className="absolute inset-0 border-4 border-[#f07c3c] border-t-transparent rounded-full animate-spin" />
-                              </div>
-                              <p className="font-black text-2xl tracking-tighter uppercase animate-pulse">Designing...</p>
+                            <div className="text-center space-y-4">
+                              <div className="w-20 h-20 border-4 border-white/20 border-t-[#FF8A3D] rounded-full animate-spin mx-auto" />
+                              <p className="text-white font-bold text-xl animate-pulse">Transforming your kitchen...</p>
                             </div>
                           </div>
                         ) : (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="text-center">
-                              <button onClick={handleVisualize} className="bg-[#f07c3c] text-white px-10 py-4 rounded-full font-black uppercase text-xs tracking-widest hover:scale-105 transition-transform shadow-2xl shadow-orange-500/50">
-                                Visualize This View
-                              </button>
-                            </div>
+                          <div className="absolute inset-0 flex items-end justify-center pb-8">
+                            <button 
+                              onClick={handleVisualize}
+                              className="px-10 py-4 bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35] text-white font-bold rounded-full shadow-2xl shadow-orange-500/50 hover:shadow-orange-500/70 transition-all hover:scale-105"
+                            >
+                              ✨ Generate Visualization
+                            </button>
                           </div>
                         )}
                       </div>
@@ -625,66 +670,184 @@ export default function CabinetVisionPage() {
                   </div>
                 </div>
 
-                {/* Thumbnail Gallery */}
-                <div className="flex gap-4 overflow-x-auto pb-4 px-2">
+                {/* Thumbnails */}
+                <div className="flex gap-3 overflow-x-auto pb-2">
                   {vizState.originalImages.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setVizState(prev => ({ ...prev, currentImageIndex: idx }))}
-                      className={`relative w-24 h-24 flex-shrink-0 rounded-2xl overflow-hidden border-4 transition-all ${
+                      className={`relative w-24 h-24 flex-shrink-0 rounded-xl overflow-hidden transition-all ${
                         vizState.currentImageIndex === idx 
-                          ? "border-[#f07c3c] shadow-lg scale-105" 
-                          : "border-slate-800 opacity-60 hover:opacity-100"
+                          ? "ring-2 ring-[#FF8A3D] scale-105" 
+                          : "ring-1 ring-white/10 opacity-60 hover:opacity-100"
                       }`}
                     >
                       <img src={img} alt={`Photo ${idx + 1}`} className="w-full h-full object-cover" />
                       {vizState.modifiedImages[idx] && (
-                        <div className="absolute top-1 right-1 w-3 h-3 bg-green-500 rounded-full border border-white" />
+                        <div className="absolute top-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
                       )}
                     </button>
                   ))}
                   <button 
                     onClick={() => setVizState({ originalImages: [], modifiedImages: {}, currentImageIndex: 0, isLoading: false, error: null })}
-                    className="w-24 h-24 flex-shrink-0 rounded-2xl border-4 border-dashed border-slate-700 flex flex-col items-center justify-center text-slate-500 hover:border-[#f07c3c] hover:text-[#f07c3c] bg-slate-900 transition-colors"
+                    className="w-24 h-24 flex-shrink-0 rounded-xl border-2 border-dashed border-white/20 flex flex-col items-center justify-center text-white/40 hover:border-[#FF8A3D] hover:text-[#FF8A3D] transition-colors"
                   >
-                    <span className="text-2xl font-black">+</span>
-                    <span className="text-[9px] font-black uppercase">New</span>
+                    <span className="text-2xl">+</span>
+                    <span className="text-xs">New</span>
                   </button>
                 </div>
 
                 {vizState.error && (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-600 text-sm">
+                  <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-red-400 text-sm">
                     {vizState.error}
                   </div>
                 )}
               </div>
 
-              {/* Right Column: Configurator */}
-              <div className="xl:col-span-4 sticky top-28 space-y-6">
-                <SelectionPanel 
-                  selections={selections} 
-                  onChange={(u) => setSelections(prev => ({ ...prev, ...u }))} 
-                  onVisualize={handleVisualize}
-                  isLoading={vizState.isLoading}
-                />
-                
-                <div className="bg-slate-900 p-8 rounded-[3rem] border border-slate-800 shadow-sm">
-                  <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4">Current Specification</h4>
-                  <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-xs font-bold text-slate-400">Door</span>
-                      <span className="text-xs font-black text-white uppercase">{selections.doorStyle}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-xs font-bold text-slate-400">Color</span>
-                      <span className="text-xs font-black text-white uppercase">{selections.finish.name}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-xs font-bold text-slate-400">Hardware</span>
-                      <span className="text-xs font-black text-white uppercase">{selections.hardwareStyle}</span>
-                    </div>
-                  </div>
+              {/* Right: Configurator Panel */}
+              <div className="xl:col-span-4 space-y-6">
+                {/* Steps Tabs */}
+                <div className="flex bg-white/5 rounded-xl p-1 border border-white/10">
+                  {[
+                    { num: 1, label: "Style" },
+                    { num: 2, label: "Finish" },
+                    { num: 3, label: "Hardware" }
+                  ].map((step) => (
+                    <button
+                      key={step.num}
+                      onClick={() => setActiveStep(step.num as 1 | 2 | 3)}
+                      className={`flex-1 py-3 px-4 rounded-lg text-sm font-bold transition-all ${
+                        activeStep === step.num
+                          ? "bg-[#FF8A3D] text-white shadow-lg"
+                          : "text-white/60 hover:text-white"
+                      }`}
+                    >
+                      {step.num}. {step.label}
+                    </button>
+                  ))}
                 </div>
+
+                {/* Step Content */}
+                <div className="bg-white/5 rounded-2xl border border-white/10 p-5 space-y-5 max-h-[60vh] overflow-y-auto">
+                  {activeStep === 1 && (
+                    <>
+                      <h3 className="text-lg font-bold text-white">Select Door Style</h3>
+                      <div className="space-y-3">
+                        {DOOR_STYLES.map((style) => (
+                          <ProductCard
+                            key={style.id}
+                            image={style.heroImage}
+                            title={style.name}
+                            subtitle={style.desc}
+                            isSelected={selections.doorStyle === style.id}
+                            onClick={() => handleDoorStyleChange(style.id)}
+                            size="normal"
+                          />
+                        ))}
+                      </div>
+                      <button 
+                        onClick={() => setActiveStep(2)}
+                        className="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-colors"
+                      >
+                        Next: Choose Finish →
+                      </button>
+                    </>
+                  )}
+
+                  {activeStep === 2 && (
+                    <>
+                      <h3 className="text-lg font-bold text-white">Select Finish</h3>
+                      <p className="text-white/50 text-sm">Available for {DOOR_STYLES.find(d => d.id === selections.doorStyle)?.name}</p>
+                      <div className="grid grid-cols-2 gap-3">
+                        {availableFinishes.map((finish) => (
+                          <ProductCard
+                            key={finish.id}
+                            image={finish.doorImage}
+                            title={finish.name}
+                            subtitle={finish.isWoodGrain ? "Wood Grain" : "Solid"}
+                            isSelected={selections.finish.id === finish.id}
+                            onClick={() => setSelections(prev => ({ ...prev, finish }))}
+                            size="small"
+                          />
+                        ))}
+                      </div>
+                      <button 
+                        onClick={() => setActiveStep(3)}
+                        className="w-full py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-colors"
+                      >
+                        Next: Choose Hardware →
+                      </button>
+                    </>
+                  )}
+
+                  {activeStep === 3 && (
+                    <>
+                      <h3 className="text-lg font-bold text-white">Select Hardware</h3>
+                      
+                      {/* Hardware Style Tabs */}
+                      <div className="flex flex-wrap gap-2">
+                        {hardwareStyles.map((style) => (
+                          <button
+                            key={style}
+                            onClick={() => setSelectedHardwareStyle(style)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                              selectedHardwareStyle === style
+                                ? "bg-[#FF8A3D] text-white"
+                                : "bg-white/10 text-white/60 hover:text-white"
+                            }`}
+                          >
+                            {style}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Hardware Options */}
+                      <div className="grid grid-cols-4 gap-3">
+                        {filteredHardware.map((hw) => (
+                          <HardwareThumbnail
+                            key={hw.id}
+                            hardware={hw}
+                            isSelected={selections.hardware.id === hw.id}
+                            onClick={() => setSelections(prev => ({ ...prev, hardware: hw }))}
+                          />
+                        ))}
+                      </div>
+                      
+                      {/* Selected Hardware Info */}
+                      <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl">
+                        <div className="w-16 h-16 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg flex items-center justify-center p-2">
+                          <Image 
+                            src={selections.hardware.withKnob} 
+                            alt={selections.hardware.name}
+                            width={48}
+                            height={48}
+                            className="object-contain"
+                          />
+                        </div>
+                        <div>
+                          <div className="font-bold text-white">{selections.hardware.name}</div>
+                          <div className="text-sm text-white/60">{selections.hardware.finish}</div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {/* Live Preview Panel */}
+                <LivePreviewPanel selections={selections} />
+
+                {/* Generate Button */}
+                <button
+                  onClick={handleVisualize}
+                  disabled={vizState.isLoading}
+                  className={`w-full py-5 rounded-2xl font-bold text-lg transition-all ${
+                    vizState.isLoading
+                      ? "bg-white/10 text-white/40 cursor-not-allowed"
+                      : "bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35] text-white hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5"
+                  }`}
+                >
+                  {vizState.isLoading ? "Generating..." : "✨ Apply & Visualize"}
+                </button>
               </div>
             </div>
           )}
