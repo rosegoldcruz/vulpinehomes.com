@@ -4,16 +4,31 @@ import { AccessToken } from "livekit-server-sdk";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const room = "vulpine_fox_room";
-  const participant = "fox_user_" + Math.random().toString(36).slice(2);
+  const apiKey = process.env.LIVEKIT_API_KEY;
+  const apiSecret = process.env.LIVEKIT_API_SECRET;
+  const url = process.env.LIVEKIT_URL;
 
-  const at = new AccessToken(
-    process.env.LIVEKIT_API_KEY!,
-    process.env.LIVEKIT_SECRET!,
-    { identity: participant }
-  );
+  if (!apiKey || !apiSecret || !url) {
+    return NextResponse.json(
+      {
+        error:
+          "LiveKit not configured. Required env vars: LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET",
+      },
+      { status: 500 }
+    );
+  }
 
-  at.addGrant({ room, roomJoin: true });
+  const room = "vulpine-fox";
+  const participant = `fox_user_${crypto.randomUUID()}`;
 
-  return NextResponse.json({ token: at.toJwt(), room });
+  const at = new AccessToken(apiKey, apiSecret, { identity: participant });
+  at.addGrant({
+    room,
+    roomJoin: true,
+    canPublish: true,
+    canSubscribe: true,
+    canPublishData: true,
+  });
+
+  return NextResponse.json({ token: at.toJwt(), room, url });
 }
