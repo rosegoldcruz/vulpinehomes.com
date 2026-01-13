@@ -58,9 +58,9 @@ export default function MobileNav() {
   ];
 
   return (
-    <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
+    <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-auto">
         <FloatingDock
-          mobileClassName="bg-[#0a0a0f] border border-white/10 rounded-full"
+          mobileClassName="bg-[#0a0a0f] border border-white/10 rounded-2xl px-2"
           items={links}
         />
     </div>

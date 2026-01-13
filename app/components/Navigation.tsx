@@ -5,42 +5,54 @@ import Image from "next/image";
 import { useState } from "react";
 import { NAV_ITEMS } from "@/lib/navigation";
 import { CTAButton } from "./CTAButton";
-import { GooeyNav } from "./ui/GooeyNav";
+import { Tabs } from "./ui/tabs";
 
 export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  // Convert NAV_ITEMS to Tabs format
+  const navTabs = NAV_ITEMS.map(item => ({
+    title: item.label,
+    value: item.href,
+    href: item.href
+  }));
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0f]/95 backdrop-blur-md border-b border-white/10">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0f]/80 backdrop-blur-xl border-b border-white/5 transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 relative z-10">
             <Image
               src="/marketing/Textvulpine.png"
               alt="Vulpine Homes"
               width={240}
               height={66}
-              className="h-14 w-auto object-contain"
+              className="h-12 w-auto object-contain brightness-125"
               priority
             />
           </Link>
 
-          {/* Desktop Navigation + CTA */}
-          <div className="hidden md:flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <GooeyNav items={NAV_ITEMS} />
-            </div>
+          {/* Desktop Navigation - Animated Tabs Style */}
+          <div className="hidden md:flex items-center absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
+             <div className="bg-white/5 border border-white/10 rounded-full p-1.5 backdrop-blur-sm shadow-2xl">
+                <Tabs tabs={navTabs} />
+             </div>
+          </div>
+
+          {/* Desktop Call/CTA */}
+          <div className="hidden md:flex items-center gap-4 relative z-10">
             {/* Call & Text Buttons */}
-            <div className="flex items-center gap-2 ml-2">
-              <a href="tel:4803648205" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/90 hover:text-[#FF8A3D] transition-colors">
-                <span>📞</span> Call
+            <div className="flex items-center gap-1 bg-white/5 rounded-full p-1 border border-white/5">
+              <a href="tel:4803648205" className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all">
+                Call
               </a>
-              <a href="sms:4803648205" className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/90 hover:text-[#FF8A3D] transition-colors">
-                <span>💬</span> Text
+              <div className="w-px h-4 bg-white/10"></div>
+              <a href="sms:4803648205" className="flex items-center gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider text-white/70 hover:text-white hover:bg-white/10 rounded-full transition-all">
+                Text
               </a>
             </div>
-            <CTAButton className="ml-2" />
+            <CTAButton />
           </div>
 
           {/* Mobile menu button */}

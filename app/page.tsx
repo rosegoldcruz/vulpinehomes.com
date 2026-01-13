@@ -54,6 +54,8 @@ export default function HomePage() {
       </Suspense>
 
       <ScrollStack>
+      {/* Hero Section Group (Hero + Trust + Stats) */}
+      <div className="relative">
       {/* Hero Section */}
       <section className="relative min-h-screen overflow-hidden">
         {/* Video Background */}
@@ -71,7 +73,7 @@ export default function HomePage() {
         </div>
 
         {/* Hero Content */}
-        <FadeIn className="relative min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center z-10 py-20">
+        <FadeIn className="relative min-h-[80vh] flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-center z-10 py-20 pb-40">
           <SlideUp className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight mb-6 text-white leading-tight">
             Smarter Kitchen Transformations —<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35]">
@@ -104,7 +106,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Trust Bar */}
+      {/* Trust Bar - now inside the group */}
       <section className="relative py-8 border-y border-white/10" style={{ background: 'linear-gradient(180deg, #0f0f18 0%, #12121c 100%)' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center lg:text-left">
@@ -123,7 +125,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Statistics Section */}
+      {/* Statistics Section - now inside the group */}
       <section className="py-12 border-b border-white/10" style={{ background: '#0f0f18' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
@@ -161,6 +163,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </div>
 
       {/* MEET YOUR PROJECT ADVISORS */}
       <section id="advisors" className="py-24 relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%)' }}>
