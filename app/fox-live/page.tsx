@@ -2,8 +2,8 @@
 
 import Script from "next/script";
 import { useEffect, useRef, useState } from "react";
-import LiveKitClient from "@/lib/livekit";
-import type { Room, RemoteTrackPublication, RemoteParticipant, Track } from "livekit-client";
+import { Room } from "livekit-client";
+import type { RemoteTrackPublication, RemoteParticipant, Track } from "livekit-client";
 
 declare global {
   interface Window {
@@ -34,7 +34,39 @@ export default function FoxLivePage() {
       setIsConnecting(true);
 
       try {
-        const room = await LiveKitClient.connect();
+        const res = await fetch("/api/livekit-token", {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-store",
+          },
+        });
+
+        const data = (await res.json()) as { token?: unknown; url?: unknown; error?: string };
+        if (!res.ok) {
+          throw new Error(data?.error || "Failed to fetch LiveKit token");
+        }
+
+        const token = data?.token;
+        const url = data?.url;
+        console.log("LiveKit token type:", typeof token);
+
+        if (typeof token !== "string" || !token) {
+          throw new Error("LiveKit token must be a string");
+        }
+        if (typeof url !== "string" || !url) {
+          throw new Error("LiveKit URL missing or invalid");
+        }
+
+        // Disconnect any previous room before establishing a new session.
+        try {
+          roomRef.current?.disconnect();
+        } catch {
+          // ignore
+        }
+
+        const room = new Room();
+        await room.connect(url, token);
         roomRef.current = room;
 
         // Mic input (LiveKit only)
@@ -199,14 +231,12 @@ export default function FoxLivePage() {
       {/* Start overlay (also used by /public/fox-live.js) */}
       <div
         id="start"
-        className="absolute inset-0 z-40 flex flex-col items-center justify-center text-white text-center p-6"
-        style={{ background: "radial-gradient(circle at center, #111 0%, #000 70%)" }}
+        className="absolute inset-0 z-40 flex flex-col items-center justify-center text-white text-center p-6 bg-gradient-to-b from-gray-950 via-gray-900 to-black"
       >
         <button
           id="startBtn"
           type="button"
-          className="appearance-none border-0 rounded-full px-8 py-5 text-lg font-bold"
-          style={{ background: "linear-gradient(135deg, #ff8a3d, #ff6b35)", color: "#000" }}
+          className="appearance-none border-0 rounded-full px-8 py-5 text-lg font-bold bg-gradient-to-r from-orange-500 to-red-600 text-white shadow-lg shadow-orange-500/25"
         >
           Tap to Meet the Fox
         </button>
@@ -218,7 +248,7 @@ export default function FoxLivePage() {
         </div>
       </div>
 
-      <Script type="module" src="/fox-live.js" strategy="afterInteractive" />
+        <Script type="module" src="/fox-live.v2.js" strategy="afterInteractive" />
     </main>
   );
 }
