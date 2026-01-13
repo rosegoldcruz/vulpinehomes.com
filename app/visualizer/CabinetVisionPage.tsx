@@ -24,6 +24,12 @@ interface HardwareOption {
   finishId: string;
   thumbnail: string; // Main hardware image
   withKnob: string; // Hardware with knob combo
+  // Size-specific images for live preview on doors
+  sizeImages: {
+    small: string;  // For smaller doors/drawers
+    medium: string; // For standard doors
+    large: string;  // For larger panels
+  };
 }
 
 interface UserSelections {
@@ -41,36 +47,54 @@ interface VisualizerState {
 }
 
 // =============== DOOR STYLES WITH IMAGES ===============
-const DOOR_STYLES: { id: DoorStyle; name: string; desc: string; heroImage: string }[] = [
+// The doorGeometry references specific door profile images that show the actual door construction
+const DOOR_STYLES: { 
+  id: DoorStyle; 
+  name: string; 
+  desc: string; 
+  heroImage: string;
+  doorGeometry: string; // Path to the door geometry visualization
+  geometryPosition: number; // Position in the doors.png sprite (0-4 from left to right)
+}[] = [
   { 
     id: "shaker", 
     name: "Shaker Classic", 
     desc: "Timeless 5-piece door with clean lines",
-    heroImage: "/cabs_clean/doors/shaker_classic/Storm-Shaker_Kitchen.jpg"
+    heroImage: "/cabs_clean/doors/shaker_classic/Storm-Shaker_Kitchen.jpg",
+    doorGeometry: "/marketing/doors.png",
+    geometryPosition: 0 // SHAKER position
   },
   { 
     id: "shaker-slide", 
     name: "Shaker Slide", 
     desc: "Modern Shaker with streamlined profile",
-    heroImage: "/cabs_clean/doors/shaker_slide/Storm-Slide_Kitchen-800x421.jpg"
+    heroImage: "/cabs_clean/doors/shaker_slide/Storm-Slide_Kitchen-800x421.jpg",
+    doorGeometry: "/marketing/doors.png",
+    geometryPosition: 2 // SLIDE position
   },
   { 
     id: "fusion-shaker", 
     name: "Fusion Shaker", 
     desc: "Shaker doors with slab drawer fronts",
-    heroImage: "/cabs_clean/doors/fusion_shaker/Storm-Fusion-Shaker_Kitchen-800x421.jpg"
+    heroImage: "/cabs_clean/doors/fusion_in_shaker/Storm-Fusion-Shaker_Kitchen-800x421.jpg",
+    doorGeometry: "/marketing/doors.png",
+    geometryPosition: 3 // SHAKER FUSION position
   },
   { 
     id: "fusion-slide", 
     name: "Fusion Slide", 
     desc: "Slide doors with modern slab drawers",
-    heroImage: "/cabs_clean/doors/fusion_slide/Storm-Fusion-Slide_Kitchen-800x421.jpg"
+    heroImage: "/cabs_clean/doors/fusion_in_slide/Storm-Fusion-Slide_Kitchen-800x421.jpg",
+    doorGeometry: "/marketing/doors.png",
+    geometryPosition: 4 // SLIDE FUSION position
   },
   { 
     id: "slab", 
     name: "Slab", 
     desc: "Minimalist flat panel, modern aesthetic",
-    heroImage: "/cabs_clean/doors/slab/Storm-Slab_Kitchen-800x421.jpg"
+    heroImage: "/cabs_clean/doors/slab/Storm-Slab_Kitchen-800x421.jpg",
+    doorGeometry: "/marketing/doors.png",
+    geometryPosition: 1 // SLAB position
   },
 ];
 
@@ -96,27 +120,180 @@ const FINISH_OPTIONS: FinishOption[] = [
 // =============== HARDWARE WITH REAL IMAGES ===============
 const HARDWARE_OPTIONS: HardwareOption[] = [
   // Arch
-  { id: "arch-satin", name: "Arch", finish: "Satin Nickel", finishId: "satin_nickel", thumbnail: "/cabs_clean/hardware/arch/Arch_SatinNickel.png", withKnob: "/cabs_clean/hardware/arch/Arch_SatinNickel_with_tpull.png" },
-  { id: "arch-chrome", name: "Arch", finish: "Chrome", finishId: "chrome", thumbnail: "/cabs_clean/hardware/arch/arch_chrome.png", withKnob: "/cabs_clean/hardware/arch/arch_chrome_with_tpull.png" },
-  { id: "arch-matte", name: "Arch", finish: "Matte Black", finishId: "matte_black", thumbnail: "/cabs_clean/hardware/arch/Arch_MatteBlack.png", withKnob: "/cabs_clean/hardware/arch/Arch_MatteBlack_with _tpull.png" },
-  { id: "arch-rose", name: "Arch", finish: "Rose Gold", finishId: "rose_gold", thumbnail: "/cabs_clean/hardware/arch/Arch_RoseGold.png", withKnob: "/cabs_clean/hardware/arch/Arch_RoseGold_with_tpull.png" },
+  { 
+    id: "arch-satin", name: "Arch", finish: "Satin Nickel", finishId: "satin_nickel", 
+    thumbnail: "/cabs_clean/hardware/arch/Arch_SatinNickel.png", 
+    withKnob: "/cabs_clean/hardware/arch/Arch_SatinNickel_with_tpull.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/arch/Arch_SatinNickel-Size 1in 7-16 - Edited.png",
+      medium: "/cabs_clean/hardware/arch/Arch_SatinNickel_Size 6 Inches - Edited.png",
+      large: "/cabs_clean/hardware/arch/Arch_SatinNickel-Size 7 1-8in - Edited.png"
+    }
+  },
+  { 
+    id: "arch-chrome", name: "Arch", finish: "Chrome", finishId: "chrome", 
+    thumbnail: "/cabs_clean/hardware/arch/arch_chrome.png", 
+    withKnob: "/cabs_clean/hardware/arch/arch_chrome_with_tpull.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/arch/arch_chrome_Size 1in 7-16.png",
+      medium: "/cabs_clean/hardware/arch/arch_chrome_6in.png",
+      large: "/cabs_clean/hardware/arch/arch_chrome_7 1-8in.png"
+    }
+  },
+  { 
+    id: "arch-matte", name: "Arch", finish: "Matte Black", finishId: "matte_black", 
+    thumbnail: "/cabs_clean/hardware/arch/Arch_MatteBlack.png", 
+    withKnob: "/cabs_clean/hardware/arch/Arch_MatteBlack_with _tpull.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/arch/Arch_MatteBlack_Size 1in 7-16 - Edited.png",
+      medium: "/cabs_clean/hardware/arch/Arch_MatteBlack_Size 6 Inches - Edited.png",
+      large: "/cabs_clean/hardware/arch/Arch_MatteBlack_Size 7 1-8in - Edited.png"
+    }
+  },
+  { 
+    id: "arch-rose", name: "Arch", finish: "Rose Gold", finishId: "rose_gold", 
+    thumbnail: "/cabs_clean/hardware/arch/Arch_RoseGold.png", 
+    withKnob: "/cabs_clean/hardware/arch/Arch_RoseGold_with_tpull.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/arch/Arch_RoseGoldSize 1in 7-16 - Edited.png",
+      medium: "/cabs_clean/hardware/arch/Arch_RoseGold_Size 6 Inches - Edited.png",
+      large: "/cabs_clean/hardware/arch/Arch_RoseGold_-Size 7 1-8in - Edited.png"
+    }
+  },
   // Bar
-  { id: "bar-matte", name: "Bar Pull", finish: "Matte Black", finishId: "matte_black", thumbnail: "/cabs_clean/hardware/bar/Bar-pulls-black .png", withKnob: "/cabs_clean/hardware/bar/Bar-matte-black-tpull.png" },
-  { id: "bar-satin", name: "Bar Pull", finish: "Satin Nickel", finishId: "satin_nickel", thumbnail: "/cabs_clean/hardware/bar/BarPull_SatinNickel.png", withKnob: "/cabs_clean/hardware/bar/BarPull_SatinNickel_with_tpull.png" },
+  { 
+    id: "bar-matte", name: "Bar Pull", finish: "Matte Black", finishId: "matte_black", 
+    thumbnail: "/cabs_clean/hardware/bar/Bar-pulls-black .png", 
+    withKnob: "/cabs_clean/hardware/bar/Bar-matte-black-tpull.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/bar/Bar-Black-Matte-Pull-4.5-on-Shaker - Edited.png",
+      medium: "/cabs_clean/hardware/bar/Bar-Black-Matte-Pull-6.0-on-Shaker.png",
+      large: "/cabs_clean/hardware/bar/Bar-Black-Matte-Pull-6.0-on-Shaker.png"
+    }
+  },
+  { 
+    id: "bar-satin", name: "Bar Pull", finish: "Satin Nickel", finishId: "satin_nickel", 
+    thumbnail: "/cabs_clean/hardware/bar/BarPull_SatinNickel.png", 
+    withKnob: "/cabs_clean/hardware/bar/BarPull_SatinNickel_with_tpull.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/bar/BarPull_SatinNickel_scale.png",
+      medium: "/cabs_clean/hardware/bar/BarPull_t_SatinNickel.png",
+      large: "/cabs_clean/hardware/bar/BarPull_t_SatinNickel.png"
+    }
+  },
   // Cottage
-  { id: "cottage-chrome", name: "Cottage", finish: "Chrome", finishId: "chrome", thumbnail: "/cabs_clean/hardware/cottage/Cottage__Chrome.png", withKnob: "/cabs_clean/hardware/cottage/Cottage__Chrome_with_knob.png" },
-  { id: "cottage-satin", name: "Cottage", finish: "Satin Nickel", finishId: "satin_nickel", thumbnail: "/cabs_clean/hardware/cottage/Cottage__SatinNickel.png", withKnob: "/cabs_clean/hardware/cottage/Cottage__SatinNickel_with_knob.png" },
-  { id: "cottage-rose", name: "Cottage", finish: "Rose Gold", finishId: "rose_gold", thumbnail: "/cabs_clean/hardware/cottage/Cottage_RoseGold_.png.png", withKnob: "/cabs_clean/hardware/cottage/Cottage_RoseGold_with_knob.png" },
+  { 
+    id: "cottage-chrome", name: "Cottage", finish: "Chrome", finishId: "chrome", 
+    thumbnail: "/cabs_clean/hardware/cottage/Cottage__Chrome.png", 
+    withKnob: "/cabs_clean/hardware/cottage/Cottage__Chrome_with_knob.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/cottage/Cottage__Chrome_Size1 7-32 Inch Knob .png",
+      medium: "/cabs_clean/hardware/cottage/Cottage__Chrome_Size4 3-4 Inches.png",
+      large: "/cabs_clean/hardware/cottage/Cottage__Chrome_Size6 1-6 Inches .png"
+    }
+  },
+  { 
+    id: "cottage-satin", name: "Cottage", finish: "Satin Nickel", finishId: "satin_nickel", 
+    thumbnail: "/cabs_clean/hardware/cottage/Cottage__SatinNickel.png", 
+    withKnob: "/cabs_clean/hardware/cottage/Cottage__SatinNickel_with_knob.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/cottage/Cottage__SatinNickel_Size1 7-32 Inch Knob .png",
+      medium: "/cabs_clean/hardware/cottage/Cottage__SatinNickel_Size4 3-4 Inches .png",
+      large: "/cabs_clean/hardware/cottage/Cottage__SatinNickel_Size6 1-6 Inches .png"
+    }
+  },
+  { 
+    id: "cottage-rose", name: "Cottage", finish: "Rose Gold", finishId: "rose_gold", 
+    thumbnail: "/cabs_clean/hardware/cottage/Cottage_RoseGold_.png.png", 
+    withKnob: "/cabs_clean/hardware/cottage/Cottage_RoseGold_with_knob.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/cottage/Cottage_RoseGold__K.png",
+      medium: "/cabs_clean/hardware/cottage/Cottage_RoseGold_96 .png",
+      large: "/cabs_clean/hardware/cottage/Cottage_RoseGold_128-1.png"
+    }
+  },
   // Loft
-  { id: "loft-satin", name: "Loft", finish: "Satin Nickel", finishId: "satin_nickel", thumbnail: "/cabs_clean/hardware/loft/Loft_SatinNickel.png", withKnob: "/cabs_clean/hardware/loft/Loft_SatinNickel_with_knob.png" },
-  { id: "loft-chrome", name: "Loft", finish: "Chrome", finishId: "chrome", thumbnail: "/cabs_clean/hardware/loft/Loft_Chrome_1.png.png", withKnob: "/cabs_clean/hardware/loft/Loft_Chrome_with_knob.png" },
-  { id: "loft-matte", name: "Loft", finish: "Matte Black", finishId: "matte_black", thumbnail: "/cabs_clean/hardware/loft/Loft_MatteBlack.png", withKnob: "/cabs_clean/hardware/loft/Loft_MatteBlack__with_knob.png" },
-  { id: "loft-rose", name: "Loft", finish: "Rose Gold", finishId: "rose_gold", thumbnail: "/cabs_clean/hardware/loft/Loft_RoseGold.png", withKnob: "/cabs_clean/hardware/loft/Loft_RoseGold_with_knob.png" },
+  { 
+    id: "loft-satin", name: "Loft", finish: "Satin Nickel", finishId: "satin_nickel", 
+    thumbnail: "/cabs_clean/hardware/loft/Loft_SatinNickel.png", 
+    withKnob: "/cabs_clean/hardware/loft/Loft_SatinNickel_with_knob.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/loft/Loft_SatinNickel_size 15-16 inch knob .png",
+      medium: "/cabs_clean/hardware/loft/Loft_SatinNickel_size 4 5-8 inch  .png",
+      large: "/cabs_clean/hardware/loft/Loft_SatinNickel_size 5 7-8 inch .png"
+    }
+  },
+  { 
+    id: "loft-chrome", name: "Loft", finish: "Chrome", finishId: "chrome", 
+    thumbnail: "/cabs_clean/hardware/loft/Loft_Chrome_1.png.png", 
+    withKnob: "/cabs_clean/hardware/loft/Loft_Chrome_with_knob.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/loft/Loft_Chrome_size 15-16 inch knob.png",
+      medium: "/cabs_clean/hardware/loft/Loft_Chrome_size 4 5-8 inch .png",
+      large: "/cabs_clean/hardware/loft/Loft_Chrome_size 5 7-8 inch .png"
+    }
+  },
+  { 
+    id: "loft-matte", name: "Loft", finish: "Matte Black", finishId: "matte_black", 
+    thumbnail: "/cabs_clean/hardware/loft/Loft_MatteBlack.png", 
+    withKnob: "/cabs_clean/hardware/loft/Loft_MatteBlack__with_knob.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/loft/Loft_MatteBlack_size 15-16 inch knob .png",
+      medium: "/cabs_clean/hardware/loft/Loft_MatteBlack_size 4 5-8 inch .png",
+      large: "/cabs_clean/hardware/loft/Loft_MatteBlack_size 5 7-8 inch .png"
+    }
+  },
+  { 
+    id: "loft-rose", name: "Loft", finish: "Rose Gold", finishId: "rose_gold", 
+    thumbnail: "/cabs_clean/hardware/loft/Loft_RoseGold.png", 
+    withKnob: "/cabs_clean/hardware/loft/Loft_RoseGold_with_knob.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/loft/Loft_RoseGold_size 15-16 inch knob .png",
+      medium: "/cabs_clean/hardware/loft/Loft_RoseGold_size 4 5-8 inch .png",
+      large: "/cabs_clean/hardware/loft/Loft_RoseGold_size 5 7-8 inch .png"
+    }
+  },
   // Square
-  { id: "square-satin", name: "Square", finish: "Satin Nickel", finishId: "satin_nickel", thumbnail: "/cabs_clean/hardware/square/Square_SatinNickel.png", withKnob: "/cabs_clean/hardware/square/Square_SatinNickel__with_knob.png" },
-  { id: "square-chrome", name: "Square", finish: "Chrome", finishId: "chrome", thumbnail: "/cabs_clean/hardware/square/Square_chrome.png", withKnob: "/cabs_clean/hardware/square/Square_chrome__with_knob.png" },
-  { id: "square-matte", name: "Square", finish: "Matte Black", finishId: "matte_black", thumbnail: "/cabs_clean/hardware/square/Square_MatteBlack.png", withKnob: "/cabs_clean/hardware/square/Square_MatteBlack__with_knob.png" },
-  { id: "square-rose", name: "Square", finish: "Rose Gold", finishId: "rose_gold", thumbnail: "/cabs_clean/hardware/square/Square_RoseGold.png", withKnob: "/cabs_clean/hardware/square/Square_RoseGold_with_knob.png" },
+  { 
+    id: "square-satin", name: "Square", finish: "Satin Nickel", finishId: "satin_nickel", 
+    thumbnail: "/cabs_clean/hardware/square/Square_SatinNickel.png", 
+    withKnob: "/cabs_clean/hardware/square/Square_SatinNickel__with_knob.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/square/Square_SatinNickel_Size 4 1-4 Inches .png",
+      medium: "/cabs_clean/hardware/square/Square_SatinNickel_Size 5 7-16 Inches.png",
+      large: "/cabs_clean/hardware/square/Square_SatinNickel_Size 15-16 Inch .png"
+    }
+  },
+  { 
+    id: "square-chrome", name: "Square", finish: "Chrome", finishId: "chrome", 
+    thumbnail: "/cabs_clean/hardware/square/Square_chrome.png", 
+    withKnob: "/cabs_clean/hardware/square/Square_chrome__with_knob.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/square/Square_chrome_Size 4 1-4 Inches .png",
+      medium: "/cabs_clean/hardware/square/Square_chrome_Size 5 7-16 Inches .png",
+      large: "/cabs_clean/hardware/square/Square_chrome_Size 15-16 Inch .png"
+    }
+  },
+  { 
+    id: "square-matte", name: "Square", finish: "Matte Black", finishId: "matte_black", 
+    thumbnail: "/cabs_clean/hardware/square/Square_MatteBlack.png", 
+    withKnob: "/cabs_clean/hardware/square/Square_MatteBlack__with_knob.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/square/Square_MatteBlack_Size 4 1-4 Inches .png",
+      medium: "/cabs_clean/hardware/square/Square_MatteBlack_Size 5 7-16 Inches .png",
+      large: "/cabs_clean/hardware/square/Square_MatteBlack_Size 15-16 Inch .png"
+    }
+  },
+  { 
+    id: "square-rose", name: "Square", finish: "Rose Gold", finishId: "rose_gold", 
+    thumbnail: "/cabs_clean/hardware/square/Square_RoseGold.png", 
+    withKnob: "/cabs_clean/hardware/square/Square_RoseGold_with_knob.png",
+    sizeImages: {
+      small: "/cabs_clean/hardware/square/Square_RoseGold_Size 4 1-4 Inches .png",
+      medium: "/cabs_clean/hardware/square/Square_RoseGold_.png",
+      large: "/cabs_clean/hardware/square/Square_RoseGold_Size 15-16 Inch.png"
+    }
+  },
 ];
 
 // =============== UPLOADER COMPONENT ===============
@@ -288,6 +465,72 @@ function ProductCard({
   );
 }
 
+// =============== DOOR STYLE CARD WITH GEOMETRY ===============
+function DoorStyleCard({ 
+  style, 
+  isSelected, 
+  onClick 
+}: { 
+  style: typeof DOOR_STYLES[0];
+  isSelected: boolean; 
+  onClick: () => void;
+}) {
+  // Calculate the clip/position for the doors.png sprite (5 doors side by side)
+  // Each door takes up ~20% of the width
+  const spriteWidth = 5; // 5 doors in the sprite
+  const doorWidthPercent = 100 / spriteWidth;
+  const offsetPercent = style.geometryPosition * doorWidthPercent;
+
+  return (
+    <button
+      onClick={onClick}
+      className={`group relative w-full rounded-2xl overflow-hidden transition-all duration-300 ${
+        isSelected 
+          ? "ring-2 ring-[#FF8A3D] ring-offset-2 ring-offset-[#0a0a0f] scale-[1.02] shadow-xl shadow-orange-500/20" 
+          : "ring-1 ring-white/10 hover:ring-white/30"
+      }`}
+    >
+      {/* Door Geometry Section */}
+      <div className="bg-gradient-to-b from-gray-100 to-gray-200 p-4">
+        <div 
+          className="relative h-24 overflow-hidden"
+          style={{
+            // Use overflow and positioning to show just the relevant door from the sprite
+          }}
+        >
+          <img 
+            src={style.doorGeometry}
+            alt={`${style.name} door geometry`}
+            className="h-full object-contain mx-auto drop-shadow-md transition-transform duration-300 group-hover:scale-105"
+            style={{
+              // Crop to show just the door at this position
+              objectFit: 'contain',
+              objectPosition: `${-offsetPercent * 5 + 50}% center`,
+              width: '500%', // 5 doors = 500% width
+              maxWidth: 'none',
+              marginLeft: `${-offsetPercent * 5}%`
+            }}
+          />
+        </div>
+      </div>
+      
+      {/* Info Section */}
+      <div className="bg-gradient-to-b from-gray-900/90 to-black p-3 text-left">
+        <div className="font-bold text-white text-sm leading-tight">{style.name}</div>
+        <div className="text-white/60 text-xs mt-0.5">{style.desc}</div>
+      </div>
+      
+      {isSelected && (
+        <div className="absolute top-2 right-2 w-6 h-6 bg-[#FF8A3D] rounded-full flex items-center justify-center z-10">
+          <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+          </svg>
+        </div>
+      )}
+    </button>
+  );
+}
+
 // =============== HARDWARE THUMBNAIL ===============
 function HardwareThumbnail({ 
   hardware, 
@@ -328,46 +571,87 @@ function HardwareThumbnail({
 
 // =============== LIVE PREVIEW PANEL ===============
 function LivePreviewPanel({ selections }: { selections: UserSelections }) {
+  // Door geometry reference image path
+  const doorGeometryImage = "/marketing/doors.png";
+  
   return (
     <div className="bg-gradient-to-b from-white/5 to-transparent rounded-2xl border border-white/10 overflow-hidden">
       <div className="p-4 border-b border-white/10">
         <h4 className="text-xs font-bold text-[#FF8A3D] uppercase tracking-widest">Live Preview</h4>
       </div>
       <div className="p-4 space-y-4">
-        {/* Door Preview */}
-        <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-900">
-          <Image 
-            src={selections.finish.doorImage} 
-            alt={`${selections.finish.name} Kitchen`}
-            fill
-            className="object-cover"
-          />
-          <div className="absolute bottom-2 left-2 right-2 flex justify-between items-end">
-            <div className="bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-lg">
-              <div className="text-xs text-white/60">Style</div>
-              <div className="text-sm font-bold text-white">{DOOR_STYLES.find(d => d.id === selections.doorStyle)?.name}</div>
+        {/* Three Door Views with Hardware */}
+        <div className="grid grid-cols-3 gap-3">
+          {/* Cabinet Door (Large) */}
+          <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-50 shadow-inner">
+            <Image 
+              src={selections.hardware.sizeImages.large} 
+              alt="Cabinet Door with Hardware"
+              fill
+              className="object-contain p-1"
+            />
+            <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-[10px] text-center py-0.5 rounded">
+              Cabinet
             </div>
-            <div className="bg-black/70 backdrop-blur-sm px-3 py-1.5 rounded-lg text-right">
-              <div className="text-xs text-white/60">Finish</div>
-              <div className="text-sm font-bold text-white">{selections.finish.name}</div>
+          </div>
+          
+          {/* Drawer (Medium) */}
+          <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-50 shadow-inner">
+            <Image 
+              src={selections.hardware.sizeImages.medium} 
+              alt="Drawer with Hardware"
+              fill
+              className="object-contain p-1"
+            />
+            <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-[10px] text-center py-0.5 rounded">
+              Drawer
+            </div>
+          </div>
+          
+          {/* Small Door/Panel */}
+          <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-50 shadow-inner">
+            <Image 
+              src={selections.hardware.sizeImages.small} 
+              alt="Small Panel with Hardware"
+              fill
+              className="object-contain p-1"
+            />
+            <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-[10px] text-center py-0.5 rounded">
+              Pull
             </div>
           </div>
         </div>
+
+        {/* Selection Summary */}
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="bg-white/5 rounded-lg py-2 px-2">
+            <div className="text-[10px] text-white/50 uppercase tracking-wider">Style</div>
+            <div className="text-xs font-bold text-white truncate">{DOOR_STYLES.find(d => d.id === selections.doorStyle)?.name}</div>
+          </div>
+          <div className="bg-white/5 rounded-lg py-2 px-2">
+            <div className="text-[10px] text-white/50 uppercase tracking-wider">Finish</div>
+            <div className="text-xs font-bold text-white truncate">{selections.finish.name}</div>
+          </div>
+          <div className="bg-white/5 rounded-lg py-2 px-2">
+            <div className="text-[10px] text-white/50 uppercase tracking-wider">Hardware</div>
+            <div className="text-xs font-bold text-white truncate">{selections.hardware.name}</div>
+          </div>
+        </div>
         
-        {/* Hardware Preview */}
-        <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl border border-white/10">
-          <div className="w-16 h-16 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg flex items-center justify-center p-2">
+        {/* Hardware Detail */}
+        <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
+          <div className="w-12 h-12 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg flex items-center justify-center p-1.5 flex-shrink-0">
             <Image 
-              src={selections.hardware.thumbnail} 
-              alt={selections.hardware.name}
-              width={48}
-              height={48}
+              src={selections.hardware.withKnob} 
+              alt={`${selections.hardware.name} with Knob`}
+              width={36}
+              height={36}
               className="object-contain drop-shadow"
             />
           </div>
-          <div>
-            <div className="text-sm font-bold text-white">{selections.hardware.name}</div>
-            <div className="text-xs text-white/60">{selections.hardware.finish}</div>
+          <div className="min-w-0">
+            <div className="text-sm font-bold text-white truncate">{selections.hardware.name}</div>
+            <div className="text-xs text-white/60 truncate">{selections.hardware.finish}</div>
           </div>
         </div>
       </div>
@@ -734,14 +1018,11 @@ export default function CabinetVisionPage() {
                       <h3 className="text-lg font-bold text-white">Select Door Style</h3>
                       <div className="space-y-3">
                         {DOOR_STYLES.map((style) => (
-                          <ProductCard
+                          <DoorStyleCard
                             key={style.id}
-                            image={style.heroImage}
-                            title={style.name}
-                            subtitle={style.desc}
+                            style={style}
                             isSelected={selections.doorStyle === style.id}
                             onClick={() => handleDoorStyleChange(style.id)}
-                            size="normal"
                           />
                         ))}
                       </div>
