@@ -8,6 +8,7 @@ import { Analytics as VercelAnalytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import Navigation from "./components/Navigation";
+import MobileNav from "./components/MobileNav";
 import Footer from "./components/Footer";
 
 export const metadata: Metadata = {
@@ -41,6 +42,7 @@ export default function RootLayout({
       </head>
       <body>
         <Navigation />
+        <MobileNav />
         <Analytics />
         {children}
         <VercelAnalytics />
