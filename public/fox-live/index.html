@@ -16,7 +16,7 @@
         -webkit-tap-highlight-color: transparent;
       }
 
-      #camera {
+      #camera-feed {
         position: fixed;
         inset: 0;
         width: 100%;
@@ -26,7 +26,7 @@
         z-index: 0;
       }
 
-      #scene {
+      #fox-canvas {
         position: fixed;
         inset: 0;
         width: 100%;
@@ -74,8 +74,8 @@
     </style>
   </head>
   <body>
-    <video id="camera" playsinline muted></video>
-    <canvas id="scene"></canvas>
+    <video id="camera-feed" playsinline muted></video>
+    <canvas id="fox-canvas"></canvas>
 
     <div id="start">
       <button id="startBtn" type="button">Tap to Meet the Fox</button>

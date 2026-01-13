@@ -1,5 +1,5 @@
-"use client";
-import FoxAR from "../page";
-export default function Fox3D() {
-  return <FoxAR />;
+import { redirect } from "next/navigation";
+
+export default function Fox3DRedirect() {
+  redirect("/fox-live");
 }

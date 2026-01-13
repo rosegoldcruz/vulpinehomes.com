@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import Analytics from "./components/Analytics";
 import EntitySchema from "./components/schemas/EntitySchema";
@@ -47,11 +46,6 @@ export default function RootLayout({
         {children}
         <VercelAnalytics />
         <SpeedInsights />
-        <Script
-          type="module"
-          src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"
-          strategy="afterInteractive"
-        />
         <Footer />
       </body>
     </html>
