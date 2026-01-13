@@ -11,7 +11,14 @@ const LiveKitClient = {
   room: null as Room | null,
 
   async connect() {
-    const res = await fetch("/api/livekit-token", { method: "GET" });
+    // Always fetch a fresh token per session; avoid Safari caching.
+    const res = await fetch("/api/livekit-token", {
+      method: "GET",
+      cache: "no-store",
+      headers: {
+        "Cache-Control": "no-store",
+      },
+    });
     const data = (await res.json()) as LiveKitTokenResponse;
 
     if (!res.ok) {
@@ -20,6 +27,13 @@ const LiveKitClient = {
 
     if (!data?.token || !data?.url) {
       throw new Error("LiveKit token response missing token/url");
+    }
+
+    // Defensive: if a previous room exists, disconnect before establishing a new session.
+    try {
+      this.room?.disconnect();
+    } catch {
+      // ignore
     }
 
     const room = new Room();

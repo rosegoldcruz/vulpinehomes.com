@@ -3,16 +3,22 @@ import { AccessToken } from "livekit-server-sdk";
 
 export const dynamic = "force-dynamic";
 
+function normalizeLiveKitUrlForClient(url: string) {
+  if (url.startsWith("ws://")) return url.replace(/^ws:\/\//, "wss://");
+  if (url.startsWith("http://")) return url.replace(/^http:\/\//, "https://");
+  return url;
+}
+
 export async function GET() {
   const apiKey = process.env.LIVEKIT_API_KEY;
   const apiSecret = process.env.LIVEKIT_API_SECRET;
-  const url = process.env.LIVEKIT_URL;
+  const url = process.env.LIVEKIT_URL || process.env.NEXT_PUBLIC_LIVEKIT_URL;
 
   if (!apiKey || !apiSecret || !url) {
     return NextResponse.json(
       {
         error:
-          "LiveKit not configured. Required env vars: LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET",
+          "LiveKit not configured. Required env vars: LIVEKIT_URL (or NEXT_PUBLIC_LIVEKIT_URL), LIVEKIT_API_KEY, LIVEKIT_API_SECRET",
       },
       { status: 500 }
     );
@@ -30,5 +36,5 @@ export async function GET() {
     canPublishData: true,
   });
 
-  return NextResponse.json({ token: at.toJwt(), room, url });
+  return NextResponse.json({ token: at.toJwt(), room, url: normalizeLiveKitUrlForClient(url) });
 }

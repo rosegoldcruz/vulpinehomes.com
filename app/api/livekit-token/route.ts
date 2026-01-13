@@ -25,6 +25,12 @@ function checkRateLimit(ip: string): boolean {
 
 export const dynamic = "force-dynamic";
 
+const noStoreHeaders = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+  Pragma: "no-cache",
+  Expires: "0",
+} as const;
+
 function getClientIp(request: NextRequest): string {
   return request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "unknown";
 }
@@ -32,7 +38,7 @@ function getClientIp(request: NextRequest): string {
 function getLiveKitConfig() {
   const apiKey = process.env.LIVEKIT_API_KEY;
   const apiSecret = process.env.LIVEKIT_API_SECRET;
-  const url = process.env.LIVEKIT_URL;
+  const url = process.env.LIVEKIT_URL || process.env.NEXT_PUBLIC_LIVEKIT_URL;
 
   return { apiKey, apiSecret, url };
 }
@@ -51,7 +57,7 @@ export async function GET(request: NextRequest) {
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
         { error: "Rate limit exceeded. Please try again later." },
-        { status: 429 }
+        { status: 429, headers: noStoreHeaders }
       );
     }
 
@@ -60,9 +66,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "LiveKit not configured. Required env vars: LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET",
+            "LiveKit not configured. Required env vars: LIVEKIT_URL (or NEXT_PUBLIC_LIVEKIT_URL), LIVEKIT_API_KEY, LIVEKIT_API_SECRET",
         },
-        { status: 500 }
+        { status: 500, headers: noStoreHeaders }
       );
     }
 
@@ -82,10 +88,10 @@ export async function GET(request: NextRequest) {
       token: token.toJwt(),
       room,
       url: normalizeLiveKitUrlForClient(url),
-    });
+    }, { headers: noStoreHeaders });
   } catch (error) {
     console.error("LiveKit token error:", error);
-    return NextResponse.json({ error: "Failed to generate token" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to generate token" }, { status: 500, headers: noStoreHeaders });
   }
 }
 
@@ -96,7 +102,7 @@ export async function POST(request: NextRequest) {
     if (!checkRateLimit(ip)) {
       return NextResponse.json(
         { error: "Rate limit exceeded. Please try again later." },
-        { status: 429 }
+        { status: 429, headers: noStoreHeaders }
       );
     }
 
@@ -106,14 +112,14 @@ export async function POST(request: NextRequest) {
     if (!identity || typeof identity !== "string" || identity.length > 100) {
       return NextResponse.json(
         { error: "Valid identity is required" },
-        { status: 400 }
+        { status: 400, headers: noStoreHeaders }
       );
     }
     
     if (!roomName || typeof roomName !== "string" || roomName.length > 100) {
       return NextResponse.json(
         { error: "Valid room name is required" },
-        { status: 400 }
+        { status: 400, headers: noStoreHeaders }
       );
     }
     
@@ -124,9 +130,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "LiveKit not configured. Required env vars: LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET",
+            "LiveKit not configured. Required env vars: LIVEKIT_URL (or NEXT_PUBLIC_LIVEKIT_URL), LIVEKIT_API_KEY, LIVEKIT_API_SECRET",
         },
-        { status: 500 }
+        { status: 500, headers: noStoreHeaders }
       );
     }
     
@@ -150,12 +156,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       token,
       url: wsUrl,
-    });
+    }, { headers: noStoreHeaders });
   } catch (error) {
     console.error("LiveKit token error:", error);
     return NextResponse.json(
       { error: "Failed to generate token" },
-      { status: 500 }
+      { status: 500, headers: noStoreHeaders }
     );
   }
 }
