@@ -75,8 +75,8 @@ export async function GET(request: NextRequest) {
     const room = "vulpine-fox";
     const identity = `user-${crypto.randomUUID()}`;
 
-    const token = new AccessToken(apiKey, apiSecret, { identity });
-    token.addGrant({
+    const at = new AccessToken(apiKey, apiSecret, { identity });
+    at.addGrant({
       room,
       roomJoin: true,
       canPublish: true,
@@ -84,8 +84,10 @@ export async function GET(request: NextRequest) {
       canPublishData: true,
     });
 
+    const jwt = await at.toJwt();
+
     return NextResponse.json({
-      token: token.toJwt(),
+      token: jwt,
       room,
       url: normalizeLiveKitUrlForClient(url),
     }, { headers: noStoreHeaders });
