@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import { FadeIn, SlideUp, StaggerContainer, ScaleOnHover } from "@/app/components/ui/Motion";
-import { ScrollStack } from "@/app/components/ui/ScrollStack";
 import { HomepageLinking } from "./components/linking/InternalLinking";
 import { CTAButton } from "./components/CTAButton";
 import CountUp from "./components/CountUp";
@@ -53,7 +52,6 @@ export default function HomePage() {
         <SuccessToast />
       </Suspense>
 
-      <ScrollStack>
       {/* Hero Section Group (Hero + Trust + Stats) */}
       <div className="relative">
       {/* Hero Section */}
@@ -456,7 +454,6 @@ export default function HomePage() {
           </div>
         </div>
       </footer>
-      </ScrollStack>
     </main>
   );
 }
