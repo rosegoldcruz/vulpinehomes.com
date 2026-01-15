@@ -17,54 +17,51 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onSelectStyle }) => {
           <p className="text-xl text-slate-500 max-w-2xl mx-auto">Explore the five signature Vulpine lines, precision-engineered for every aesthetic.</p>
         </div>
 
-        <div className="relative flex justify-center">
-          <img src="/everything-visualized/doors.png" alt="Vulpine Door Styles" className="max-w-full h-auto" />
-          
-          {/* Clickable door areas positioned over the image */}
-          <div className="absolute inset-0 flex justify-center items-center">
-            <div className="relative w-full max-w-4xl">
-              {DOOR_STYLES.map((style, index) => (
-                <button
-                  key={style.id}
-                  onClick={() => onSelectStyle(style.id)}
-                  className="absolute cursor-pointer hover:opacity-80 transition-opacity"
-                  style={{
-                    left: `${index * 20}%`,
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    width: '18%',
-                    height: '80%'
-                  }}
-                  title={style.name}
-                />
-              ))}
+        <div className="space-y-12">
+          <div className="relative flex justify-center">
+            <img src="/everything-visualized/doors.png" alt="Vulpine Door Styles" className="max-w-full h-auto" />
+            
+            {/* Clickable door areas positioned over each door */}
+            <div className="absolute inset-0 flex justify-center items-center">
+              <div className="relative w-full max-w-5xl h-full">
+                {DOOR_STYLES.map((style, index) => (
+                  <button
+                    key={style.id}
+                    onClick={() => onSelectStyle(style.id)}
+                    className="absolute cursor-pointer hover:opacity-30 transition-opacity bg-transparent hover:bg-black/20"
+                    style={{
+                      left: `${2 + index * 19}%`,
+                      top: '25%',
+                      width: '18%',
+                      height: '50%'
+                    }}
+                    title={style.name}
+                  />
+                ))}
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Colors & Materials Section */}
-      <section className="bg-slate-900 rounded-[4rem] p-16 text-white space-y-12 relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-20 opacity-5 pointer-events-none">
-           <svg className="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z" /></svg>
-        </div>
-        <div className="text-center space-y-4 relative z-10">
-          <h2 className="text-5xl font-black tracking-tighter uppercase leading-none">Vulpine Finish Palette</h2>
-          <p className="text-white/60 text-lg max-w-xl mx-auto">From high-gloss modernism to organic wood grains, our finishes are built to last.</p>
-        </div>
-        
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-6 relative z-10">
-          {FINISH_OPTIONS.map(f => (
-            <div key={f.id} className="space-y-3 text-center">
-              <div 
-                className="w-full aspect-square rounded-3xl border-4 border-white/10 shadow-2xl relative overflow-hidden"
-                style={{ backgroundColor: f.hex }}
-              >
-                {f.type === 'Gloss' && <div className="absolute inset-0 bg-gradient-to-tr from-white/0 to-white/30" />}
+          {/* Door Style Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+            {DOOR_STYLES.map((style) => (
+              <div key={style.id} className="group bg-white rounded-[3rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl transition-all">
+                <div className="p-8 space-y-4">
+                  <div className="flex justify-between items-start">
+                    <h3 className="text-3xl font-black text-slate-900 tracking-tighter uppercase">{style.name}</h3>
+                    <span className="bg-orange-50 text-[#f07c3c] px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Premium</span>
+                  </div>
+                  <p className="text-slate-500 leading-relaxed">{style.desc}</p>
+                  <button 
+                    onClick={() => onSelectStyle(style.id)}
+                    className="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#f07c3c] transition-colors"
+                  >
+                    Configure This Series
+                  </button>
+                </div>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-white/50">{f.name}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
