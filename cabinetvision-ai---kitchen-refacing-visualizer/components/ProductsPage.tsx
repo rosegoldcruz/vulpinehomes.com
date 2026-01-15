@@ -17,27 +17,8 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onSelectStyle }) => {
           <p className="text-xl text-slate-500 max-w-2xl mx-auto">Explore the five signature Vulpine lines, precision-engineered for every aesthetic.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {DOOR_STYLES.map((style) => (
-            <div key={style.id} className="group bg-white rounded-[3rem] overflow-hidden border border-slate-100 shadow-sm hover:shadow-2xl transition-all">
-              <div className="aspect-[16/10] overflow-hidden">
-                <img src={style.image} alt={style.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-              </div>
-              <div className="p-10 space-y-6">
-                <div className="flex justify-between items-start">
-                  <h3 className="text-4xl font-black text-slate-900 tracking-tighter uppercase">{style.name}</h3>
-                  <span className="bg-orange-50 text-[#f07c3c] px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Premium</span>
-                </div>
-                <p className="text-slate-500 text-lg leading-relaxed">{style.desc}</p>
-                <button 
-                  onClick={() => onSelectStyle(style.id)}
-                  className="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#f07c3c] transition-colors"
-                >
-                  Configure This Series
-                </button>
-              </div>
-            </div>
-          ))}
+        <div className="flex justify-center">
+          <img src="/everything-visualized/doors.png" alt="Vulpine Door Styles" className="max-w-full h-auto" />
         </div>
       </section>
 
