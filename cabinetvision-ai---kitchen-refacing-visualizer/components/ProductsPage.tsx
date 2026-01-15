@@ -17,8 +17,29 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onSelectStyle }) => {
           <p className="text-xl text-slate-500 max-w-2xl mx-auto">Explore the five signature Vulpine lines, precision-engineered for every aesthetic.</p>
         </div>
 
-        <div className="flex justify-center">
+        <div className="relative flex justify-center">
           <img src="/everything-visualized/doors.png" alt="Vulpine Door Styles" className="max-w-full h-auto" />
+          
+          {/* Clickable door areas positioned over the image */}
+          <div className="absolute inset-0 flex justify-center items-center">
+            <div className="relative w-full max-w-4xl">
+              {DOOR_STYLES.map((style, index) => (
+                <button
+                  key={style.id}
+                  onClick={() => onSelectStyle(style.id)}
+                  className="absolute cursor-pointer hover:opacity-80 transition-opacity"
+                  style={{
+                    left: `${index * 20}%`,
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    width: '18%',
+                    height: '80%'
+                  }}
+                  title={style.name}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
