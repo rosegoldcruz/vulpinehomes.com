@@ -2,30 +2,14 @@ import * as THREE from "https://unpkg.com/three@0.158.0/build/three.module.js";
 import { GLTFLoader } from "https://unpkg.com/three@0.158.0/examples/jsm/loaders/GLTFLoader.js";
 
 function foxLiveMain() {
-  console.log("[fox-live] init v3 - with conversation animations");
+  console.log("[fox-live.v2] Passive renderer initializing");
 
-  const video = document.getElementById("camera-feed");
   const canvas = document.getElementById("fox-canvas");
-  const startOverlay = document.getElementById("start");
-  const startBtn = document.getElementById("startBtn");
-  const errorEl = document.getElementById("error");
-
-  if (!video) {
-    console.error("[fox-live] camera-feed not found");
-    return;
-  }
 
   if (!canvas) {
-    console.error("[fox-live] fox-canvas not found");
+    console.error("[fox-live.v2] fox-canvas not found");
     return;
   }
-
-  if (!startBtn) {
-    console.error("[fox-live] startBtn not found");
-    return;
-  }
-
-  console.log("[fox-live] startBtn found, attaching click listener");
 
   let mixer = null;
   let foxRoot = null;
@@ -34,105 +18,62 @@ function foxLiveMain() {
   let currentAction = null;
   let previousAnimationState = 'idle';
 
-  startBtn.addEventListener("click", async () => {
-    console.log("[fox-live] Button clicked");
+  console.log("[fox-live.v2] Initializing Three.js renderer");
 
-    try {
-      await startCamera();
-      console.log("[fox-live] Camera started");
-      startOverlay.style.display = "none";
-      initThree();
-    } catch (err) {
-      console.error("[fox-live] Failed to start:", err);
-      if (errorEl) {
-        errorEl.textContent = "Camera error: " + (err.message || err);
-      }
-    }
+  const renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    alpha: true,
+    antialias: true
   });
 
-  async function startCamera() {
-    console.log("[fox-live] Requesting camera access");
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      throw new Error("Camera API not supported");
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(
+    45,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100
+  );
+  camera.position.set(0, 1.6, 4);
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x333333, 1.3));
+
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+  dirLight.position.set(3, 6, 2);
+  scene.add(dirLight);
+
+  const loader = new GLTFLoader();
+
+  // Try to load the VR Foxy model with talk animation first
+  loader.load(
+    "/models/vr-foxy-0000/animations/talk/vrfoxy_talk.glb",
+    (gltf) => {
+      console.log("[fox-live.v2] Talk animation model loaded");
+      setupFoxModel(gltf, scene, true);
+    },
+    undefined,
+    (err) => {
+      console.warn("[fox-live.v2] Talk model failed, trying fox.glb:", err);
+      // Fallback to fox.glb
+      loader.load(
+        "/fox.glb",
+        (gltf) => {
+          console.log("[fox-live.v2] Fox model loaded (fallback)");
+          setupFoxModel(gltf, scene, false);
+        },
+        undefined,
+        (err) => {
+          console.error("[fox-live.v2] Failed to load any fox model:", err);
+          createStubModel(scene);
+        }
+      );
     }
+  );
 
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: false,
-      video: {
-        facingMode: { ideal: "environment" },
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      }
-    });
-
-    console.log("[fox-live] Got media stream");
-
-    video.srcObject = stream;
-    video.setAttribute("playsinline", "");
-    video.muted = true;
-
-    await video.play();
-    console.log("[fox-live] Video playing");
-  }
-
-  function initThree() {
-    console.log("[fox-live] Initializing Three.js");
-
-    const renderer = new THREE.WebGLRenderer({
-      canvas: canvas,
-      alpha: true,
-      antialias: true
-    });
-
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    const scene = new THREE.Scene();
-
-    const camera = new THREE.PerspectiveCamera(
-      45,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      100
-    );
-    camera.position.set(0, 1.6, 4);
-
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x333333, 1.3));
-
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-    dirLight.position.set(3, 6, 2);
-    scene.add(dirLight);
-
-    const loader = new GLTFLoader();
-
-    // Try to load the VR Foxy model with talk animation first
-    loader.load(
-      "/models/vr-foxy-0000/animations/talk/vrfoxy_talk.glb",
-      (gltf) => {
-        console.log("[fox-live] Talk animation model loaded");
-        setupFoxModel(gltf, scene, true);
-      },
-      undefined,
-      (err) => {
-        console.warn("[fox-live] Talk model failed, trying fox.glb:", err);
-        // Fallback to fox.glb
-        loader.load(
-          "/fox.glb",
-          (gltf) => {
-            console.log("[fox-live] Fox model loaded (fallback)");
-            setupFoxModel(gltf, scene, false);
-          },
-          undefined,
-          (err) => {
-            console.error("[fox-live] Failed to load any fox model:", err);
-            createStubModel(scene);
-          }
-        );
-      }
-    );
-
-    function setupFoxModel(gltf, scene, hasTalkAnim) {
+  function setupFoxModel(gltf, scene, hasTalkAnim) {
       const fox = gltf.scene;
       foxRoot = fox;
       fox.scale.set(1.3, 1.3, 1.3);
@@ -163,7 +104,7 @@ function foxLiveMain() {
         }
       });
 
-      console.log("[fox-live] Found mouth targets:", mouthTargets.length);
+    console.log("[fox-live.v2] Found mouth targets:", mouthTargets.length);
 
       mixer = new THREE.AnimationMixer(fox);
 
@@ -172,7 +113,7 @@ function foxLiveMain() {
       gltf.animations.forEach((clip) => {
         const name = clip.name.toLowerCase();
         animations[name] = clip;
-        console.log("[fox-live] Found animation:", clip.name);
+      console.log("[fox-live.v2] Found animation:", clip.name);
       });
 
       // Play idle animation initially
@@ -183,11 +124,11 @@ function foxLiveMain() {
       if (idleClip) {
         currentAction = mixer.clipAction(idleClip);
         currentAction.play();
-        console.log("[fox-live] Playing animation:", idleClip.name);
-      }
+      console.log("[fox-live.v2] Playing animation:", idleClip.name);
     }
+  }
 
-    function createStubModel(scene) {
+  function createStubModel(scene) {
       // Never fail silently: stub geometry so rendering continues.
       const stub = new THREE.Mesh(
         new THREE.SphereGeometry(0.5, 16, 16),
@@ -195,12 +136,12 @@ function foxLiveMain() {
       );
       stub.position.set(0, 0, 0);
       scene.add(stub);
-      foxRoot = stub;
-    }
+    foxRoot = stub;
+  }
 
-    const clock = new THREE.Clock();
+  const clock = new THREE.Clock();
 
-    function animate() {
+  function animate() {
       requestAnimationFrame(animate);
 
       // Get animation state from window (set by React component)
@@ -211,7 +152,7 @@ function foxLiveMain() {
 
       // Handle animation state changes
       if (animationState !== previousAnimationState) {
-        console.log("[fox-live] Animation state changed:", animationState);
+      console.log("[fox-live.v2] Animation state changed:", animationState);
         previousAnimationState = animationState;
         
         if (mixer) {
@@ -301,18 +242,17 @@ function foxLiveMain() {
       if (mixer) {
         mixer.update(clock.getDelta());
       }
-      renderer.render(scene, camera);
-    }
-
-    animate();
-    console.log("[fox-live] Render loop started");
-
-    window.addEventListener("resize", () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    renderer.render(scene, camera);
   }
+
+  animate();
+  console.log("[fox-live.v2] Render loop started");
+
+  window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
 }
 
 if (document.readyState === "loading") {
