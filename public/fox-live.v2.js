@@ -254,19 +254,27 @@ function foxLiveMain() {
         }
       }
 
-      // Subtle idle movement
+      // Subtle idle movement + face tracking
       if (foxRoot) {
         const breathe = Math.sin(performance.now() * 0.001) * 0.015;
-        const sway = Math.sin(performance.now() * 0.0006) * 0.08;
-        
-        foxRoot.rotation.y = sway;
         foxRoot.position.y = -1.2 + breathe;
         
-        // Look toward camera when talking
+        // Get face position from FoxRuntime
+        const facePos = window.__FOX_FACE_POSITION || { x: 0, y: 0 };
+        
+        // Blend face tracking with idle sway
+        const idleSway = Math.sin(performance.now() * 0.0006) * 0.08;
+        const targetRotationY = facePos.x * 0.3 + idleSway * 0.3;
+        const targetRotationX = -facePos.y * 0.2;
+        
+        // Smooth interpolation
+        foxRoot.rotation.y += (targetRotationY - foxRoot.rotation.y) * 0.05;
+        
         if (isSpeaking) {
-          foxRoot.rotation.x = Math.sin(performance.now() * 0.002) * 0.03;
+          foxRoot.rotation.x += (targetRotationX - foxRoot.rotation.x) * 0.08;
         } else {
-          foxRoot.rotation.x = Math.sin(performance.now() * 0.0009) * 0.05;
+          const idleNod = Math.sin(performance.now() * 0.0009) * 0.05;
+          foxRoot.rotation.x += ((targetRotationX + idleNod) - foxRoot.rotation.x) * 0.05;
         }
       }
 
