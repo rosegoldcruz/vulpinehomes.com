@@ -1,8 +1,17 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+// Invariant: All cabinet and hardware image sources MUST come from getCabinetImagePath or hardwareSourcesById/hardwarePreviewSources. Do not construct paths inline; missing assets must throw.
+
+import React, { useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Navigation from "../components/Navigation";
+
+// Utility to URL-encode image paths that may contain spaces
+const encodeImagePath = (path: string): string => {
+  // Split by '/' and encode each part separately to preserve path structure
+  return path.split('/').map(part => encodeURIComponent(part)).join('/');
+};
+
 
 // =============== TYPES ===============
 type DoorStyle = "shaker" | "shaker-slide" | "slab" | "fusion-shaker" | "fusion-slide";
@@ -116,6 +125,62 @@ const FINISH_OPTIONS: FinishOption[] = [
   { id: "platinum-teak", name: "Platinum Teak", hex: "#b8a88a", isWoodGrain: true, doorImage: "/cabs_clean/doors/slab/Platinum-Teak-Slab_Kitchen-800x421.jpg", doorDetailImage: "/cabs_clean/doors/slab/slab-platnum-teak.png", availableFor: ["slab"] },
   { id: "wheat-oak", name: "Wheat Oak", hex: "#d4a574", isWoodGrain: true, doorImage: "/cabs_clean/doors/slab/Wheat-Oak-Slab-800x421.jpg", doorDetailImage: "/cabs_clean/doors/slab/slab-wheat-oak.png", availableFor: ["slab"] },
 ];
+
+// Explicit map of cabinet hero images per style/finish combination
+const CABINET_IMAGE_MAP: Record<DoorStyle, Record<string, string>> = {
+  shaker: {
+    flour: "/cabs_clean/doors/shaker_classic/Flour-Shaker_Kitchen.jpg",
+    storm: "/cabs_clean/doors/shaker_classic/Storm-Shaker_Kitchen.jpg",
+    graphite: "/cabs_clean/doors/shaker_classic/Graphite-Shaker_Kitchen.jpg",
+    "espresso-walnut": "/cabs_clean/doors/shaker_classic/Espresso-Walnut-Shaker_Kitchen.jpg",
+    slate: "/cabs_clean/doors/shaker_classic/Slate-Shaker_Kitchen.jpg",
+    mist: "/cabs_clean/doors/shaker_classic/Mist-Shaker_Kitchen.jpg",
+    "latte-walnut": "/cabs_clean/doors/shaker_classic/Latte-Walnut-Shaker_Kitchen.jpg",
+    "nimbus-oak": "/cabs_clean/doors/shaker_classic/Nimbus-Oak-Shaker_Kitchen.jpg",
+    "sable-oak": "/cabs_clean/doors/shaker_classic/Sable-Oak-Shaker.jpg",
+  },
+  "shaker-slide": {
+    flour: "/cabs_clean/doors/shaker_slide/Flour-Slide_Kitchen-800x421.png",
+    storm: "/cabs_clean/doors/shaker_slide/Storm-Slide_Kitchen-800x421.jpg",
+    graphite: "/cabs_clean/doors/shaker_slide/Graphite-Slide_Kitchen.jpg",
+    "espresso-walnut": "/cabs_clean/doors/shaker_slide/Espresso-Walnut-Slide_Kitchen-800x421.jpg",
+  },
+  "fusion-shaker": {
+    flour: "/cabs_clean/doors/fusion_in_shaker/Flour-Fusion-Shaker_Kitchen.jpg",
+    storm: "/cabs_clean/doors/fusion_in_shaker/Storm-Fusion-Shaker_Kitchen.jpg",
+    graphite: "/cabs_clean/doors/fusion_in_shaker/Graphite-Fusion-Shaker_Kitchen.jpg",
+    "espresso-walnut": "/cabs_clean/doors/fusion_in_shaker/Espresso-Walnut-Fusion-Shaker.jpg",
+    "latte-walnut": "/cabs_clean/doors/fusion_in_shaker/Latte-Walnut-Fusion-Shaker_Kitchen.jpg",
+    mist: "/cabs_clean/doors/fusion_in_shaker/Mist-Fusion-Shaker_Kitchen.jpg",
+    slate: "/cabs_clean/doors/fusion_in_shaker/Slate-Fusion-Shaker_Kitchen.jpg",
+  },
+  "fusion-slide": {
+    flour: "/cabs_clean/doors/fusion_in_slide/Flour-Fusion-Slide_Kitchen.jpg",
+    storm: "/cabs_clean/doors/fusion_in_slide/Storm-Fusion-Slide_Kitchen.jpg",
+    graphite: "/cabs_clean/doors/fusion_in_slide/Graphite-Fusion-Slide_Kitchen.jpg",
+    "espresso-walnut": "/cabs_clean/doors/fusion_in_slide/Espresso-Walnut-Fusion-Slide.jpg",
+  },
+  slab: {
+    flour: "/cabs_clean/doors/slab/Flour-Slab_Kitchen-800x421.jpg",
+    storm: "/cabs_clean/doors/slab/Storm-Slab_Kitchen-800x421.jpg",
+    graphite: "/cabs_clean/doors/slab/Graphite-Slab_Kitchen-800x421.jpg",
+    "espresso-walnut": "/cabs_clean/doors/slab/Espresso-Walnut-Slab-800x421.jpg",
+    "latte-walnut": "/cabs_clean/doors/slab/Latte-Walnut-Slab_Kitchen-800x421.jpg",
+    mist: "/cabs_clean/doors/slab/Mist-Slab_Kitchen-800x421.jpg",
+    "platinum-teak": "/cabs_clean/doors/slab/Platinum-Teak-Slab_Kitchen-800x421.jpg",
+    slate: "/cabs_clean/doors/slab/Slate-Slab_Kitchen-800x421.jpg",
+    "snow-gloss": "/cabs_clean/doors/slab/Snow-Gloss-Slab_Kitchen-800x421.jpg",
+    "urban-teak": "/cabs_clean/doors/slab/Urban-Teak-Slab_Kitchen-800x421.jpg",
+    "wheat-oak": "/cabs_clean/doors/slab/Wheat-Oak-Slab-800x421.jpg",
+  },
+};
+
+const getCabinetImagePath = (doorStyle: DoorStyle, finishId: string): string => {
+  const styleMap = CABINET_IMAGE_MAP[doorStyle];
+  if (styleMap?.[finishId]) return styleMap[finishId];
+
+  throw new Error(`Missing cabinet image for style ${doorStyle} with finish ${finishId}`);
+};
 
 // =============== HARDWARE WITH REAL IMAGES ===============
 const HARDWARE_OPTIONS: HardwareOption[] = [
@@ -448,6 +513,7 @@ function ProductCard({
         alt={title}
         fill
         className="object-cover transition-transform duration-500 group-hover:scale-105"
+        key={image}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 p-3 text-left">
@@ -534,10 +600,12 @@ function DoorStyleCard({
 // =============== HARDWARE THUMBNAIL ===============
 function HardwareThumbnail({ 
   hardware, 
+  thumbnailSrc,
   isSelected, 
   onClick 
 }: { 
   hardware: HardwareOption; 
+  thumbnailSrc: string;
   isSelected: boolean; 
   onClick: () => void;
 }) {
@@ -552,10 +620,12 @@ function HardwareThumbnail({
     >
       <div className="relative w-full h-full">
         <Image 
-          src={hardware.thumbnail} 
+          src={thumbnailSrc} 
           alt={`${hardware.name} ${hardware.finish}`}
           fill
           className="object-contain transition-transform duration-300 group-hover:scale-110 drop-shadow-lg"
+          unoptimized
+          key={thumbnailSrc}
         />
       </div>
       {isSelected && (
@@ -570,25 +640,49 @@ function HardwareThumbnail({
 }
 
 // =============== LIVE PREVIEW PANEL ===============
-function LivePreviewPanel({ selections }: { selections: UserSelections }) {
-  // Door geometry reference image path
-  const doorGeometryImage = "/marketing/doors.png";
-  
+function LivePreviewPanel({
+  selections,
+  cabinetPreviewSrc,
+  hardwareSources,
+}: {
+  selections: UserSelections;
+  cabinetPreviewSrc: string;
+  hardwareSources: { large: string; medium: string; small: string; withKnob: string };
+}) {
+  const { large, medium, small, withKnob } = hardwareSources;
+
   return (
     <div className="bg-gradient-to-b from-white/5 to-transparent rounded-2xl border border-white/10 overflow-hidden">
       <div className="p-4 border-b border-white/10">
         <h4 className="text-xs font-bold text-[#FF8A3D] uppercase tracking-widest">Live Preview</h4>
       </div>
       <div className="p-4 space-y-4">
+        {/* Cabinet hero driven by door + finish selection */}
+        <div className="relative aspect-video rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-50 shadow-inner">
+          <Image
+            src={cabinetPreviewSrc}
+            alt="Cabinet preview"
+            fill
+            className="object-cover"
+            unoptimized
+            key={cabinetPreviewSrc}
+          />
+          <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-[10px] text-center py-0.5 rounded">
+            Cabinet Preview
+          </div>
+        </div>
+
         {/* Three Door Views with Hardware */}
         <div className="grid grid-cols-3 gap-3">
           {/* Cabinet Door (Large) */}
           <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-50 shadow-inner">
             <Image 
-              src={selections.hardware.sizeImages.large} 
+              src={large} 
               alt="Cabinet Door with Hardware"
               fill
               className="object-contain p-1"
+              unoptimized
+              key={large}
             />
             <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-[10px] text-center py-0.5 rounded">
               Cabinet
@@ -598,10 +692,12 @@ function LivePreviewPanel({ selections }: { selections: UserSelections }) {
           {/* Drawer (Medium) */}
           <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-50 shadow-inner">
             <Image 
-              src={selections.hardware.sizeImages.medium} 
+              src={medium} 
               alt="Drawer with Hardware"
               fill
               className="object-contain p-1"
+              unoptimized
+              key={medium}
             />
             <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-[10px] text-center py-0.5 rounded">
               Drawer
@@ -611,10 +707,12 @@ function LivePreviewPanel({ selections }: { selections: UserSelections }) {
           {/* Small Door/Panel */}
           <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-50 shadow-inner">
             <Image 
-              src={selections.hardware.sizeImages.small} 
+              src={small} 
               alt="Small Panel with Hardware"
               fill
               className="object-contain p-1"
+              unoptimized
+              key={small}
             />
             <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-[10px] text-center py-0.5 rounded">
               Pull
@@ -642,11 +740,13 @@ function LivePreviewPanel({ selections }: { selections: UserSelections }) {
         <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
           <div className="w-12 h-12 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg flex items-center justify-center p-1.5 flex-shrink-0">
             <Image 
-              src={selections.hardware.withKnob} 
+              src={withKnob} 
               alt={`${selections.hardware.name} with Knob`}
               width={36}
               height={36}
               className="object-contain drop-shadow"
+              unoptimized
+              key={withKnob}
             />
           </div>
           <div className="min-w-0">
@@ -782,6 +882,42 @@ export default function CabinetVisionPage() {
   const hardwareStyles = ["Arch", "Bar Pull", "Cottage", "Loft", "Square"];
   const [selectedHardwareStyle, setSelectedHardwareStyle] = useState("Arch");
   const filteredHardware = HARDWARE_OPTIONS.filter(h => h.name === selectedHardwareStyle);
+
+  const hardwareSourcesById = useMemo(() => {
+    const entries = HARDWARE_OPTIONS.map((hardware) => {
+      const { thumbnail, withKnob, sizeImages } = hardware;
+      if (!thumbnail || !withKnob || !sizeImages.large || !sizeImages.medium || !sizeImages.small) {
+        throw new Error(`Missing hardware assets for ${hardware.id}`);
+      }
+
+      return [
+        hardware.id,
+        {
+          thumbnail: encodeImagePath(thumbnail),
+          withKnob: encodeImagePath(withKnob),
+          large: encodeImagePath(sizeImages.large),
+          medium: encodeImagePath(sizeImages.medium),
+          small: encodeImagePath(sizeImages.small),
+        },
+      ];
+    });
+
+    return Object.fromEntries(entries) as Record<HardwareOption["id"], { thumbnail: string; withKnob: string; large: string; medium: string; small: string }>;
+  }, []);
+
+  // Single sources of truth for preview images
+  const cabinetPreviewSrc = useMemo(
+    () => encodeImagePath(getCabinetImagePath(selections.doorStyle, selections.finish.id)),
+    [selections.doorStyle, selections.finish.id]
+  );
+
+  const hardwarePreviewSources = useMemo(() => {
+    const sources = hardwareSourcesById[selections.hardware.id];
+    if (!sources) {
+      throw new Error(`Missing hardware sources for ${selections.hardware.id}`);
+    }
+    return sources;
+  }, [hardwareSourcesById, selections.hardware.id]);
 
   const handleUpload = (base64s: string[], uploadedFiles: File[]) => {
     setVizState({
@@ -1041,15 +1177,20 @@ export default function CabinetVisionPage() {
                       <p className="text-white/50 text-sm">Available for {DOOR_STYLES.find(d => d.id === selections.doorStyle)?.name}</p>
                       <div className="grid grid-cols-2 gap-3">
                         {availableFinishes.map((finish) => (
-                          <ProductCard
-                            key={finish.id}
-                            image={finish.doorImage}
-                            title={finish.name}
-                            subtitle={finish.isWoodGrain ? "Wood Grain" : "Solid"}
-                            isSelected={selections.finish.id === finish.id}
-                            onClick={() => setSelections(prev => ({ ...prev, finish }))}
-                            size="small"
-                          />
+                          {
+                            const finishImageSrc = encodeImagePath(getCabinetImagePath(selections.doorStyle, finish.id));
+                            return (
+                              <ProductCard
+                                key={finish.id}
+                                image={finishImageSrc}
+                                title={finish.name}
+                                subtitle={finish.isWoodGrain ? "Wood Grain" : "Solid"}
+                                isSelected={selections.finish.id === finish.id}
+                                onClick={() => setSelections(prev => ({ ...prev, finish }))}
+                                size="small"
+                              />
+                            );
+                          }
                         ))}
                       </div>
                       <button 
@@ -1084,25 +1225,34 @@ export default function CabinetVisionPage() {
 
                       {/* Hardware Options */}
                       <div className="grid grid-cols-4 gap-3">
-                        {filteredHardware.map((hw) => (
-                          <HardwareThumbnail
-                            key={hw.id}
-                            hardware={hw}
-                            isSelected={selections.hardware.id === hw.id}
-                            onClick={() => setSelections(prev => ({ ...prev, hardware: hw }))}
-                          />
-                        ))}
+                        {filteredHardware.map((hw) => {
+                          const sources = hardwareSourcesById[hw.id];
+                          if (!sources) {
+                            throw new Error(`Missing hardware sources for ${hw.id}`);
+                          }
+
+                          return (
+                            <HardwareThumbnail
+                              key={hw.id}
+                              hardware={hw}
+                              thumbnailSrc={sources.thumbnail}
+                              isSelected={selections.hardware.id === hw.id}
+                              onClick={() => setSelections(prev => ({ ...prev, hardware: hw }))}
+                            />
+                          );
+                        })}
                       </div>
                       
                       {/* Selected Hardware Info */}
                       <div className="flex items-center gap-4 p-4 bg-white/5 rounded-xl">
                         <div className="w-16 h-16 bg-gradient-to-b from-gray-100 to-gray-200 rounded-lg flex items-center justify-center p-2">
                           <Image 
-                            src={selections.hardware.withKnob} 
+                            src={hardwarePreviewSources.withKnob} 
                             alt={selections.hardware.name}
                             width={48}
                             height={48}
                             className="object-contain"
+                            key={hardwarePreviewSources.withKnob}
                           />
                         </div>
                         <div>
@@ -1115,7 +1265,11 @@ export default function CabinetVisionPage() {
                 </div>
 
                 {/* Live Preview Panel */}
-                <LivePreviewPanel selections={selections} />
+                <LivePreviewPanel 
+                  selections={selections} 
+                  cabinetPreviewSrc={cabinetPreviewSrc}
+                  hardwareSources={hardwarePreviewSources}
+                />
 
                 {/* Generate Button */}
                 <button

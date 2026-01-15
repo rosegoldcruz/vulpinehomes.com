@@ -42,3 +42,4 @@ next-env.d.ts
 
 VULPINE-FULL-BACKUP-*.tar.gz
 vulpinehomes-backup-*.tar.gz
+.aider*
