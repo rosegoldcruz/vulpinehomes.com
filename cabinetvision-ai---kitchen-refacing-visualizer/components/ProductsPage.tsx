@@ -14,7 +14,7 @@ const ProductsPage: React.FC<ProductsPageProps> = ({ onSelectStyle }) => {
       <section className="space-y-12">
         <div className="text-center space-y-4">
           <h2 className="text-5xl font-black text-slate-900 tracking-tighter uppercase">Our Cabinet Series</h2>
-          <p className="text-xl text-slate-500 max-w-2xl mx-auto">Explore the four signature Vulpine lines, precision-engineered for every aesthetic.</p>
+          <p className="text-xl text-slate-500 max-w-2xl mx-auto">Explore the five signature Vulpine lines, precision-engineered for every aesthetic.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">

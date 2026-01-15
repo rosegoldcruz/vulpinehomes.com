@@ -4,33 +4,33 @@ import { DoorStyle, FinishOption, HardwareStyle } from './types';
 export const DOOR_STYLES = [
   { 
     id: DoorStyle.SHAKER_CLASSIC, 
-    name: 'Shaker Classic', 
-    desc: 'The timeless 5-piece door style with a wide color palette.',
-    image: 'https://images.unsplash.com/photo-1556909190-eccf4a8bf9ad?auto=format&fit=crop&q=80&w=800' 
+    name: 'Shaker', 
+    desc: 'The timeless 5-piece door style with clean, classic lines.',
+    image: '/everything-visualized/shaker-door.png' 
   },
   { 
     id: DoorStyle.SHAKER_SLIDE, 
-    name: 'Shaker Slide', 
-    desc: 'A modern take on Shaker with a streamlined profile, available in core colors.',
-    image: 'https://images.unsplash.com/photo-1556912177-c5485375968c?auto=format&fit=crop&q=80&w=800' 
+    name: 'Slide', 
+    desc: 'A modern streamlined profile with horizontal emphasis.',
+    image: '/everything-visualized/slide-door.png' 
   },
   { 
     id: DoorStyle.FUSION_SHAKER, 
-    name: 'Fusion Shaker', 
+    name: 'Shaker Fusion', 
     desc: 'Combines Shaker doors with slab drawer fronts for a transitional look.',
-    image: 'https://images.unsplash.com/photo-1556911261-6bd341186b2f?auto=format&fit=crop&q=80&w=800' 
-  },
-  { 
-    id: DoorStyle.FUSION_SLIDE, 
-    name: 'Fusion Slide', 
-    desc: 'Slide profile doors mixed with modern slab drawers.',
-    image: 'https://images.unsplash.com/photo-1484154218962-a1c002085d2f?auto=format&fit=crop&q=80&w=800' 
+    image: '/everything-visualized/shaker-fusion-door.png' 
   },
   { 
     id: DoorStyle.SLAB, 
     name: 'Slab', 
-    desc: 'Minimalist flat doors available in our largest variety of finishes.',
-    image: 'https://images.unsplash.com/photo-1556911223-e1520288c02b?auto=format&fit=crop&q=80&w=800' 
+    desc: 'Minimalist flat doors for contemporary design.',
+    image: '/everything-visualized/slab-door.png' 
+  },
+  { 
+    id: DoorStyle.FUSION_SLIDE, 
+    name: 'Slide Fusion', 
+    desc: 'Slide profile doors mixed with modern slab drawers.',
+    image: '/everything-visualized/slide-fusion-door.png' 
   }
 ];
 

@@ -7,9 +7,18 @@ function foxLiveMain() {
   const canvas = document.getElementById("fox-canvas");
 
   if (!canvas) {
-    console.error("[fox-live.v2] fox-canvas not found");
-    return;
+    console.error("[fox-live.v2] fox-canvas not found - React must mount canvas first");
+    throw new Error("fox-canvas element not found. Ensure React has mounted the canvas.");
   }
+
+  // Validate canvas dimensions
+  const rect = canvas.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) {
+    console.error("[fox-live.v2] Canvas has zero dimensions:", rect);
+    throw new Error("Canvas has zero width or height");
+  }
+
+  console.log("[fox-live.v2] Canvas validated:", rect);
 
   let mixer = null;
   let foxRoot = null;
@@ -24,6 +33,7 @@ function foxLiveMain() {
   const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
     alpha: true,
+    premultipliedAlpha: false,
     antialias: true
   });
 
@@ -31,7 +41,7 @@ function foxLiveMain() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xff0000);
+  scene.background = null; // Transparent for AR overlay
 
   const camera = new THREE.PerspectiveCamera(
     45,
@@ -249,14 +259,9 @@ function foxLiveMain() {
 
   animate();
   console.log("[fox-live.v2] Render loop started");
-
-  window.addEventListener("resize", () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-  });
 }
 
+// Passive initialization - wait for React to mount canvas
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", foxLiveMain, { once: true });
 } else {

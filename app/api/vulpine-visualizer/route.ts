@@ -33,9 +33,9 @@ export async function POST(req: NextRequest) {
     const email = ((formData.get("email") as string) || "").trim();
     const sessionId = ((formData.get("sessionId") as string) || "").trim() || null;
 
-    if (!name || !email || !phone) {
+    if (!name || !phone) {
       return NextResponse.json(
-        { error: "Name, email, and phone are required to run the visualizer" },
+        { error: "Name and phone are required to run the visualizer" },
         { status: 400 },
       );
     }
