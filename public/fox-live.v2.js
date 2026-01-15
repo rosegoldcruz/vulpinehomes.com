@@ -19,6 +19,7 @@ function foxLiveMain() {
   let previousAnimationState = 'idle';
 
   console.log("[fox-live.v2] Initializing Three.js renderer");
+  console.log("[fox-live.v2] canvas:", canvas, canvas?.getBoundingClientRect?.());
 
   const renderer = new THREE.WebGLRenderer({
     canvas: canvas,
@@ -30,6 +31,7 @@ function foxLiveMain() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xff0000);
 
   const camera = new THREE.PerspectiveCamera(
     45,
