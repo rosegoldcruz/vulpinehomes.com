@@ -1176,22 +1176,20 @@ export default function CabinetVisionPage() {
                       <h3 className="text-lg font-bold text-white">Select Finish</h3>
                       <p className="text-white/50 text-sm">Available for {DOOR_STYLES.find(d => d.id === selections.doorStyle)?.name}</p>
                       <div className="grid grid-cols-2 gap-3">
-                        {availableFinishes.map((finish) => (
-                          {
-                            const finishImageSrc = encodeImagePath(getCabinetImagePath(selections.doorStyle, finish.id));
-                            return (
-                              <ProductCard
-                                key={finish.id}
-                                image={finishImageSrc}
-                                title={finish.name}
-                                subtitle={finish.isWoodGrain ? "Wood Grain" : "Solid"}
-                                isSelected={selections.finish.id === finish.id}
-                                onClick={() => setSelections(prev => ({ ...prev, finish }))}
-                                size="small"
-                              />
-                            );
-                          }
-                        ))}
+                        {availableFinishes.map((finish) => {
+                          const finishImageSrc = encodeImagePath(getCabinetImagePath(selections.doorStyle, finish.id));
+                          return (
+                            <ProductCard
+                              key={finish.id}
+                              image={finishImageSrc}
+                              title={finish.name}
+                              subtitle={finish.isWoodGrain ? "Wood Grain" : "Solid"}
+                              isSelected={selections.finish.id === finish.id}
+                              onClick={() => setSelections(prev => ({ ...prev, finish }))}
+                              size="small"
+                            />
+                          );
+                        })}
                       </div>
                       <button 
                         onClick={() => setActiveStep(3)}
