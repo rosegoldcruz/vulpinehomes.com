@@ -113,39 +113,9 @@ export default function ColorSelector() {
         </p>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-        {/* Left side - Color swatches by door style */}
-        <div className="lg:w-[280px] flex-shrink-0 space-y-6">
-          {Object.entries(doorStyleColors).map(([style, colors]) => (
-            <div key={style}>
-              <h3 className="text-sm font-bold text-white/70 uppercase tracking-wider mb-3">
-                {style}
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {colors.map((item) => {
-                  const swatch = colorSwatches[item.color];
-                  const isSelected = selectedStyle === style && selectedColor === item.color;
-                  return (
-                    <button
-                      key={`${style}-${item.color}`}
-                      onClick={() => handleColorClick(style, item.color, item.image)}
-                      className={`w-8 h-8 rounded-full border-2 transition-all duration-150 hover:scale-110 ${
-                        isSelected
-                          ? "border-[#FF8A3D] ring-2 ring-[#FF8A3D] ring-offset-2 ring-offset-[#0f0f18] scale-110"
-                          : "border-white/30 hover:border-white/60"
-                      }`}
-                      style={{ backgroundColor: swatch?.hex || "#888" }}
-                      title={swatch?.name || item.color}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Right side - Kitchen image display */}
-        <div className="flex-1">
+      <div className="flex flex-col gap-8">
+        {/* Kitchen image display */}
+        <div className="w-full">
           <div className="relative bg-white/5 rounded-2xl overflow-hidden shadow-xl border border-white/10">
             {/* Main kitchen image */}
             <div className="relative aspect-[16/10]">

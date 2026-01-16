@@ -155,31 +155,56 @@ export default function ProductsPage() {
             </h2>
           </div>
 
-          {/* Circular Door Style Selector */}
-          <div className="flex flex-wrap justify-center gap-8 md:gap-12 mb-12">
-            {doorStyles.map((door) => (
-              <DoorStyleCircle
-                key={door.id}
-                door={door}
-                isSelected={selectedDoor.id === door.id}
-                onClick={() => setSelectedDoor(door)}
-              />
-            ))}
+          {/* Combined Doors Image with Clickable Areas */}
+          <div className="relative mb-16">
+            <Image
+              src="/everything-visualized/doors.png"
+              alt="Cabinet Door Styles"
+              width={1920}
+              height={600}
+              className="w-full h-auto"
+              priority
+            />
+            
+            {/* Clickable door areas positioned over each door */}
+            <div className="absolute inset-0 flex justify-center items-center">
+              <div className="relative w-full h-full max-w-7xl mx-auto">
+                {doorStyles.map((door, index) => (
+                  <button
+                    key={door.id}
+                    onClick={() => setSelectedDoor(door)}
+                    className="absolute cursor-pointer hover:bg-white/10 transition-all"
+                    style={{
+                      left: `${8 + index * 18.4}%`,
+                      top: '20%',
+                      width: '16%',
+                      height: '60%'
+                    }}
+                    title={door.name}
+                    aria-label={`Select ${door.name}`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
 
-          {/* Selected Door Details */}
-          <div className="max-w-2xl mx-auto text-center bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-            <h3 className="text-2xl md:text-3xl font-bold text-[#FF8A3D] mb-3">{selectedDoor.name}</h3>
-            <p className="text-white/80 text-lg leading-relaxed mb-6">{selectedDoor.detailedDescription}</p>
-            <Link
-              href="#door-colors"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35] text-white font-semibold rounded-full transition-all hover:shadow-lg hover:shadow-[#FF8A3D]/30"
-            >
-              View Color Options
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </Link>
+          {/* Door Information Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {doorStyles.map((door) => (
+              <div
+                key={door.id}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-[#FF8A3D]/50 hover:shadow-xl hover:shadow-[#FF8A3D]/10 transition-all"
+              >
+                <h3 className="text-xl font-bold text-white mb-3">{door.name}</h3>
+                <p className="text-white/70 text-sm leading-relaxed mb-4">{door.detailedDescription}</p>
+                <button
+                  onClick={() => setSelectedDoor(door)}
+                  className="w-full px-4 py-2 bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35] text-white font-semibold rounded-lg transition-all hover:shadow-lg hover:shadow-[#FF8A3D]/30"
+                >
+                  Configure
+                </button>
+              </div>
+            ))}
           </div>
         </div>
       </section>
