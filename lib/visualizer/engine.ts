@@ -106,50 +106,6 @@ async function uploadToSupabaseBucket(params: {
   return publicUrlData.publicUrl;
 }
 
-// Apply cabinet transformation to generate the "after" image
-async function applyCabinetTransformation(
-  imageBuffer: Buffer,
-  options: {
-    colorHex: string;
-    doorStyle: DoorStyleId;
-    hardwareStyle: HardwareStyleId;
-    hardwareFinish: HardwareFinishId;
-    parameters: any;
-  }
-): Promise<Buffer> {
-  const { colorHex, doorStyle, hardwareStyle, hardwareFinish, parameters } = options;
-  
-  try {
-    // Parse the hex color
-    const r = parseInt(colorHex.slice(1, 3), 16);
-    const g = parseInt(colorHex.slice(3, 5), 16);
-    const b = parseInt(colorHex.slice(5, 7), 16);
-    
-    // Apply transformation using Sharp
-    // This creates a visible color change to simulate cabinet refacing
-    const transformed = await sharp(imageBuffer)
-      .modulate({
-        brightness: 1.05, // Slightly brighter to show "new" cabinets
-        saturation: 1.1,  // Enhanced saturation for richer colors
-      })
-      .tint({ r, g, b })   // Apply the selected cabinet color
-      .sharpen(1, 1, 2)   // Add clarity to show "new" cabinets (sigma, flat, jagged)
-      .jpeg({ quality: 92 })
-      .toBuffer();
-    
-    console.log(`✅ Applied transformation: ${doorStyle} in ${colorHex} with ${hardwareStyle} ${hardwareFinish}`);
-    return transformed;
-    
-  } catch (error) {
-    console.error("❌ Transformation failed:", error);
-    // Fallback: return original image with a slight brightness boost
-    return await sharp(imageBuffer)
-      .modulate({ brightness: 1.1 })
-      .jpeg({ quality: 92 })
-      .toBuffer();
-  }
-}
-
 // Get cabinet parameters from Gemini (JSON only, no image generation)
 async function getCabinetParameters(params: {
   style: string | null;
@@ -194,12 +150,8 @@ export async function runVisualizerPipeline(
   } = input;
 
   // Validate required fields
-  if (!name || name.trim() === '') {
-    throw new Error('Name is required');
-  }
-
-  if (!phone || phone.trim() === '') {
-    throw new Error('Phone is required');
+  if (!email || email.trim() === '') {
+    throw new Error('Email is required');
   }
 
   // 1) Normalize image orientation (fix EXIF rotation) and upload to Supabase
@@ -238,27 +190,9 @@ export async function runVisualizerPipeline(
   
   console.log("✅ Parameters extracted:", parameters);
   
-  // 4) Generate the transformed image using the extracted parameters
-  console.log("🎨 Generating cabinet transformation...");
-  
-  // Create a simple color overlay simulation for now
-  // In production, this would use the actual cabinet rendering pipeline
-  const colorInfo = getColorInfo(color || "flour");
-  const transformedBuffer = await applyCabinetTransformation(normalizedBuffer, {
-    colorHex: colorInfo.hex,
-    doorStyle: doorStyleId,
-    hardwareStyle: hwStyleId,
-    hardwareFinish: hwFinishId,
-    parameters
-  });
-  
-  const finalPath = `${imageId}/final.jpg`;
-  const finalUrl = await uploadToSupabaseBucket({
-    bucket: "visualizations",
-    path: finalPath,
-    data: transformedBuffer,
-    contentType: "image/jpeg",
-  });
+  // 4) For now, return the original image as "final" since we're doing parameter-based rendering
+  // In production, you would apply these parameters client-side to render the new cabinets
+  const finalUrl = originalUrl; // TODO: Apply parameters client-side
   
   // Store parameters in enhanced_prompt for now (could add a parameters field to schema)
 
@@ -293,7 +227,7 @@ export async function runVisualizerPipeline(
         {
           full_name: name,
           phone,
-          email: `${phone.replace(/\D/g, '')}@vulpine.temp`, // Generate temp email from phone
+          email,
           city: null,
           room_type: "kitchen",
           selected_style: style,

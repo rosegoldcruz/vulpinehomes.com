@@ -4,7 +4,6 @@ declare global {
     __FOX_IS_SPEAKING?: boolean;
     __FOX_ANIMATION_STATE?: 'idle' | 'talking' | 'listening' | 'thinking';
     __FOX_FACE_POSITION?: { x: number; y: number };
-    __FOX_CAMERA_MODE?: "environment" | "user" | "none";
   }
 }
 
@@ -92,27 +91,13 @@ export class FoxRuntime {
 
   private async initWebcam(): Promise<void> {
     try {
-      // Try environment (rear) camera first
-      try {
-        this.videoStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { exact: "environment" },
-            width: { ideal: 640 },
-            height: { ideal: 480 }
-          }
-        });
-        window.__FOX_CAMERA_MODE = "environment";
-      } catch (envError) {
-        console.warn('[FoxRuntime] Environment camera unavailable, falling back to user camera');
-        this.videoStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: "user",
-            width: { ideal: 640 },
-            height: { ideal: 480 }
-          }
-        });
-        window.__FOX_CAMERA_MODE = "user";
-      }
+      this.videoStream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: 'user',
+          width: { ideal: 640 },
+          height: { ideal: 480 }
+        }
+      });
 
       this.videoElement = document.getElementById('camera-feed') as HTMLVideoElement;
       if (this.videoElement) {
@@ -122,7 +107,6 @@ export class FoxRuntime {
       }
     } catch (error) {
       console.warn('[FoxRuntime] Webcam unavailable, continuing without face tracking');
-      window.__FOX_CAMERA_MODE = "none";
     }
   }
 
@@ -330,11 +314,6 @@ export class FoxRuntime {
 
   private async playGreeting(): Promise<void> {
     try {
-      // Set greeting state immediately after user gesture
-      window.__FOX_IS_SPEAKING = true;
-      window.__FOX_ANIMATION_STATE = "talking";
-      this.config.onStateChange?.('talking');
-
       const response = await fetch('/api/fox-conversation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -351,18 +330,9 @@ export class FoxRuntime {
           this.config.onResponse?.(data.response);
         }
         await this.playAudio(data.audio);
-      } else {
-        // Reset state if greeting fails
-        window.__FOX_IS_SPEAKING = false;
-        window.__FOX_ANIMATION_STATE = 'listening';
-        this.config.onStateChange?.('listening');
       }
     } catch (error) {
       console.error('[FoxRuntime] Greeting failed:', error);
-      // Reset state on error
-      window.__FOX_IS_SPEAKING = false;
-      window.__FOX_ANIMATION_STATE = 'listening';
-      this.config.onStateChange?.('listening');
     }
   }
 
@@ -387,8 +357,12 @@ export class FoxRuntime {
         const audio = new Audio(url);
         this.currentAudio = audio;
 
-        // TTS output goes directly to destination, NOT through analyser
-        // This prevents microphone input from being played back as echo
+        if (this.audioContext && this.analyserNode) {
+          const source = this.audioContext.createMediaElementSource(audio);
+          source.connect(this.analyserNode);
+          this.analyserNode.connect(this.audioContext.destination);
+        }
+
         audio.onended = () => {
           URL.revokeObjectURL(url);
           this.isSpeaking = false;

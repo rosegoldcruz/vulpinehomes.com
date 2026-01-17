@@ -62,42 +62,48 @@ const DOOR_STYLES: {
   name: string; 
   desc: string; 
   heroImage: string;
-  doorGeometry: string; // Path to the individual door image
+  doorGeometry: string; // Path to the door geometry visualization
+  geometryPosition: number; // Position in the doors.png sprite (0-4 from left to right)
 }[] = [
   { 
     id: "shaker", 
     name: "Shaker Classic", 
     desc: "Timeless 5-piece door with clean lines",
     heroImage: "/cabs_clean/doors/shaker_classic/Storm-Shaker_Kitchen.jpg",
-    doorGeometry: "/everything-visualized/shaker-door.png"
+    doorGeometry: "/marketing/doors.png",
+    geometryPosition: 0 // SHAKER position
   },
   { 
     id: "shaker-slide", 
     name: "Shaker Slide", 
     desc: "Modern Shaker with streamlined profile",
     heroImage: "/cabs_clean/doors/shaker_slide/Storm-Slide_Kitchen-800x421.jpg",
-    doorGeometry: "/everything-visualized/slide-door.png"
+    doorGeometry: "/marketing/doors.png",
+    geometryPosition: 2 // SLIDE position
   },
   { 
     id: "fusion-shaker", 
     name: "Fusion Shaker", 
     desc: "Shaker doors with slab drawer fronts",
     heroImage: "/cabs_clean/doors/fusion_in_shaker/Storm-Fusion-Shaker_Kitchen-800x421.jpg",
-    doorGeometry: "/everything-visualized/shaker-fusion-door.png"
+    doorGeometry: "/marketing/doors.png",
+    geometryPosition: 3 // SHAKER FUSION position
   },
   { 
     id: "fusion-slide", 
     name: "Fusion Slide", 
     desc: "Slide doors with modern slab drawers",
     heroImage: "/cabs_clean/doors/fusion_in_slide/Storm-Fusion-Slide_Kitchen-800x421.jpg",
-    doorGeometry: "/everything-visualized/slide-fusion-door.png"
+    doorGeometry: "/marketing/doors.png",
+    geometryPosition: 4 // SLIDE FUSION position
   },
   { 
     id: "slab", 
     name: "Slab", 
     desc: "Minimalist flat panel, modern aesthetic",
     heroImage: "/cabs_clean/doors/slab/Storm-Slab_Kitchen-800x421.jpg",
-    doorGeometry: "/everything-visualized/slab-door.png"
+    doorGeometry: "/marketing/doors.png",
+    geometryPosition: 1 // SLAB position
   },
 ];
 
@@ -174,66 +180,6 @@ const getCabinetImagePath = (doorStyle: DoorStyle, finishId: string): string => 
   if (styleMap?.[finishId]) return styleMap[finishId];
 
   throw new Error(`Missing cabinet image for style ${doorStyle} with finish ${finishId}`);
-};
-
-// Door detail image mapping (PNG close-ups for preview composites)
-const DOOR_DETAIL_MAP: Record<DoorStyle, Record<string, string>> = {
-  shaker: {
-    flour: "/cabs_clean/doors/shaker_classic/shaker-classic-flour.png",
-    storm: "/cabs_clean/doors/shaker_classic/shaker-classic-storm.png",
-    graphite: "/cabs_clean/doors/shaker_classic/shaker-classic-graphite.png",
-    "espresso-walnut": "/cabs_clean/doors/shaker_classic/shaker-classic-espresso-walnut.png",
-    slate: "/cabs_clean/doors/shaker_classic/shaker-classic-slate.png",
-    mist: "/cabs_clean/doors/shaker_classic/shaker-classic-mist.png",
-    "latte-walnut": "/cabs_clean/doors/shaker_classic/shaker-claassic-latte-walnut.png",
-    "nimbus-oak": "/cabs_clean/doors/shaker_classic/shaker-classic-nimbus-oak.png",
-    "sable-oak": "/cabs_clean/doors/shaker_classic/shaker-classic-sable-oak.png",
-  },
-  "shaker-slide": {
-    flour: "/cabs_clean/doors/shaker_slide/shaker-slide-flour.png",
-    storm: "/cabs_clean/doors/shaker_slide/shaker-slide-storm.png",
-    graphite: "/cabs_clean/doors/shaker_slide/shaker-slide-graphite.png",
-    "espresso-walnut": "/cabs_clean/doors/shaker_slide/shaker-slide-espresso-walnut.png",
-  },
-  "fusion-shaker": {
-    flour: "/cabs_clean/doors/fusion_in_shaker/Fusion-Shaker-flour.png",
-    storm: "/cabs_clean/doors/fusion_in_shaker/Fusion-Shaker-storm.png",
-    graphite: "/cabs_clean/doors/fusion_in_shaker/Fusion-Shaker-graphite.png",
-    "espresso-walnut": "/cabs_clean/doors/fusion_in_shaker/Fusion-Shaker-espresso-walnut.png",
-    "latte-walnut": "/cabs_clean/doors/fusion_in_shaker/Fusion-Shaker-latte-walnut.png",
-    mist: "/cabs_clean/doors/fusion_in_shaker/Fusion-Shaker-mist.png",
-    slate: "/cabs_clean/doors/fusion_in_shaker/Fusion-Shaker-slate.png",
-  },
-  "fusion-slide": {
-    flour: "/cabs_clean/doors/fusion_in_slide/Fusion-Slide-flour.png",
-    storm: "/cabs_clean/doors/fusion_in_slide/Fusion-Slide-storm.png",
-    graphite: "/cabs_clean/doors/fusion_in_slide/Fusion-Slide-graphite.png",
-    "espresso-walnut": "/cabs_clean/doors/fusion_in_slide/Fusion-Slide-espresso-walnut.png",
-  },
-  slab: {
-    flour: "/cabs_clean/doors/slab/slab-flour.png",
-    storm: "/cabs_clean/doors/slab/slab-storm.png",
-    graphite: "/cabs_clean/doors/slab/slab-graphite.png",
-    "espresso-walnut": "/cabs_clean/doors/slab/slab-espresso-walnut.png",
-    "latte-walnut": "/cabs_clean/doors/slab/slab-latte-walnut.png",
-    mist: "/cabs_clean/doors/slab/slab-mist.png",
-    "platinum-teak": "/cabs_clean/doors/slab/slab-platnum-teak.png",
-    slate: "/cabs_clean/doors/slab/slab-slate.png",
-    "snow-gloss": "/cabs_clean/doors/slab/slab-snow-gloss-white.png",
-    "urban-teak": "/cabs_clean/doors/slab/slab-urban-teak.png",
-    "wheat-oak": "/cabs_clean/doors/slab/slab-wheat-oak.png",
-  },
-};
-
-const getDoorDetailImage = (doorStyle: DoorStyle, finishId: string): string => {
-  const styleMap = DOOR_DETAIL_MAP[doorStyle];
-  if (styleMap?.[finishId]) return styleMap[finishId];
-  
-  // Fallback to first available finish for this style if exact match not found
-  const firstAvailable = Object.values(styleMap || {})[0];
-  if (firstAvailable) return firstAvailable;
-  
-  throw new Error(`Missing door detail image for style ${doorStyle} with finish ${finishId}`);
 };
 
 // =============== HARDWARE WITH REAL IMAGES ===============
@@ -595,6 +541,12 @@ function DoorStyleCard({
   isSelected: boolean; 
   onClick: () => void;
 }) {
+  // Calculate the clip/position for the doors.png sprite (5 doors side by side)
+  // Each door takes up ~20% of the width
+  const spriteWidth = 5; // 5 doors in the sprite
+  const doorWidthPercent = 100 / spriteWidth;
+  const offsetPercent = style.geometryPosition * doorWidthPercent;
+
   return (
     <button
       onClick={onClick}
@@ -606,11 +558,24 @@ function DoorStyleCard({
     >
       {/* Door Geometry Section */}
       <div className="bg-gradient-to-b from-gray-100 to-gray-200 p-4">
-        <div className="relative h-24 flex items-center justify-center">
+        <div 
+          className="relative h-24 overflow-hidden"
+          style={{
+            // Use overflow and positioning to show just the relevant door from the sprite
+          }}
+        >
           <img 
             src={style.doorGeometry}
             alt={`${style.name} door geometry`}
-            className="h-full object-contain drop-shadow-md transition-transform duration-300 group-hover:scale-105"
+            className="h-full object-contain mx-auto drop-shadow-md transition-transform duration-300 group-hover:scale-105"
+            style={{
+              // Crop to show just the door at this position
+              objectFit: 'contain',
+              objectPosition: `${-offsetPercent * 5 + 50}% center`,
+              width: '500%', // 5 doors = 500% width
+              maxWidth: 'none',
+              marginLeft: `${-offsetPercent * 5}%`
+            }}
           />
         </div>
       </div>
@@ -685,9 +650,6 @@ function LivePreviewPanel({
   hardwareSources: { large: string; medium: string; small: string; withKnob: string };
 }) {
   const { large, medium, small, withKnob } = hardwareSources;
-  
-  // Get the door detail image for the selected style and finish
-  const doorDetailImage = getDoorDetailImage(selections.doorStyle, selections.finish.id);
 
   return (
     <div className="bg-gradient-to-b from-white/5 to-transparent rounded-2xl border border-white/10 overflow-hidden">
@@ -710,31 +672,18 @@ function LivePreviewPanel({
           </div>
         </div>
 
-        {/* Three Door Views with Hardware Composited */}
+        {/* Three Door Views with Hardware */}
         <div className="grid grid-cols-3 gap-3">
           {/* Cabinet Door (Large) */}
           <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-50 shadow-inner">
-            {/* Door background */}
             <Image 
-              src={doorDetailImage} 
-              alt="Door"
+              src={large} 
+              alt="Cabinet Door with Hardware"
               fill
-              className="object-contain p-2"
+              className="object-contain p-1"
               unoptimized
-              key={`door-${doorDetailImage}`}
+              key={large}
             />
-            {/* Hardware overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Image 
-                src={large} 
-                alt="Hardware"
-                width={80}
-                height={80}
-                className="object-contain drop-shadow-lg"
-                unoptimized
-                key={`hw-large-${large}`}
-              />
-            </div>
             <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-[10px] text-center py-0.5 rounded">
               Cabinet
             </div>
@@ -742,27 +691,14 @@ function LivePreviewPanel({
           
           {/* Drawer (Medium) */}
           <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-50 shadow-inner">
-            {/* Door background */}
             <Image 
-              src={doorDetailImage} 
-              alt="Door"
+              src={medium} 
+              alt="Drawer with Hardware"
               fill
-              className="object-contain p-2"
+              className="object-contain p-1"
               unoptimized
-              key={`door-drawer-${doorDetailImage}`}
+              key={medium}
             />
-            {/* Hardware overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Image 
-                src={medium} 
-                alt="Hardware"
-                width={60}
-                height={60}
-                className="object-contain drop-shadow-lg"
-                unoptimized
-                key={`hw-medium-${medium}`}
-              />
-            </div>
             <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-[10px] text-center py-0.5 rounded">
               Drawer
             </div>
@@ -770,27 +706,14 @@ function LivePreviewPanel({
           
           {/* Small Door/Panel */}
           <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-gradient-to-b from-gray-100 to-gray-50 shadow-inner">
-            {/* Door background */}
             <Image 
-              src={doorDetailImage} 
-              alt="Door"
+              src={small} 
+              alt="Small Panel with Hardware"
               fill
-              className="object-contain p-2"
+              className="object-contain p-1"
               unoptimized
-              key={`door-pull-${doorDetailImage}`}
+              key={small}
             />
-            {/* Hardware overlay */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Image 
-                src={small} 
-                alt="Hardware"
-                width={40}
-                height={40}
-                className="object-contain drop-shadow-lg"
-                unoptimized
-                key={`hw-small-${small}`}
-              />
-            </div>
             <div className="absolute bottom-1 left-1 right-1 bg-black/60 backdrop-blur-sm text-white text-[10px] text-center py-0.5 rounded">
               Pull
             </div>

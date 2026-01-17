@@ -1,0 +1,7 @@
+{
+  "name": "CabinetVision AI - Kitchen Refacing Visualizer",
+  "description": "An interactive tool that uses AI to visualize cabinet refacing options on your actual kitchen photo. Choose from professional door styles and finishes with photorealistic results.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

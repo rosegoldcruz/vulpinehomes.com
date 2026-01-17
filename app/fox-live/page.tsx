@@ -48,19 +48,6 @@ export default function FoxLivePage() {
     };
   }, []);
 
-  useEffect(() => {
-    const handleResize = () => {
-      const canvas = document.getElementById('fox-canvas') as HTMLCanvasElement;
-      if (canvas) {
-        // Trigger Three.js resize via window message
-        window.dispatchEvent(new Event('resize'));
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   const handleTextMessage = async (text: string) => {
     if (runtimeRef.current) {
       await runtimeRef.current.sendTextMessage(text);
@@ -69,11 +56,11 @@ export default function FoxLivePage() {
 
   return (
     <main className="relative w-full h-[100svh] bg-black overflow-hidden">
-      {/* User camera (bottom layer) */}
-      <video id="camera-feed" className="absolute inset-0 w-full h-full object-cover z-0" playsInline muted />
-
       {/* Three.js Fox (top layer) */}
-      <canvas id="fox-canvas" className="absolute inset-0 w-full h-full z-10 pointer-events-none" />
+      <canvas id="fox-canvas" className="absolute inset-0 w-full h-full z-20 pointer-events-none" />
+
+      {/* User camera (bottom layer) */}
+      <video id="camera-feed" className="absolute inset-0 w-full h-full object-cover z-10" playsInline muted />
 
 
       {/* Status bar (when connected) */}
