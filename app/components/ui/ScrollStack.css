@@ -1,0 +1,20 @@
+.scroll-stack-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.scroll-stack-item-content {
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+  border-top: 1px solid rgba(255,255,255,0.1);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
