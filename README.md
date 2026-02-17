@@ -52,7 +52,10 @@ Copy `.env.example` to `.env.local` (for local dev) and mirror the same keys in 
 
 **Supabase**
 - `NEXT_PUBLIC_SUPABASE_URL` – from Supabase project settings
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` – anon key used for affiliate magic-link auth
 - `SUPABASE_SERVICE_ROLE_KEY` – service role key (server only)
+- `AFFILIATE_SESSION_SECRET` – HMAC secret for secure httpOnly affiliate session cookie
+- `NEXT_PUBLIC_SITE_URL` – public site origin used in referral links and magic-link callback URLs
 
 **Twilio**
 - `TWILIO_ACCOUNT_SID`
@@ -109,6 +112,16 @@ Run `create_referral_program_v1.sql` in Supabase SQL editor:
 4. Confirm the following tables exist in `public`: `referrers`, `referral_codes`, `leads`, `jobs`, `payouts`
 
 The script enables `pgcrypto` with `CREATE EXTENSION IF NOT EXISTS pgcrypto;` so `gen_random_uuid()` works for UUID defaults.
+
+### 3.4. Affiliate portal incremental migration
+
+Run `add_referral_clicks_affiliate.sql` in Supabase SQL editor when upgrading an existing referral setup:
+
+1. Open **Supabase Dashboard → SQL Editor → New query**
+2. Paste the full contents of `add_referral_clicks_affiliate.sql`
+3. Click **Run**
+4. Confirm `public.referral_clicks` exists with index `idx_referral_clicks_code_created_at`
+5. Confirm `leads_status_valid` and `jobs_status_valid` constraints were added
 
 ---
 
