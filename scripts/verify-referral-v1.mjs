@@ -33,6 +33,12 @@ function randomPhone() {
   return `480${suffix}`;
 }
 
+function shouldRequireSecureCookie(siteUrl) {
+  if (process.env.VERIFY_EXPECT_SECURE_COOKIE === "0") return false;
+  if (process.env.VERIFY_EXPECT_SECURE_COOKIE === "1") return true;
+  return siteUrl.startsWith("https://");
+}
+
 async function main() {
   const siteUrl = pickSiteUrl();
   const supabaseUrl = getEnv("NEXT_PUBLIC_SUPABASE_URL");
@@ -101,6 +107,10 @@ async function main() {
 
   if (!/\bPath=\//i.test(setCookie) || !/\bSameSite=Lax\b/i.test(setCookie) || !/\bMax-Age=2592000\b/i.test(setCookie)) {
     fail(`/r/[code] cookie missing expected attributes. set-cookie: ${setCookie}`);
+  }
+
+  if (shouldRequireSecureCookie(siteUrl) && !/\bSecure\b/i.test(setCookie)) {
+    fail(`/r/[code] cookie missing Secure attribute under production/https verification. set-cookie: ${setCookie}`);
   }
   pass("/r/[code] set cookie with path=/, SameSite=Lax, Max-Age=30 days");
 
