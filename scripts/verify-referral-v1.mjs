@@ -21,13 +21,6 @@ function pickSiteUrl() {
   return raw.replace(/\/+$/, "");
 }
 
-function extractCookiePair(setCookieHeader) {
-  if (!setCookieHeader) return null;
-  const first = setCookieHeader.split(",")[0]?.trim() || "";
-  const pair = first.split(";")[0]?.trim() || "";
-  return pair || null;
-}
-
 function randomPhone() {
   const suffix = String(Math.floor(Math.random() * 9000000) + 1000000);
   return `480${suffix}`;
@@ -37,6 +30,19 @@ function shouldRequireSecureCookie(siteUrl) {
   if (process.env.VERIFY_EXPECT_SECURE_COOKIE === "0") return false;
   if (process.env.VERIFY_EXPECT_SECURE_COOKIE === "1") return true;
   return siteUrl.startsWith("https://");
+}
+
+async function getClickCount(supabase, code) {
+  const { count, error } = await supabase
+    .from("referral_clicks")
+    .select("*", { count: "exact", head: true })
+    .eq("code", code);
+
+  if (error) {
+    fail(`Supabase click query failed: ${error.message}`);
+  }
+
+  return Number(count || 0);
 }
 
 async function main() {
@@ -77,6 +83,8 @@ async function main() {
   }
   pass(`create-link returned code ${code}`);
 
+  const clicksBefore = await getClickCount(supabase, code);
+
   const redirectRes = await fetch(
     `${siteUrl}/r/${encodeURIComponent(code)}?utm_source=referral&utm_medium=link&utm_campaign=500_referral&utm_term=verify`,
     {
@@ -114,8 +122,11 @@ async function main() {
   }
   pass("/r/[code] set cookie with path=/, SameSite=Lax, Max-Age=30 days");
 
-  const cookiePair = extractCookiePair(setCookie);
-  if (!cookiePair) fail("Unable to parse cookie from /r/[code] response");
+  const clicksAfter = await getClickCount(supabase, code);
+  if (clicksAfter < clicksBefore + 1) {
+    fail(`Expected referral_clicks to increment. Before=${clicksBefore}, After=${clicksAfter}`);
+  }
+  pass(`/r/[code] click tracking incremented (${clicksBefore} -> ${clicksAfter})`);
 
   const leadPhone = randomPhone();
   const quoteForm = new FormData();
@@ -123,12 +134,13 @@ async function main() {
   quoteForm.set("email", `lead.verify.${runId}@example.com`);
   quoteForm.set("phone", leadPhone);
   quoteForm.set("city", "Phoenix");
+  quoteForm.set("referralCode", code);
   quoteForm.set("notes", "Referral verification run");
 
   const quoteRes = await fetch(`${siteUrl}/api/vulpine-kitchen-quote`, {
     method: "POST",
     headers: {
-      Cookie: cookiePair,
+      Cookie: "vh_referral_code=INVALIDCOOKIECODE",
     },
     body: quoteForm,
   });
@@ -137,7 +149,7 @@ async function main() {
   if (!quoteRes.ok || !quoteBody?.success) {
     fail(`quote submit failed (${quoteRes.status}): ${JSON.stringify(quoteBody)}`);
   }
-  pass("Quote submission succeeded with referral cookie attached");
+  pass("Quote submission succeeded with typed referral code (overriding invalid cookie)");
 
   const { data: leadRow, error: leadError } = await supabase
     .from("leads")

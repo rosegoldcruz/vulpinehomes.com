@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS public.referral_clicks (
 );
 
 CREATE INDEX IF NOT EXISTS idx_referral_clicks_code_created_at
-  ON public.referral_clicks(code, created_at DESC);
+  ON public.referral_clicks(code, created_at);
 
 UPDATE public.leads
 SET status = 'new'
@@ -46,4 +46,3 @@ BEGIN
   END IF;
 END
 $$;
-

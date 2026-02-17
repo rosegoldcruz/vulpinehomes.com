@@ -123,6 +123,23 @@ Run `add_referral_clicks_affiliate.sql` in Supabase SQL editor when upgrading an
 4. Confirm `public.referral_clicks` exists with index `idx_referral_clicks_code_created_at`
 5. Confirm `leads_status_valid` and `jobs_status_valid` constraints were added
 
+### 3.5. Affiliate verification script
+
+Run the end-to-end referral verification script after deploying:
+
+```bash
+VERIFY_SITE_URL=https://www.vulpinehomes.com \
+NEXT_PUBLIC_SUPABASE_URL=... \
+SUPABASE_SERVICE_ROLE_KEY=... \
+node scripts/verify-referral-v1.mjs
+```
+
+The script validates:
+- code creation succeeds
+- `/r/<code>` increments `referral_clicks`
+- `/r/<code>` sets the referral cookie with expected attributes
+- quote submission with typed referral code writes `leads.referral_code`
+
 ---
 
 ## 4. Running Locally

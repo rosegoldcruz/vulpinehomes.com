@@ -212,6 +212,7 @@ export default async function AffiliateDashboardPage({
         status,
         jobId: job?.id || null,
         jobValue: job?.contract_value ?? null,
+        payoutStatus: payout?.status || "none",
       };
     })
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -221,27 +222,30 @@ export default async function AffiliateDashboardPage({
     return status === "won" || status === "in_progress";
   }).length;
 
-  const completedCount = statusRows.filter((row) => row.status === "completed").length;
-  const paidCount = statusRows.filter((row) => row.status === "paid").length;
+  const completedJobsCount = filteredJobs.filter(
+    (job) => normalizeJobStatus(job.status) === "completed"
+  ).length;
+  const paidJobsCount = filteredJobs.filter(
+    (job) => normalizeJobStatus(job.status) === "paid"
+  ).length;
 
-  const pendingPayoutJobIds = new Set(
+  const paidPayoutJobIds = new Set(
+    filteredPayouts.filter((payout) => payout.status === "paid").map((payout) => payout.job_id)
+  );
+  const pendingEligibleJobIds = new Set(
     filteredPayouts
       .filter((payout) => payout.status === "pending")
       .map((payout) => payout.job_id)
   );
-  const completedUnpaidJobIds = new Set(
-    filteredJobs
-      .filter((job) => normalizeJobStatus(job.status) === "completed")
-      .map((job) => job.id)
-  );
-  const unpaidJobIds = new Set<string>([
-    ...Array.from(pendingPayoutJobIds),
-    ...Array.from(completedUnpaidJobIds),
-  ]);
-  const completedWithoutJob = statusRows.filter(
-    (row) => row.status === "completed" && !row.jobId
-  ).length;
-  const unpaidEarnings = (unpaidJobIds.size + completedWithoutJob) * 500;
+  for (const completedJobId of filteredJobs
+    .filter((job) => normalizeJobStatus(job.status) === "completed")
+    .map((job) => job.id)) {
+    if (!paidPayoutJobIds.has(completedJobId)) {
+      pendingEligibleJobIds.add(completedJobId);
+    }
+  }
+
+  const unpaidEarnings = pendingEligibleJobIds.size * 500;
 
   const paidEarnings = filteredPayouts
     .filter((payout) => payout.status === "paid")
@@ -277,6 +281,9 @@ export default async function AffiliateDashboardPage({
           <p className="mt-2 text-white/75">Commission: $500 per completed cabinet refacing project.</p>
           <p className="mt-1 text-white/75">
             Active referral code(s): {activeCodes.length > 0 ? activeCodes.length : 0}
+          </p>
+          <p className="mt-1 text-white/70">
+            Payout is issued after completion and full customer payment.
           </p>
         </div>
       </section>
@@ -336,12 +343,12 @@ export default async function AffiliateDashboardPage({
               <p className="mt-1 text-2xl font-bold">{jobsInProgressCount}</p>
             </div>
             <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-              <p className="text-xs uppercase tracking-wide text-white/50">Completed</p>
-              <p className="mt-1 text-2xl font-bold">{completedCount}</p>
+              <p className="text-xs uppercase tracking-wide text-white/50">Completed Jobs</p>
+              <p className="mt-1 text-2xl font-bold">{completedJobsCount}</p>
             </div>
             <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-              <p className="text-xs uppercase tracking-wide text-white/50">Paid</p>
-              <p className="mt-1 text-2xl font-bold">{paidCount}</p>
+              <p className="text-xs uppercase tracking-wide text-white/50">Paid Jobs</p>
+              <p className="mt-1 text-2xl font-bold">{paidJobsCount}</p>
             </div>
             <div className="rounded-xl border border-white/10 bg-black/20 p-4">
               <p className="text-xs uppercase tracking-wide text-white/50">Unpaid Earnings</p>
@@ -368,13 +375,14 @@ export default async function AffiliateDashboardPage({
                   <th className="py-2 pr-4">Created</th>
                   <th className="py-2 pr-4">City</th>
                   <th className="py-2 pr-4">Status</th>
+                  <th className="py-2 pr-4">Payout</th>
                   <th className="py-2">Job Value</th>
                 </tr>
               </thead>
               <tbody className="text-white/90">
                 {statusRows.length === 0 ? (
                   <tr>
-                    <td className="py-3 text-white/60" colSpan={4}>
+                    <td className="py-3 text-white/60" colSpan={5}>
                       No attributed referrals in this range.
                     </td>
                   </tr>
@@ -386,6 +394,11 @@ export default async function AffiliateDashboardPage({
                     <td className="py-2 pr-4">
                       <span className="rounded-full border border-white/20 px-2.5 py-1 text-xs uppercase tracking-wide">
                         {row.status}
+                      </span>
+                    </td>
+                    <td className="py-2 pr-4">
+                      <span className="rounded-full border border-white/20 px-2.5 py-1 text-xs uppercase tracking-wide">
+                        {row.payoutStatus}
                       </span>
                     </td>
                     <td className="py-2">

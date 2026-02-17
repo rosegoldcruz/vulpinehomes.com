@@ -64,7 +64,7 @@ CREATE INDEX IF NOT EXISTS idx_leads_referral_code ON public.leads(referral_code
 CREATE INDEX IF NOT EXISTS idx_leads_created_at ON public.leads(created_at);
 CREATE INDEX IF NOT EXISTS idx_payouts_status ON public.payouts(status);
 CREATE INDEX IF NOT EXISTS idx_referral_codes_referrer_id ON public.referral_codes(referrer_id);
-CREATE INDEX IF NOT EXISTS idx_referral_clicks_code_created_at ON public.referral_clicks(code, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_referral_clicks_code_created_at ON public.referral_clicks(code, created_at);
 
 -- Supports idempotent upsert by job_id from admin payout endpoint
 CREATE UNIQUE INDEX IF NOT EXISTS idx_payouts_job_id_unique ON public.payouts(job_id);
