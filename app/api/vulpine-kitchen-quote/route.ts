@@ -11,6 +11,7 @@ export const runtime = "nodejs";
 // Storage bucket - use same bucket as visualizer for consistency
 const STORAGE_BUCKET = "visualizations";
 const FALLBACK_BUCKETS = ["visualizations", "kitchen-photos", "visualizer-inputs"];
+const LEAD_DEDUPE_WINDOW_MS = 10 * 60 * 1000;
 
 async function resolveActiveReferralCode(rawCode: string | null): Promise<string | null> {
   const normalized = normalizeReferralCode(rawCode);
@@ -25,6 +26,26 @@ async function resolveActiveReferralCode(rawCode: string | null): Promise<string
     .maybeSingle();
 
   return data?.code || null;
+}
+
+async function hasRecentMirroredLead(phone: string): Promise<boolean> {
+  const cutoffIso = new Date(Date.now() - LEAD_DEDUPE_WINDOW_MS).toISOString();
+  const { data, error } = await supabaseServer
+    .from("leads")
+    .select("id")
+    .eq("phone", phone)
+    .eq("source", "kitchen_quote")
+    .gte("created_at", cutoffIso)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.warn("⚠️ Lead dedupe lookup failed:", error);
+    return false;
+  }
+
+  return !!data?.id;
 }
 
 // Helper: Try uploading to multiple buckets with fallback
@@ -173,21 +194,26 @@ export async function POST(req: NextRequest) {
 
     console.log(`✅ Lead created with ID: ${lead.id}`);
 
-    const { error: canonicalLeadError } = await supabaseServer.from("leads").insert({
-      name: parsed.full_name || "Website Kitchen Quote",
-      phone: parsed.phone,
-      email: parsed.email,
-      city: parsed.city,
-      notes: `${parsed.notes || ""}${parsed.notes ? "\n" : ""}Kitchen Quote ID: ${lead.id}`,
-      source: "kitchen_quote",
-      referral_code: referralCode,
-      status: "new",
-    });
-
-    if (canonicalLeadError) {
-      console.warn("⚠️ Failed to mirror quote lead into leads table:", canonicalLeadError);
+    const duplicateLead = parsed.phone ? await hasRecentMirroredLead(parsed.phone) : false;
+    if (duplicateLead) {
+      console.log("ℹ️ Duplicate quote lead detected in dedupe window; mirror insert skipped");
     } else {
-      console.log("✅ Lead mirrored into leads table");
+      const { error: canonicalLeadError } = await supabaseServer.from("leads").insert({
+        name: parsed.full_name || "Website Kitchen Quote",
+        phone: parsed.phone,
+        email: parsed.email,
+        city: parsed.city,
+        notes: `${parsed.notes || ""}${parsed.notes ? "\n" : ""}Kitchen Quote ID: ${lead.id}`,
+        source: "kitchen_quote",
+        referral_code: referralCode,
+        status: "new",
+      });
+
+      if (canonicalLeadError) {
+        console.warn("⚠️ Failed to mirror quote lead into leads table:", canonicalLeadError);
+      } else {
+        console.log("✅ Lead mirrored into leads table");
+      }
     }
 
     // --------------------------------------------
