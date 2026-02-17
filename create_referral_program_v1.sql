@@ -54,10 +54,51 @@ CREATE TABLE IF NOT EXISTS public.payouts (
   created_at timestamptz DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS public.referral_clicks (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  code text NOT NULL REFERENCES public.referral_codes(code) ON DELETE CASCADE,
+  created_at timestamptz DEFAULT now()
+);
+
 CREATE INDEX IF NOT EXISTS idx_leads_referral_code ON public.leads(referral_code);
 CREATE INDEX IF NOT EXISTS idx_leads_created_at ON public.leads(created_at);
 CREATE INDEX IF NOT EXISTS idx_payouts_status ON public.payouts(status);
 CREATE INDEX IF NOT EXISTS idx_referral_codes_referrer_id ON public.referral_codes(referrer_id);
+CREATE INDEX IF NOT EXISTS idx_referral_clicks_code_created_at ON public.referral_clicks(code, created_at DESC);
 
 -- Supports idempotent upsert by job_id from admin payout endpoint
 CREATE UNIQUE INDEX IF NOT EXISTS idx_payouts_job_id_unique ON public.payouts(job_id);
+
+UPDATE public.leads
+SET status = 'new'
+WHERE status IS NULL
+   OR status NOT IN ('new', 'contacted', 'scheduled', 'in_progress', 'completed', 'paid');
+
+UPDATE public.jobs
+SET status = 'won'
+WHERE status IS NULL
+   OR status NOT IN ('won', 'in_progress', 'completed', 'paid');
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'leads_status_valid'
+  ) THEN
+    ALTER TABLE public.leads
+      ADD CONSTRAINT leads_status_valid
+      CHECK (status IN ('new', 'contacted', 'scheduled', 'in_progress', 'completed', 'paid'));
+  END IF;
+END
+$$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'jobs_status_valid'
+  ) THEN
+    ALTER TABLE public.jobs
+      ADD CONSTRAINT jobs_status_valid
+      CHECK (status IN ('won', 'in_progress', 'completed', 'paid'));
+  END IF;
+END
+$$;

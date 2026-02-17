@@ -5,6 +5,12 @@ import {
   getAdminReferralsPassword,
   isAdminReferralsAuthenticated,
 } from "@/lib/adminReferralsAuth";
+import {
+  JOB_STATUS_VALUES,
+  LEAD_STATUS_VALUES,
+  normalizeJobStatus,
+  normalizeLeadStatus,
+} from "@/lib/referralStatus";
 
 export const dynamic = "force-dynamic";
 
@@ -353,6 +359,8 @@ export default async function AdminReferralsPage({
                             {leads.map((lead) => {
                               const job = jobsByLeadId.get(lead.id);
                               const payout = job ? payoutsByJobId.get(job.id) : undefined;
+                              const leadStatus = normalizeLeadStatus(lead.status);
+                              const jobStatus = job ? normalizeJobStatus(job.status) : null;
 
                               return (
                                 <div key={lead.id} className="rounded-lg border border-white/10 bg-[#0f1117] p-4">
@@ -367,8 +375,8 @@ export default async function AdminReferralsPage({
                                       </p>
                                     </div>
                                     <div className="text-sm text-white/70">
-                                      <p>Lead status: {lead.status || "new"}</p>
-                                      <p>Job: {job?.status || "none"}</p>
+                                      <p>Lead status: {leadStatus}</p>
+                                      <p>Job: {jobStatus || "none"}</p>
                                       <p>Payout: {payout?.status || "none"}</p>
                                     </div>
                                   </div>
@@ -405,6 +413,58 @@ export default async function AdminReferralsPage({
                                         Paid {formatDate(payout.paid_at)}
                                       </p>
                                     ) : null}
+                                  </div>
+
+                                  <div className="mt-3 grid gap-2 md:grid-cols-2">
+                                    <form action="/api/admin/referrals/status" method="post" className="flex gap-2">
+                                      <input type="hidden" name="entity" value="lead" />
+                                      <input type="hidden" name="id" value={lead.id} />
+                                      <input type="hidden" name="returnTo" value={returnTo} />
+                                      <select
+                                        name="status"
+                                        defaultValue={leadStatus}
+                                        className="w-full rounded-lg border border-white/20 bg-black/30 px-3 py-1.5 text-xs text-white"
+                                      >
+                                        {LEAD_STATUS_VALUES.map((status) => (
+                                          <option key={status} value={status}>
+                                            Lead: {status}
+                                          </option>
+                                        ))}
+                                      </select>
+                                      <button
+                                        type="submit"
+                                        className="rounded-lg border border-white/25 px-3 py-1.5 text-xs font-semibold text-white hover:border-[#FF8A3D]"
+                                      >
+                                        Update
+                                      </button>
+                                    </form>
+
+                                    {job ? (
+                                      <form action="/api/admin/referrals/status" method="post" className="flex gap-2">
+                                        <input type="hidden" name="entity" value="job" />
+                                        <input type="hidden" name="id" value={job.id} />
+                                        <input type="hidden" name="returnTo" value={returnTo} />
+                                        <select
+                                          name="status"
+                                          defaultValue={jobStatus || "won"}
+                                          className="w-full rounded-lg border border-white/20 bg-black/30 px-3 py-1.5 text-xs text-white"
+                                        >
+                                          {JOB_STATUS_VALUES.map((status) => (
+                                            <option key={status} value={status}>
+                                              Job: {status}
+                                            </option>
+                                          ))}
+                                        </select>
+                                        <button
+                                          type="submit"
+                                          className="rounded-lg border border-white/25 px-3 py-1.5 text-xs font-semibold text-white hover:border-[#FF8A3D]"
+                                        >
+                                          Update
+                                        </button>
+                                      </form>
+                                    ) : (
+                                      <div />
+                                    )}
                                   </div>
                                 </div>
                               );

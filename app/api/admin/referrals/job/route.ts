@@ -4,6 +4,7 @@ import {
   isAdminReferralsAuthenticated,
   sanitizeReturnTo,
 } from "@/lib/adminReferralsAuth";
+import { normalizeLeadStatus } from "@/lib/referralStatus";
 import { supabaseServer } from "@/lib/supabaseServer";
 
 export const runtime = "nodejs";
@@ -41,6 +42,24 @@ export async function POST(req: NextRequest) {
       console.error("Failed to create job:", error);
       url.searchParams.set("error", "create-job");
       return NextResponse.redirect(url, 303);
+    }
+  }
+
+  const { data: leadRow } = await supabaseServer
+    .from("leads")
+    .select("status")
+    .eq("id", leadId)
+    .limit(1)
+    .maybeSingle();
+
+  const currentLeadStatus = normalizeLeadStatus(leadRow?.status);
+  if (currentLeadStatus !== "paid" && currentLeadStatus !== "completed") {
+    const { error: leadStatusError } = await supabaseServer
+      .from("leads")
+      .update({ status: "in_progress" })
+      .eq("id", leadId);
+    if (leadStatusError) {
+      console.error("Failed to update lead status on conversion:", leadStatusError);
     }
   }
 

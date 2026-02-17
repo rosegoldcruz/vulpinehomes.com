@@ -77,6 +77,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.redirect(url, 303);
   }
 
+  const { error: updateLeadError } = await supabaseServer
+    .from("leads")
+    .update({
+      status: "paid",
+    })
+    .eq("id", jobData.lead_id);
+
+  if (updateLeadError) {
+    console.error("Failed to update lead to paid:", updateLeadError);
+    url.searchParams.set("error", "update-lead");
+    return NextResponse.redirect(url, 303);
+  }
+
   const { error: payoutError } = await supabaseServer.from("payouts").upsert(
     {
       referrer_id: referralCodeRow.referrer_id,
