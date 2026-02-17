@@ -17,6 +17,7 @@ import MobileNav from "./components/MobileNav";
 import Footer from "./components/Footer";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://vulpinehomes.com"),
   title: "Cabinet Refacing Phoenix | Vulpine Homes – Save 50%+",
   description:
     "Cabinet Refacing & Kitchen Remodeling in Phoenix. Save 50% vs full remodel. Quotes in 24 hours. 5-Star Rated. Serving Scottsdale, Mesa, Gilbert & more.",
@@ -62,4 +63,3 @@ export default function RootLayout({
     </html>
   );
 }
-

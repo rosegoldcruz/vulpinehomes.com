@@ -6,9 +6,9 @@ import { FloatingDock } from "@/app/components/ui/floating-dock";
 import {
   IconHome,
   IconBox,
-  IconInfoCircle,
   IconWand,
   IconTools,
+  IconMessageCircle,
 } from "@tabler/icons-react";
 
 export default function MobileNav() {
@@ -21,14 +21,14 @@ export default function MobileNav() {
       href: "/",
     },
     {
-      title: "Services",
+      title: "Cabinet Refacing",
       icon: (
         <IconTools className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "/services",
+      href: "/kitchen-cabinet-refacing",
     },
     {
-      title: "Products",
+      title: "Door Styles",
       icon: (
         <IconBox className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
@@ -42,11 +42,11 @@ export default function MobileNav() {
       href: "/visualizer",
     },
     {
-      title: "About",
+      title: "Quote",
       icon: (
-        <IconInfoCircle className="h-full w-full text-neutral-500 dark:text-neutral-300" />
+        <IconMessageCircle className="h-full w-full text-neutral-500 dark:text-neutral-300" />
       ),
-      href: "/about",
+      href: "/get-quote",
     },
   ];
 

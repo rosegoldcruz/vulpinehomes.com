@@ -131,8 +131,8 @@ export default function FAQPage() {
               <Link href="/kitchen-cabinet-refacing" className="bg-white/5 rounded-xl p-6 border border-white/10 hover:border-[#FF8A3D] transition-all">
                 <h3 className="text-white font-bold">Kitchen Cabinet Refacing</h3>
               </Link>
-              <Link href="/cabinet-refacing-vs-replacement" className="bg-white/5 rounded-xl p-6 border border-white/10 hover:border-[#FF8A3D] transition-all">
-                <h3 className="text-white font-bold">Refacing vs Replacement</h3>
+              <Link href="/areas-served" className="bg-white/5 rounded-xl p-6 border border-white/10 hover:border-[#FF8A3D] transition-all">
+                <h3 className="text-white font-bold">Installation Areas</h3>
               </Link>
             </div>
           </div>

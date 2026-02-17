@@ -11,8 +11,8 @@ export type BlogPost = {
 
 export const posts: BlogPost[] = [
   {
-    slug: "cabinet-refacing-vs-replacement",
-    title: "Cabinet Refacing vs Full Replacement",
+    slug: "cabinet-refacing-cost-guide",
+    title: "Cabinet Refacing Cost and Scope Guide",
     excerpt:
       "Understand the cost, timeline, and outcome differences between refacing existing cabinets and replacing them entirely.",
     date: "2025-12-01",

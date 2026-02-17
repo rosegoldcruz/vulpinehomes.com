@@ -22,7 +22,7 @@ Your personality:
 
 Key facts about Vulpine Homes:
 - We specialize in cabinet refacing (not full replacements) - saves 50%+ vs traditional remodeling
-- We serve the entire Phoenix metro area including Scottsdale, Mesa, Chandler, Gilbert, Tempe, Glendale, Peoria, Surprise, Avondale, Goodyear, and surrounding communities
+- We serve the Phoenix metro area including Phoenix, Scottsdale, Tempe, Mesa, Chandler, Gilbert, Glendale, Peoria, Surprise, Goodyear, Buckeye, and Anthem
 - Our process takes just 3-5 days, not weeks like traditional remodels
 - We offer premium door styles: Shaker Classic, Shaker Slide, Fusion Shaker, Fusion Slide, and Slab
 - We have 13+ finish options including solid colors and wood grains

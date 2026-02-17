@@ -149,9 +149,9 @@ export default function KitchenCabinetRefacingPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 { title: "Cabinet Refacing Phoenix AZ", link: "/cabinet-refacing-phoenix-az" },
-                { title: "Cabinet Refacing vs Replacement", link: "/cabinet-refacing-vs-replacement" },
-                { title: "Replace Cabinet Doors", link: "/replace-cabinet-doors" },
-                { title: "Custom Cabinet Doors", link: "/custom-cabinet-doors" }
+                { title: "Installation Areas", link: "/areas-served" },
+                { title: "Door Styles", link: "/products" },
+                { title: "Visualizer", link: "/visualizer" }
               ].map((page) => (
                 <Link
                   key={page.link}
