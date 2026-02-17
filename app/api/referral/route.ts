@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { isValidEmail, normalizePhone } from "@/lib/phoneNormalizer";
 import { normalizeReferralCode } from "@/lib/referralProgram";
+import { checkRateLimit, getRequestIp } from "@/lib/requestRateLimit";
 import { sendReferralTelegramMessage } from "@/lib/telegram";
 
 export const runtime = "nodejs";
@@ -17,6 +18,24 @@ interface ReferralPayload {
   city: string;
   notes: string | null;
 }
+
+type FailureReason =
+  | "validation"
+  | "rate_limit"
+  | "missing_env"
+  | "schema_missing"
+  | "supabase_insert_failed"
+  | "unexpected";
+
+type ErrorDetails = {
+  message: string;
+  code?: string;
+  details?: string;
+};
+
+const IS_PRODUCTION = process.env.NODE_ENV === "production";
+const REFERRAL_BUILD_TAG = "referral-diagnostics-v1";
+const SUPABASE_SERVER_ENV_KEYS = ["NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_SERVICE_ROLE_KEY"] as const;
 
 function sanitizeText(value: FormDataEntryValue | null, max = 500): string {
   if (typeof value !== "string") return "";
@@ -35,10 +54,170 @@ function hashLower(value: string): string {
   return createHash("sha256").update(value.trim().toLowerCase()).digest("hex");
 }
 
-function redirectToRefer(req: NextRequest, hash: string): NextResponse {
+function buildRequestId(): string {
+  return randomUUID().replace(/-/g, "").slice(0, 12);
+}
+
+function redirectToRefer(params: {
+  req: NextRequest;
+  hash: "referral-success" | "referral-error";
+  requestId: string;
+  reason?: string;
+}): NextResponse {
+  const { req, hash, requestId, reason } = params;
   const url = new URL("/refer", req.url);
+  url.searchParams.set("rid", requestId);
+  if (reason) {
+    url.searchParams.set("reason", reason);
+  }
   url.hash = hash;
   return NextResponse.redirect(url, 303);
+}
+
+function getMissingSupabaseServerEnvNames(): string[] {
+  const missing: string[] = [];
+  for (const envKey of SUPABASE_SERVER_ENV_KEYS) {
+    if (!process.env[envKey]) {
+      missing.push(envKey);
+    }
+  }
+  return missing;
+}
+
+function withDiagnosticsHeaders(params: {
+  response: NextResponse;
+  requestId: string;
+  reason: string;
+  missingEnvNames?: string[];
+}): NextResponse {
+  const { response, requestId, reason, missingEnvNames } = params;
+  response.headers.set("x-vh-rid", requestId);
+  response.headers.set("x-vh-reason", reason);
+  response.headers.set("x-vh-build", REFERRAL_BUILD_TAG);
+  if (reason === "missing_env" && missingEnvNames?.length) {
+    response.headers.set("x-vh-missing-env", missingEnvNames.join(","));
+  }
+  return response;
+}
+
+function toErrorDetails(error: unknown): ErrorDetails | null {
+  if (!error || typeof error !== "object") return null;
+  const raw = error as { message?: unknown; code?: unknown; details?: unknown };
+  if (typeof raw.message !== "string" || !raw.message.trim()) return null;
+  return {
+    message: raw.message,
+    code: typeof raw.code === "string" ? raw.code : undefined,
+    details: typeof raw.details === "string" ? raw.details : undefined,
+  };
+}
+
+function detectRelationName(details: ErrorDetails): string | null {
+  const relationMatch =
+    details.message.match(/relation\s+"([^"]+)"/i) ||
+    details.details?.match(/relation\s+"([^"]+)"/i);
+  return relationMatch?.[1] || null;
+}
+
+function mapFailureReason(defaultReason: FailureReason, error?: ErrorDetails | null): FailureReason {
+  if (!error) return defaultReason;
+  if (error.code === "42P01" || /relation\s+"[^"]+"\s+does not exist/i.test(error.message)) {
+    return "schema_missing";
+  }
+  return defaultReason;
+}
+
+function logFailure(params: {
+  requestId: string;
+  reason: FailureReason;
+  error?: ErrorDetails | null;
+  meta?: Record<string, string | number | boolean | null>;
+}) {
+  const relation = params.error ? detectRelationName(params.error) : null;
+  console.error("[referral] submission_failed", {
+    requestId: params.requestId,
+    reason: params.reason,
+    relation,
+    error: params.error
+      ? {
+          code: params.error.code || null,
+          message: params.error.message,
+          details: params.error.details || null,
+        }
+      : null,
+    meta: params.meta || null,
+  });
+}
+
+function failureResponse(params: {
+  req: NextRequest;
+  requestId: string;
+  reason: FailureReason;
+  status?: number;
+  error?: ErrorDetails | null;
+  retryAfterSeconds?: number;
+  missingEnvNames?: string[];
+}): NextResponse {
+  const status = params.status || 400;
+  const reasonHeader = params.reason;
+
+  if (!IS_PRODUCTION) {
+    const response = NextResponse.json(
+      {
+        ok: false,
+        requestId: params.requestId,
+        reason: params.reason,
+        error: params.error
+          ? {
+              message: params.error.message,
+              code: params.error.code || null,
+            }
+          : null,
+      },
+      { status }
+    );
+    if (params.retryAfterSeconds && params.retryAfterSeconds > 0) {
+      response.headers.set("Retry-After", String(params.retryAfterSeconds));
+    }
+    return withDiagnosticsHeaders({
+      response,
+      requestId: params.requestId,
+      reason: reasonHeader,
+      missingEnvNames: params.missingEnvNames,
+    });
+  }
+
+  if (status === 429) {
+    const response = NextResponse.json(
+      {
+        ok: false,
+        reason: params.reason,
+        requestId: params.requestId,
+      },
+      { status }
+    );
+    if (params.retryAfterSeconds && params.retryAfterSeconds > 0) {
+      response.headers.set("Retry-After", String(params.retryAfterSeconds));
+    }
+    return withDiagnosticsHeaders({
+      response,
+      requestId: params.requestId,
+      reason: reasonHeader,
+      missingEnvNames: params.missingEnvNames,
+    });
+  }
+
+  const redirect = redirectToRefer({
+    req: params.req,
+    hash: "referral-error",
+    requestId: params.requestId,
+    reason: params.reason,
+  });
+  return withDiagnosticsHeaders({
+    response: redirect,
+    requestId: params.requestId,
+    reason: reasonHeader,
+    missingEnvNames: params.missingEnvNames,
+  });
 }
 
 async function trackGa4Lead(city: string) {
@@ -138,13 +317,17 @@ async function resolveActiveReferralCode(rawCode: string | null): Promise<string
   const normalized = normalizeReferralCode(rawCode);
   if (!normalized) return null;
 
-  const { data } = await supabaseServer
+  const { data, error } = await supabaseServer
     .from("referral_codes")
     .select("code")
     .eq("code", normalized)
     .eq("active", true)
     .limit(1)
     .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
 
   return data?.code || null;
 }
@@ -196,7 +379,50 @@ async function persistReferral(payload: ReferralPayload, referralCode: string | 
 }
 
 export async function POST(req: NextRequest) {
+  const requestId = buildRequestId();
+
   try {
+    const ip = getRequestIp(req);
+    const rateCheck = checkRateLimit({
+      scope: "api_referral_submit",
+      key: ip,
+      windowMs: 5 * 60 * 1000,
+      maxRequests: 8,
+      blockMs: 2 * 60 * 1000,
+    });
+
+    if (!rateCheck.allowed) {
+      const retryAfterSeconds = Math.max(1, Math.ceil(rateCheck.retryAfterMs / 1000));
+      logFailure({
+        requestId,
+        reason: "rate_limit",
+        meta: { retryAfterSeconds, ip },
+      });
+      return failureResponse({
+        req,
+        requestId,
+        reason: "rate_limit",
+        status: 429,
+        retryAfterSeconds,
+      });
+    }
+
+    const missingSupabaseEnvNames = getMissingSupabaseServerEnvNames();
+    if (missingSupabaseEnvNames.length > 0) {
+      logFailure({
+        requestId,
+        reason: "missing_env",
+        meta: { missing: missingSupabaseEnvNames.join(",") },
+      });
+      return failureResponse({
+        req,
+        requestId,
+        reason: "missing_env",
+        status: 500,
+        missingEnvNames: missingSupabaseEnvNames,
+      });
+    }
+
     const formData = await req.formData();
 
     const payload: ReferralPayload = {
@@ -224,26 +450,83 @@ export async function POST(req: NextRequest) {
       !payload.referredPhone ||
       !payload.city
     ) {
-      return redirectToRefer(req, "referral-error");
+      logFailure({
+        requestId,
+        reason: "validation",
+        meta: {
+          hasReferrerName: Boolean(payload.referrerName),
+          hasReferrerEmail: Boolean(payload.referrerEmail),
+          hasReferrerPhone: Boolean(payload.referrerPhone),
+          hasReferredName: Boolean(payload.referredName),
+          hasReferredPhone: Boolean(payload.referredPhone),
+          hasCity: Boolean(payload.city),
+        },
+      });
+      return failureResponse({
+        req,
+        requestId,
+        reason: "validation",
+        status: 400,
+      });
     }
 
     if (consent !== "yes") {
-      return redirectToRefer(req, "referral-error");
+      logFailure({
+        requestId,
+        reason: "validation",
+        meta: { consentValue: typeof consent === "string" ? consent : null },
+      });
+      return failureResponse({
+        req,
+        requestId,
+        reason: "validation",
+        status: 400,
+      });
     }
 
     if (!isValidEmail(payload.referrerEmail)) {
-      return redirectToRefer(req, "referral-error");
+      logFailure({
+        requestId,
+        reason: "validation",
+        meta: { field: "referrerEmail" },
+      });
+      return failureResponse({
+        req,
+        requestId,
+        reason: "validation",
+        status: 400,
+      });
     }
 
     if (payload.referredEmail && !isValidEmail(payload.referredEmail)) {
-      return redirectToRefer(req, "referral-error");
+      logFailure({
+        requestId,
+        reason: "validation",
+        meta: { field: "referredEmail" },
+      });
+      return failureResponse({
+        req,
+        requestId,
+        reason: "validation",
+        status: 400,
+      });
     }
 
     const normalizedReferrerPhone = normalizeUsPhone(payload.referrerPhone);
     const normalizedReferredPhone = normalizeUsPhone(payload.referredPhone);
 
     if (!normalizedReferrerPhone || !normalizedReferredPhone) {
-      return redirectToRefer(req, "referral-error");
+      logFailure({
+        requestId,
+        reason: "validation",
+        meta: { field: "phone" },
+      });
+      return failureResponse({
+        req,
+        requestId,
+        reason: "validation",
+        status: 400,
+      });
     }
 
     payload.referrerPhone = normalizedReferrerPhone;
@@ -272,9 +555,32 @@ export async function POST(req: NextRequest) {
       }),
     ]);
 
-    return redirectToRefer(req, "referral-success");
+    const success = redirectToRefer({
+      req,
+      hash: "referral-success",
+      requestId,
+    });
+    return withDiagnosticsHeaders({
+      response: success,
+      requestId,
+      reason: "ok",
+    });
   } catch (error) {
-    console.error("Referral submission failed:", error);
-    return redirectToRefer(req, "referral-error");
+    const errorDetails = toErrorDetails(error);
+    const reason = mapFailureReason("supabase_insert_failed", errorDetails);
+
+    logFailure({
+      requestId,
+      reason,
+      error: errorDetails,
+    });
+
+    return failureResponse({
+      req,
+      requestId,
+      reason,
+      status: reason === "schema_missing" ? 500 : 502,
+      error: errorDetails,
+    });
   }
 }
