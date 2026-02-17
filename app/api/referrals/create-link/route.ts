@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { generateReferralCode, buildShareUrl } from "@/lib/referralProgram";
 import { isValidEmail, normalizePhone } from "@/lib/phoneNormalizer";
+import { checkRateLimit, getRequestIp } from "@/lib/requestRateLimit";
 
 export const runtime = "nodejs";
 
@@ -18,27 +19,36 @@ function normalizeReferrerPhone(phone: string): string | null {
   return null;
 }
 
-async function findExistingReferrer(phone: string | null, email: string | null) {
-  if (phone) {
-    const { data } = await supabaseServer
-      .from("referrers")
-      .select("id")
-      .eq("phone", phone)
-      .order("created_at", { ascending: true })
-      .limit(1)
-      .maybeSingle();
-    if (data?.id) return data.id as string;
-  }
+type ReferrerLookup = {
+  id: string;
+  email: string | null;
+  phone: string | null;
+};
 
+async function findExistingReferrer(
+  phone: string | null,
+  email: string | null
+): Promise<ReferrerLookup | null> {
   if (email) {
     const { data } = await supabaseServer
       .from("referrers")
-      .select("id")
+      .select("id, email, phone")
       .eq("email", email)
       .order("created_at", { ascending: true })
       .limit(1)
       .maybeSingle();
-    if (data?.id) return data.id as string;
+    if (data?.id) return data as ReferrerLookup;
+  }
+
+  if (phone) {
+    const { data } = await supabaseServer
+      .from("referrers")
+      .select("id, email, phone")
+      .eq("phone", phone)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (data?.id) return data as ReferrerLookup;
   }
 
   return null;
@@ -49,9 +59,9 @@ async function createOrUpdateReferrer(input: {
   email: string | null;
   phone: string | null;
 }) {
-  const existingId = await findExistingReferrer(input.phone, input.email);
+  const existing = await findExistingReferrer(input.phone, input.email);
 
-  if (!existingId) {
+  if (!existing) {
     const { data, error } = await supabaseServer
       .from("referrers")
       .insert({
@@ -69,20 +79,24 @@ async function createOrUpdateReferrer(input: {
     return data.id as string;
   }
 
-  await supabaseServer
+  const { error: updateError } = await supabaseServer
     .from("referrers")
     .update({
       name: input.name,
-      email: input.email,
-      phone: input.phone,
+      email: input.email || existing.email,
+      phone: input.phone || existing.phone,
     })
-    .eq("id", existingId);
+    .eq("id", existing.id);
 
-  return existingId;
+  if (updateError) {
+    throw updateError;
+  }
+
+  return existing.id;
 }
 
 async function createCode(referrerId: string): Promise<string> {
-  for (let i = 0; i < 10; i += 1) {
+  for (let i = 0; i < 20; i += 1) {
     const code = generateReferralCode(9);
     const { error } = await supabaseServer.from("referral_codes").insert({
       code,
@@ -100,6 +114,27 @@ async function createCode(referrerId: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getRequestIp(req);
+    const rate = checkRateLimit({
+      scope: "referrals-create-link",
+      key: ip,
+      windowMs: 10 * 60 * 1000,
+      maxRequests: 10,
+      blockMs: 30 * 60 * 1000,
+    });
+
+    if (!rate.allowed) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again shortly." },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(Math.ceil(rate.retryAfterMs / 1000)),
+          },
+        }
+      );
+    }
+
     const body = await req.json();
     const name = sanitizeText(body?.name, 120);
     const emailRaw = sanitizeText(body?.email, 180).toLowerCase();
