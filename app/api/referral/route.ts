@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { isValidEmail, normalizePhone } from "@/lib/phoneNormalizer";
+import { normalizeReferralCode } from "@/lib/referralProgram";
 import { sendReferralTelegramMessage } from "@/lib/telegram";
 
 export const runtime = "nodejs";
@@ -133,7 +134,37 @@ async function trackMetaLead(params: {
   });
 }
 
-async function persistReferral(payload: ReferralPayload) {
+async function resolveActiveReferralCode(rawCode: string | null): Promise<string | null> {
+  const normalized = normalizeReferralCode(rawCode);
+  if (!normalized) return null;
+
+  const { data } = await supabaseServer
+    .from("referral_codes")
+    .select("code")
+    .eq("code", normalized)
+    .eq("active", true)
+    .limit(1)
+    .maybeSingle();
+
+  return data?.code || null;
+}
+
+async function persistReferral(payload: ReferralPayload, referralCode: string | null) {
+  const { error: leadsError } = await supabaseServer.from("leads").insert({
+    name: payload.referredName,
+    phone: payload.referredPhone,
+    email: payload.referredEmail,
+    city: payload.city,
+    notes: payload.notes,
+    source: "referral_program",
+    referral_code: referralCode,
+    status: "new",
+  });
+
+  if (leadsError) {
+    throw leadsError;
+  }
+
   const summary = [
     "Referral Program Submission",
     `Referrer Name: ${payload.referrerName}`,
@@ -154,13 +185,13 @@ async function persistReferral(payload: ReferralPayload) {
     phone: payload.referrerPhone,
     email: payload.referrerEmail,
     city: payload.city,
-    notes: summary,
+    notes: referralCode ? `${summary}\nReferral Code: ${referralCode}` : summary,
     status: "new",
     source: "referral_program",
   });
 
   if (error) {
-    throw error;
+    console.warn("Referral mirror insert into kitchen_quotes failed:", error);
   }
 }
 
@@ -178,6 +209,10 @@ export async function POST(req: NextRequest) {
       city: sanitizeText(formData.get("city"), 100),
       notes: sanitizeText(formData.get("notes"), 2000) || null,
     };
+
+    const explicitReferralCode = sanitizeText(formData.get("referralCode"), 32);
+    const cookieReferralCode = req.cookies.get("vh_referral_code")?.value || null;
+    const referralCode = await resolveActiveReferralCode(explicitReferralCode || cookieReferralCode);
 
     const consent = formData.get("consentAware");
 
@@ -214,7 +249,7 @@ export async function POST(req: NextRequest) {
     payload.referrerPhone = normalizedReferrerPhone;
     payload.referredPhone = normalizedReferredPhone;
 
-    await persistReferral(payload);
+    await persistReferral(payload, referralCode);
 
     await Promise.allSettled([
       sendReferralTelegramMessage({

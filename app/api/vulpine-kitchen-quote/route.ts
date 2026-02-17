@@ -4,12 +4,28 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
 import { sendLeadTelegramMessage } from "@/lib/telegram";
 import { normalizePhone, isValidEmail } from "@/lib/phoneNormalizer";
+import { normalizeReferralCode } from "@/lib/referralProgram";
 
 export const runtime = "nodejs";
 
 // Storage bucket - use same bucket as visualizer for consistency
 const STORAGE_BUCKET = "visualizations";
 const FALLBACK_BUCKETS = ["visualizations", "kitchen-photos", "visualizer-inputs"];
+
+async function resolveActiveReferralCode(rawCode: string | null): Promise<string | null> {
+  const normalized = normalizeReferralCode(rawCode);
+  if (!normalized) return null;
+
+  const { data } = await supabaseServer
+    .from("referral_codes")
+    .select("code")
+    .eq("code", normalized)
+    .eq("active", true)
+    .limit(1)
+    .maybeSingle();
+
+  return data?.code || null;
+}
 
 // Helper: Try uploading to multiple buckets with fallback
 async function uploadWithFallback(
@@ -56,6 +72,10 @@ export async function POST(req: NextRequest) {
 
     console.log("📝 Form data:", payload);
 
+    const explicitReferralCode = typeof payload.referralCode === "string" ? payload.referralCode : null;
+    const cookieReferralCode = req.cookies.get("vh_referral_code")?.value || null;
+    const referralCode = await resolveActiveReferralCode(explicitReferralCode || cookieReferralCode);
+
     // Validate email (REQUIRED)
     const email = payload.email?.trim() || null;
     if (!email || !isValidEmail(email)) {
@@ -82,6 +102,11 @@ export async function POST(req: NextRequest) {
     const phoneNormalized = normalizePhone(phoneRaw);
 
     // Normalize types
+    const parsedNotes = payload.notes || null;
+    const notesWithReferral = referralCode
+      ? `${parsedNotes ? `${parsedNotes}\n` : ""}Referral Code: ${referralCode}`
+      : parsedNotes;
+
     const parsed = {
       full_name: payload.name || null,
       phone: phoneNormalized,
@@ -95,9 +120,9 @@ export async function POST(req: NextRequest) {
       countertop: payload.countertop || null,
       num_doors: payload.doors ? Number(payload.doors) : null,
       num_drawers: payload.drawers ? Number(payload.drawers) : null,
-      notes: payload.notes || null,
+      notes: notesWithReferral,
       status: "new",
-      source: "web",
+      source: referralCode ? "web_referral" : "web",
     };
 
     // --------------------------------------------
@@ -147,6 +172,23 @@ export async function POST(req: NextRequest) {
     }
 
     console.log(`✅ Lead created with ID: ${lead.id}`);
+
+    const { error: canonicalLeadError } = await supabaseServer.from("leads").insert({
+      name: parsed.full_name || "Website Kitchen Quote",
+      phone: parsed.phone,
+      email: parsed.email,
+      city: parsed.city,
+      notes: `${parsed.notes || ""}${parsed.notes ? "\n" : ""}Kitchen Quote ID: ${lead.id}`,
+      source: "kitchen_quote",
+      referral_code: referralCode,
+      status: "new",
+    });
+
+    if (canonicalLeadError) {
+      console.warn("⚠️ Failed to mirror quote lead into leads table:", canonicalLeadError);
+    } else {
+      console.log("✅ Lead mirrored into leads table");
+    }
 
     // --------------------------------------------
     // 2️⃣ UPLOAD PHOTOS (if any) - with graceful fallback
