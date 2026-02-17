@@ -99,6 +99,17 @@ If you still use the old quote form / v1 visualizer, also run:
 
 v2 does **not** depend on these, but other parts of the app might.
 
+### 3.3. Referral program v1 schema
+
+Run `create_referral_program_v1.sql` in Supabase SQL editor:
+
+1. Open **Supabase Dashboard → SQL Editor → New query**
+2. Paste the full contents of `create_referral_program_v1.sql`
+3. Click **Run**
+4. Confirm the following tables exist in `public`: `referrers`, `referral_codes`, `leads`, `jobs`, `payouts`
+
+The script enables `pgcrypto` with `CREATE EXTENSION IF NOT EXISTS pgcrypto;` so `gen_random_uuid()` works for UUID defaults.
+
 ---
 
 ## 4. Running Locally
@@ -172,4 +183,3 @@ These reduce duplicate calls when:
 For heavier scale you can extend this to Redis or a Supabase table, but
 the current setup keeps things fast and simple while meeting the 3–5 image
 / ~60 second target under normal load.
-
