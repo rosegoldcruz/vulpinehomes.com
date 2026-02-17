@@ -23,6 +23,7 @@ export default function VulpineKitchenQuotePage() {
     phone: "",
     email: "",
     city: "",
+    referralCode: "",
     doors: "",
     drawers: "",
     hasIsland: false,
@@ -408,6 +409,18 @@ export default function VulpineKitchenQuotePage() {
                     />
                   </div>
                 </div>
+                <div className="mt-6 space-y-2">
+                  <label className="text-sm font-medium text-gray-400 ml-1">
+                    Referral code (optional)
+                  </label>
+                  <input
+                    name="referralCode"
+                    value={form.referralCode}
+                    onChange={handleChange}
+                    className="w-full rounded-xl bg-black/20 border border-white/10 px-5 py-4 text-white placeholder-gray-600 outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 transition-all"
+                    placeholder="Enter referral code if you have one"
+                  />
+                </div>
                 <ScaleOnHover className="mt-6">
                   <button
                     onClick={() => setStep(2)}
@@ -628,4 +641,3 @@ export default function VulpineKitchenQuotePage() {
     </main>
   );
 }
-

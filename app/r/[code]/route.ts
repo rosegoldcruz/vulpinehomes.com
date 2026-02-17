@@ -35,6 +35,13 @@ export async function GET(
     return NextResponse.redirect(destination, 307);
   }
 
+  const { error: clickError } = await supabaseServer.from("referral_clicks").insert({
+    code: data.code,
+  });
+  if (clickError) {
+    console.warn("Failed to persist referral click:", clickError);
+  }
+
   const res = NextResponse.redirect(destination, 307);
   res.cookies.set({
     name: REFERRAL_COOKIE,

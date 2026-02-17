@@ -13,6 +13,11 @@ const STORAGE_BUCKET = "visualizations";
 const FALLBACK_BUCKETS = ["visualizations", "kitchen-photos", "visualizer-inputs"];
 const LEAD_DEDUPE_WINDOW_MS = 10 * 60 * 1000;
 
+function sanitizeText(value: unknown, max = 120): string {
+  if (typeof value !== "string") return "";
+  return value.trim().slice(0, max);
+}
+
 async function resolveActiveReferralCode(rawCode: string | null): Promise<string | null> {
   const normalized = normalizeReferralCode(rawCode);
   if (!normalized) return null;
@@ -93,9 +98,19 @@ export async function POST(req: NextRequest) {
 
     console.log("📝 Form data:", payload);
 
-    const explicitReferralCode = typeof payload.referralCode === "string" ? payload.referralCode : null;
+    const explicitReferralCode = sanitizeText(payload.referralCode, 40) || null;
     const cookieReferralCode = req.cookies.get("vh_referral_code")?.value || null;
     const referralCode = await resolveActiveReferralCode(explicitReferralCode || cookieReferralCode);
+
+    if (explicitReferralCode && !referralCode) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Referral code is invalid or inactive",
+        },
+        { status: 400 }
+      );
+    }
 
     // Validate email (REQUIRED)
     const email = payload.email?.trim() || null;
