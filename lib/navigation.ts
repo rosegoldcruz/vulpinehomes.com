@@ -6,5 +6,5 @@ export const NAV_ITEMS = [
   { label: "Quote", href: "/get-quote" },
   { label: "Visualizer", href: "/visualizer" },
   { label: "About", href: "/about" },
-  { label: "Refer", href: "/get-quote?source=referral" },
+  { label: "Refer", href: "/refer" },
 ];

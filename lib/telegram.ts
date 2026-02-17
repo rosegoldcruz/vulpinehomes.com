@@ -147,3 +147,70 @@ export async function sendLeadTelegramMessage(params: TelegramLeadParams) {
     console.error("Error sending Telegram lead message:", err);
   }
 }
+
+export interface TelegramReferralParams {
+  referrerName: string;
+  referrerEmail: string;
+  referrerPhone: string;
+  referredName: string;
+  referredPhone: string;
+  referredEmail?: string | null;
+  city: string;
+  notes?: string | null;
+}
+
+export async function sendReferralTelegramMessage(params: TelegramReferralParams) {
+  if (!BOT_TOKEN || !CHAT_ID) {
+    console.log("Telegram not configured, skipping referral alert");
+    return;
+  }
+
+  const {
+    referrerName,
+    referrerEmail,
+    referrerPhone,
+    referredName,
+    referredPhone,
+    referredEmail,
+    city,
+    notes,
+  } = params;
+
+  const lines = [
+    "🤝 NEW REFERRAL SUBMISSION",
+    "",
+    "Program: $500 Cabinet Refacing Referral",
+    "",
+    `Referrer: ${referrerName}`,
+    `Referrer Email: ${referrerEmail}`,
+    `Referrer Phone: ${referrerPhone}`,
+    "",
+    `Referred Person: ${referredName}`,
+    `Referred Phone: ${referredPhone}`,
+    `Referred Email: ${referredEmail || "N/A"}`,
+    `City: ${city}`,
+  ];
+
+  if (notes) {
+    lines.push("", `Notes: ${notes}`);
+  }
+
+  const text = lines.join("\n");
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: CHAT_ID, text }),
+    });
+
+    if (!res.ok) {
+      const body = await res.text();
+      console.error("Failed to send Telegram referral message", res.status, body);
+    } else {
+      console.log("Telegram referral message sent");
+    }
+  } catch (err) {
+    console.error("Error sending Telegram referral message:", err);
+  }
+}
