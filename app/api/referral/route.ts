@@ -378,7 +378,7 @@ async function persistReferral(payload: ReferralPayload, referralCode: string | 
     .filter(Boolean)
     .join("\n");
 
-  const { error } = await supabaseServer.from("kitchen_quotes").insert({
+  const { data: quoteData, error } = await supabaseServer.from("kitchen_quotes").insert({
     full_name: payload.referrerName,
     phone: payload.referrerPhone,
     email: payload.referrerEmail,
@@ -386,11 +386,13 @@ async function persistReferral(payload: ReferralPayload, referralCode: string | 
     notes: referralCode ? `${summary}\nReferral Code: ${referralCode}` : summary,
     status: "new",
     source: "referral_program",
-  });
+  }).select("id").single();
 
   if (error) {
-    console.warn("Referral mirror insert into kitchen_quotes failed:", error);
+    throw error;
   }
+  
+  return quoteData?.id || null;
 }
 
 export async function POST(req: NextRequest) {
