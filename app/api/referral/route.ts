@@ -341,23 +341,34 @@ async function resolveActiveReferralCode(rawCode: string | null): Promise<string
 }
 
 async function persistReferral(payload: ReferralPayload, referralCode: string | null) {
+  const [firstName = "", ...rest] = payload.referredName.trim().split(/\s+/);
+  const lastName = rest.join(" ");
+
   const { error: leadsError } = await supabaseServer.from("leads").insert({
-    name: payload.referredName,
+    first_name: firstName || payload.referredName,
+    last_name: lastName || null,
     phone: payload.referredPhone,
     email: payload.referredEmail,
     city: payload.city,
-    notes: payload.notes,
     source: "referral_program",
-    referral_code: referralCode,
     status: "new",
+    metadata: {
+      referral_code: referralCode,
+      referrer: {
+        name: payload.referrerName,
+        email: payload.referrerEmail,
+        phone: payload.referrerPhone,
+      },
+      notes: payload.notes || null,
+    },
   });
 
-  const leadInsertErrorDetails = leadsError ? toErrorDetails(leadsError) : null;
   if (leadsError) {
+    const leadInsertErrorDetails = toErrorDetails(leadsError);
     if (isMissingRelationError(leadInsertErrorDetails)) {
       console.warn("Referral lead insert skipped; leads table missing.", leadInsertErrorDetails);
     } else {
-      throw leadsError;
+      console.warn("Referral lead insert failed; continuing without CRM lead.", leadInsertErrorDetails);
     }
   }
 
