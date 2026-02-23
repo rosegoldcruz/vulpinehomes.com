@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer } from "@/lib/supabaseServer";
+import { sendLeadTelegramMessage } from "@/lib/telegram";
 import Replicate from "replicate";
 import sharp from "sharp";
 
@@ -180,7 +181,31 @@ export async function POST(req: NextRequest) {
       console.log("✅ Lead saved:", lead.id);
     }
 
-    return NextResponse.json(
+    // --------------------------------------------
+    // 3️⃣ SEND TELEGRAM NOTIFICATION
+    // --------------------------------------------
+    const telegramResult = await sendLeadTelegramMessage({
+      name,
+      phone,
+      city: null, // Visualizer doesn't ask for city initially
+      doors: null,
+      drawers: null,
+      hasIsland: false,
+      photoCount: 1, // original image
+      originalUrls: [originalUrl],
+      afterUrls: [finalUrl],
+      style,
+      color,
+      hardware: `${hardwareStyle} ${hardwareColor}`,
+      source: "vulpine_visualizer_v2",
+    });
+
+    // --------------------------------------------
+    // 4️⃣ RETURN SUCCESS
+    // --------------------------------------------
+    console.log("✅ Visualizer submission complete");
+
+    const response = NextResponse.json(
       {
         success: true,
         result: {
@@ -191,6 +216,13 @@ export async function POST(req: NextRequest) {
       },
       { status: 200 }
     );
+
+    response.headers.set("x-vh-intake", "ok");
+    response.headers.set("x-vh-form-type", "visualizer");
+    response.headers.set("x-vh-telegram", telegramResult.status);
+    response.headers.set("x-vh-telegram-reason", telegramResult.reason);
+
+    return response;
   } catch (err) {
     console.error("❌ Visualizer error:", err);
     const message = err instanceof Error ? err.message : "Visualization failed";

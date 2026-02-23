@@ -291,15 +291,14 @@ export async function POST(req: NextRequest) {
     }
 
     // --------------------------------------------
-    // 3️⃣ SEND TELEGRAM NOTIFICATION (non-blocking)
+    // 3️⃣ SEND TELEGRAM NOTIFICATION
     // --------------------------------------------
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const fullPhotoUrls = uploadedPhotos.map(({ path, bucket }) => 
       `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`
     );
 
-    // Fire-and-forget - don't let Telegram failure break the submission
-    sendLeadTelegramMessage({
+    const telegramResult = await sendLeadTelegramMessage({
       name: parsed.full_name,
       phone: parsed.phone,
       city: parsed.city,
@@ -309,20 +308,28 @@ export async function POST(req: NextRequest) {
       photoCount: uploadedPhotos.length,
       photoUrls: fullPhotoUrls, // Already full URLs now
       source: "kitchen_quote_landing",
-    })
-      .then(() => console.log("✅ Telegram lead notification sent"))
-      .catch((err) => console.error("⚠️ Telegram notification failed (non-critical):", err));
+    });
 
     // --------------------------------------------
     // 4️⃣ RETURN SUCCESS
     // --------------------------------------------
     console.log("✅ Kitchen quote submission complete");
 
-    return NextResponse.json({
-      success: true,
-      id: lead.id,
-      photosUploaded: uploadedPhotos.length,
-    });
+    const response = NextResponse.json(
+      {
+        success: true,
+        id: lead.id,
+        photosUploaded: uploadedPhotos.length,
+      },
+      { status: 200 }
+    );
+    
+    response.headers.set("x-vh-intake", "ok");
+    response.headers.set("x-vh-form-type", "kitchen_quote");
+    response.headers.set("x-vh-telegram", telegramResult.status);
+    response.headers.set("x-vh-telegram-reason", telegramResult.reason);
+
+    return response;
 
   } catch (err) {
     console.error("❌ Kitchen quote submission error:", err);

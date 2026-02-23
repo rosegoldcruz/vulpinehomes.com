@@ -126,6 +126,14 @@ function mapFailureReason(defaultReason: FailureReason, error?: ErrorDetails | n
   return defaultReason;
 }
 
+function isMissingRelationError(error?: ErrorDetails | null): boolean {
+  if (!error) return false;
+  if (error.code === "42P01") return true;
+  if (/relation\s+"[^"]+"\s+does not exist/i.test(error.message)) return true;
+  if (error.details && /relation\s+"[^"]+"\s+does not exist/i.test(error.details)) return true;
+  return false;
+}
+
 function logFailure(params: {
   requestId: string;
   reason: FailureReason;
@@ -344,8 +352,13 @@ async function persistReferral(payload: ReferralPayload, referralCode: string | 
     status: "new",
   });
 
+  const leadInsertErrorDetails = leadsError ? toErrorDetails(leadsError) : null;
   if (leadsError) {
-    throw leadsError;
+    if (isMissingRelationError(leadInsertErrorDetails)) {
+      console.warn("Referral lead insert skipped; leads table missing.", leadInsertErrorDetails);
+    } else {
+      throw leadsError;
+    }
   }
 
   const summary = [

@@ -37,10 +37,15 @@ export interface TelegramLeadParams {
   source?: string | null;
 }
 
-export async function sendLeadTelegramMessage(params: TelegramLeadParams) {
+export type TelegramResult = {
+  status: "sent" | "skipped" | "failed";
+  reason: "ok" | "missing_env" | "http_401" | "http_403" | "http_429" | "exception" | string;
+};
+
+export async function sendLeadTelegramMessage(params: TelegramLeadParams): Promise<TelegramResult> {
   if (!BOT_TOKEN || !CHAT_ID) {
     console.log("Telegram not configured, skipping lead alert");
-    return;
+    return { status: "skipped", reason: "missing_env" };
   }
 
   const {
@@ -140,11 +145,14 @@ export async function sendLeadTelegramMessage(params: TelegramLeadParams) {
     if (!res.ok) {
       const body = await res.text();
       console.error("Failed to send Telegram lead message", res.status, body);
+      return { status: "failed", reason: `http_${res.status}` };
     } else {
       console.log("Telegram lead message sent");
+      return { status: "sent", reason: "ok" };
     }
   } catch (err) {
     console.error("Error sending Telegram lead message:", err);
+    return { status: "failed", reason: "exception" };
   }
 }
 
@@ -159,10 +167,10 @@ export interface TelegramReferralParams {
   notes?: string | null;
 }
 
-export async function sendReferralTelegramMessage(params: TelegramReferralParams) {
+export async function sendReferralTelegramMessage(params: TelegramReferralParams): Promise<TelegramResult> {
   if (!BOT_TOKEN || !CHAT_ID) {
     console.log("Telegram not configured, skipping referral alert");
-    return;
+    return { status: "skipped", reason: "missing_env" };
   }
 
   const {
@@ -207,10 +215,13 @@ export async function sendReferralTelegramMessage(params: TelegramReferralParams
     if (!res.ok) {
       const body = await res.text();
       console.error("Failed to send Telegram referral message", res.status, body);
+      return { status: "failed", reason: `http_${res.status}` };
     } else {
       console.log("Telegram referral message sent");
+      return { status: "sent", reason: "ok" };
     }
   } catch (err) {
     console.error("Error sending Telegram referral message:", err);
+    return { status: "failed", reason: "exception" };
   }
 }
