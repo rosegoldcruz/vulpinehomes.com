@@ -577,6 +577,10 @@ export async function POST(req: NextRequest) {
       hash: "referral-success",
       requestId,
     });
+    
+    success.headers.set("x-vh-intake", "ok");
+    success.headers.set("x-vh-form-type", "referral");
+    
     return withDiagnosticsHeaders({
       response: success,
       requestId,
