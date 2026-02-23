@@ -352,15 +352,6 @@ async function persistReferral(payload: ReferralPayload, referralCode: string | 
     city: payload.city,
     source: "referral_program",
     status: "new",
-    metadata: {
-      referral_code: referralCode,
-      referrer: {
-        name: payload.referrerName,
-        email: payload.referrerEmail,
-        phone: payload.referrerPhone,
-      },
-      notes: payload.notes || null,
-    },
   });
 
   if (leadsError) {
