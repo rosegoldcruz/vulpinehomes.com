@@ -55,6 +55,7 @@ async function uploadToSupabase(bucket: string, path: string, data: Buffer, cont
 }
 
 export async function POST(req: NextRequest) {
+  const requestId = crypto.randomUUID().slice(0, 12);
   try {
     const formData = await req.formData();
 
@@ -217,17 +218,56 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
 
+    response.headers.set("x-vh-rid", requestId);
     response.headers.set("x-vh-intake", "ok");
+    response.headers.set("x-vh-reason", "ok");
     response.headers.set("x-vh-form-type", "visualizer");
     response.headers.set("x-vh-telegram", telegramResult.status);
     response.headers.set("x-vh-telegram-reason", telegramResult.reason);
 
+    console.info("[vh:intake]", {
+      rid: requestId,
+      endpoint: "/api/vulpine-visualizer",
+      intake: "ok",
+      reason: "ok",
+      telegram: telegramResult.status,
+      telegramReason: telegramResult.reason
+    });
+
     return response;
   } catch (err) {
     console.error("❌ Visualizer error:", err);
-    const message = err instanceof Error ? err.message : "Visualization failed";
-    return NextResponse.json({ error: message }, { status: 500 });
-  }
+    const errorObj = err instanceof Error ? err : new Error(String(err));
+    const message = errorObj.message || "Visualization failed";
+    const details = errorObj.stack || "";
+    
+    const response = NextResponse.json(
+      {
+        success: false,
+        error: message,
+        details: details,
+      },
+      { status: 500 }
+    );
+
+    response.headers.set("x-vh-rid", requestId);
+    response.headers.set("x-vh-intake", "fail");
+    response.headers.set("x-vh-reason", "visualization_failed");
+    response.headers.set("x-vh-form-type", "visualizer");
+    response.headers.set("x-vh-telegram", "skipped");
+    response.headers.set("x-vh-telegram-reason", "unknown");
+
+    console.info("[vh:intake]", {
+      rid: requestId,
+      endpoint: "/api/vulpine-visualizer",
+      intake: "fail",
+      reason: "visualization_failed",
+      telegram: "skipped",
+      telegramReason: "unknown"
+    });
+
+    return response;
+  } 
 }
 
 export async function GET() {

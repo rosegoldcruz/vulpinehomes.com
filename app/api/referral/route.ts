@@ -89,14 +89,43 @@ function withDiagnosticsHeaders(params: {
   requestId: string;
   reason: string;
   missingEnvNames?: string[];
+  telegramStatus?: string;
+  telegramReason?: string;
+  formType?: string;
 }): NextResponse {
-  const { response, requestId, reason, missingEnvNames } = params;
+  const { response, requestId, reason, missingEnvNames, telegramStatus, telegramReason, formType } = params;
   response.headers.set("x-vh-rid", requestId);
   response.headers.set("x-vh-reason", reason);
   response.headers.set("x-vh-build", REFERRAL_BUILD_TAG);
-  if (reason === "missing_env" && missingEnvNames?.length) {
+
+  if (missingEnvNames && missingEnvNames.length > 0) {
     response.headers.set("x-vh-missing-env", missingEnvNames.join(","));
   }
+  
+  if (telegramStatus) {
+    response.headers.set("x-vh-telegram", telegramStatus);
+  }
+  
+  if (telegramReason) {
+    response.headers.set("x-vh-telegram-reason", telegramReason);
+  }
+
+  if (formType) {
+    response.headers.set("x-vh-form-type", formType);
+  }
+  
+  const intakeStatus = reason === "ok" ? "ok" : "fail";
+  response.headers.set("x-vh-intake", intakeStatus);
+  
+  console.info("[vh:intake]", {
+    rid: requestId,
+    endpoint: "/api/referral",
+    intake: intakeStatus,
+    reason: reason,
+    telegram: telegramStatus || "skipped",
+    telegramReason: telegramReason || "unknown"
+  });
+
   return response;
 }
 
@@ -164,6 +193,8 @@ function failureResponse(params: {
   error?: ErrorDetails | null;
   retryAfterSeconds?: number;
   missingEnvNames?: string[];
+  telegramStatus?: string;
+  telegramReason?: string;
 }): NextResponse {
   const status = params.status || 400;
   const reasonHeader = params.reason;
@@ -191,6 +222,9 @@ function failureResponse(params: {
       requestId: params.requestId,
       reason: reasonHeader,
       missingEnvNames: params.missingEnvNames,
+      telegramStatus: params.telegramStatus,
+      telegramReason: params.telegramReason,
+      formType: "referral"
     });
   }
 
@@ -203,7 +237,7 @@ function failureResponse(params: {
       },
       { status }
     );
-    if (params.retryAfterSeconds && params.retryAfterSeconds > 0) {
+    if (params.retryAfterSeconds) {
       response.headers.set("Retry-After", String(params.retryAfterSeconds));
     }
     return withDiagnosticsHeaders({
@@ -211,6 +245,9 @@ function failureResponse(params: {
       requestId: params.requestId,
       reason: reasonHeader,
       missingEnvNames: params.missingEnvNames,
+      telegramStatus: params.telegramStatus,
+      telegramReason: params.telegramReason,
+      formType: "referral"
     });
   }
 
@@ -225,6 +262,9 @@ function failureResponse(params: {
     requestId: params.requestId,
     reason: reasonHeader,
     missingEnvNames: params.missingEnvNames,
+    telegramStatus: params.telegramStatus,
+    telegramReason: params.telegramReason,
+    formType: "referral"
   });
 }
 
@@ -551,18 +591,18 @@ export async function POST(req: NextRequest) {
 
     await persistReferral(payload, referralCode);
 
-    await Promise.allSettled([
+    const [telegramResult] = await Promise.all([
       sendReferralTelegramMessage({
         referrerName: payload.referrerName,
         referrerEmail: payload.referrerEmail,
         referrerPhone: payload.referrerPhone,
         referredName: payload.referredName,
         referredPhone: payload.referredPhone,
-        referredEmail: payload.referredEmail,
         city: payload.city,
-        notes: payload.notes,
       }),
-      trackGa4Lead(payload.city),
+      trackGa4Lead(payload.city).catch((err) => {
+        console.warn("GA4 measurement failed:", err);
+      }),
       trackMetaLead({
         req,
         referrerEmail: payload.referrerEmail,
@@ -578,13 +618,13 @@ export async function POST(req: NextRequest) {
       requestId,
     });
     
-    success.headers.set("x-vh-intake", "ok");
-    success.headers.set("x-vh-form-type", "referral");
-    
     return withDiagnosticsHeaders({
       response: success,
       requestId,
       reason: "ok",
+      telegramStatus: telegramResult.status,
+      telegramReason: telegramResult.reason,
+      formType: "referral"
     });
   } catch (error) {
     const errorDetails = toErrorDetails(error);

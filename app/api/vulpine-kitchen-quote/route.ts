@@ -85,13 +85,14 @@ export async function POST(req: NextRequest) {
   console.log("📥 Kitchen quote submission started");
 
   try {
-    const formData = await req.formData();
+    const rawForm = await req.formData();
+    const requestId = crypto.randomUUID().slice(0, 12);
 
     // --------------------------------------------
     // Extract text fields
     // --------------------------------------------
     const payload: Record<string, any> = {};
-    formData.forEach((value, key) => {
+    rawForm.forEach((value, key) => {
       if (value instanceof File) return;
       payload[key] = value;
     });
@@ -165,7 +166,7 @@ export async function POST(req: NextRequest) {
     // Extract photo Files
     // --------------------------------------------
     const photoFiles: File[] = [];
-    formData.forEach((value, key) => {
+    rawForm.forEach((value, key) => {
       if (value instanceof File && key.startsWith("photos_")) {
         if (value.size > 0) {
           console.log(`📸 Found photo: ${value.name} (${value.size} bytes)`);
@@ -324,22 +325,56 @@ export async function POST(req: NextRequest) {
       { status: 200 }
     );
     
+    response.headers.set("x-vh-rid", requestId);
     response.headers.set("x-vh-intake", "ok");
+    response.headers.set("x-vh-reason", "ok");
     response.headers.set("x-vh-form-type", "kitchen_quote");
     response.headers.set("x-vh-telegram", telegramResult.status);
     response.headers.set("x-vh-telegram-reason", telegramResult.reason);
 
+    console.info("[vh:intake]", {
+      rid: requestId,
+      endpoint: "/api/vulpine-kitchen-quote",
+      intake: "ok",
+      reason: "ok",
+      telegram: telegramResult.status,
+      telegramReason: telegramResult.reason
+    });
+
     return response;
 
   } catch (err) {
-    console.error("❌ Kitchen quote submission error:", err);
-    return NextResponse.json(
+    const errorObj = err instanceof Error ? err : new Error(String(err));
+    const message = errorObj.message || "Database insert failed";
+    const details = errorObj.stack || "";
+    console.error("❌ Lead insert error:", { message, details, ...((err as any) || {}) });
+
+    const response = NextResponse.json(
       {
         success: false,
-        error: "Internal server error",
-        details: err instanceof Error ? err.message : String(err)
+        error: message,
+        details: details,
       },
       { status: 500 }
     );
+
+    const requestId = crypto.randomUUID().slice(0, 12);
+    response.headers.set("x-vh-rid", requestId);
+    response.headers.set("x-vh-intake", "fail");
+    response.headers.set("x-vh-reason", "supabase_insert_failed");
+    response.headers.set("x-vh-form-type", "kitchen_quote");
+    response.headers.set("x-vh-telegram", "skipped");
+    response.headers.set("x-vh-telegram-reason", "unknown");
+
+    console.info("[vh:intake]", {
+      rid: requestId,
+      endpoint: "/api/vulpine-kitchen-quote",
+      intake: "fail",
+      reason: "supabase_insert_failed",
+      telegram: "skipped",
+      telegramReason: "unknown"
+    });
+
+    return response;
   }
 }
