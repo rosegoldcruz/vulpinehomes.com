@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import fs from 'fs';
+
 function fail(message) {
   console.error(`\n[FAIL] ${message}`);
   process.exit(1);
@@ -57,11 +59,18 @@ async function runVisualizerSmoke(siteUrl, runId) {
   form.set("style", "shaker");
   form.set("color", "flour");
   
-  // Create a minimal valid 1x1 JPEG pixel
-  const pixelBase64 = "/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA=";
-  const pixelBuffer = Buffer.from(pixelBase64, 'base64');
-  const blob = new Blob([pixelBuffer], { type: 'image/jpeg' });
-  form.set("image", blob, "dummy.jpg");
+  // Read the committed fixture image
+  let imageBlob;
+  try {
+    const fixturePath = new URL('./fixtures/ok.jpg', import.meta.url);
+    const fixtureBuffer = fs.readFileSync(fixturePath);
+    imageBlob = new Blob([fixtureBuffer], { type: 'image/jpeg' });
+  } catch (err) {
+    console.log(`\n[SKIP] Visualizer test skipped: Missing fixture at scripts/fixtures/ok.jpg`);
+    return;
+  }
+  
+  form.set("image", imageBlob, "ok.jpg");
 
   const response = await fetch(`${siteUrl}/api/vulpine-visualizer`, {
     method: "POST",
