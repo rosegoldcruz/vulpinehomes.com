@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const C4L_HOST = "cabinets4less.vulpinehomes.com";
+const C4L_HOSTS = new Set([
+  "cabinets4less.vulpinehomes.com",
+  "www.cabinets4less.vulpinehomes.com",
+]);
 
 function normalizeHost(rawHost: string | null): string {
   return (rawHost || "").toLowerCase().split(":")[0];
@@ -9,7 +12,7 @@ function normalizeHost(rawHost: string | null): string {
 export function middleware(req: NextRequest) {
   const host = normalizeHost(req.headers.get("host"));
 
-  if (!host.startsWith(C4L_HOST)) {
+  if (!C4L_HOSTS.has(host)) {
     return NextResponse.next();
   }
 
@@ -35,4 +38,3 @@ export const config = {
     "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)",
   ],
 };
-
