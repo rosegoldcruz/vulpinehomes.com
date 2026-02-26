@@ -5,20 +5,13 @@ import { useEffect } from "react";
 
 const CAMPAIGN_ID = "C4L_TEMPE_21D";
 
-declare global {
-  interface Window {
-    fbq?: (...args: unknown[]) => void;
-  }
-}
-
 export default function C4LThankYouClient() {
   useEffect(() => {
-    if (typeof window === "undefined" || typeof window.fbq !== "function") {
-      return;
-    }
+    const fbq = (window as any)?.fbq as undefined | ((...args: any[]) => void);
+    if (typeof fbq !== "function") return;
 
-    window.fbq("track", "Lead");
-    window.fbq("trackCustom", "Showroom_Tempe_Booked", {
+    fbq("track", "Lead");
+    fbq("trackCustom", "Showroom_Tempe_Booked", {
       campaign_id: CAMPAIGN_ID,
     });
   }, []);
@@ -44,4 +37,3 @@ export default function C4LThankYouClient() {
     </main>
   );
 }
-
