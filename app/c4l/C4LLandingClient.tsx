@@ -5,10 +5,29 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 const CAMPAIGN_ID = "C4L_TEMPE_21D";
-const ADDRESS_LINE = "ADDRESS_LINE";
-const CITY_STATE_ZIP = "TEMPE, AZ, ZIP";
-const STORE_HOURS = "Store Hours (placeholder)";
-const PARKING_NOTE = "Parking Note (placeholder)";
+const ADDRESS_LINE = "1840 E Warner Rd Suite 116";
+const CITY_STATE_ZIP = "Tempe, AZ 85284";
+const STORE_HOURS = "Store Hours: Please confirm when we call to schedule.";
+const PARKING_NOTE = "Parking Note: Plaza parking available near Suite 116.";
+const DANIEL_NAME = "Daniel Cruz";
+const DANIEL_TITLE = "Design Specialist, Cabinets4Less";
+const DANIEL_CELL_DISPLAY = "(480) 364-8205";
+const DANIEL_CELL_TEL = "4803648205";
+const DANIEL_EMAIL = "Cruz@Cabinets4Less.com";
+const C4L_FOOTER_BANNER = "/c4l/HighQual-C4L-Cab4Less-Horiz-8-1200x373.png";
+const C4L_GALLERY_IMAGES = [
+  "/c4l/2G9A0832.jpg",
+  "/c4l/2G9A0833.jpg",
+  "/c4l/2G9A0835.jpg",
+  "/c4l/2G9A0837.jpg",
+  "/c4l/2G9A0839.jpg",
+  "/c4l/2G9A0841.jpg",
+  "/c4l/2G9A0843.jpg",
+  "/c4l/2G9A0852.jpg",
+  "/c4l/2G9A0856.jpg",
+  "/c4l/2G9A0857.jpg",
+  "/c4l/Kitchen-Cab-Page2.webp",
+] as const;
 const HEAR_OPTIONS = ["Vulpine Homes Ad", "Facebook", "Google", "Walk-in"] as const;
 
 type Props = {
@@ -100,6 +119,13 @@ export default function C4LLandingClient({ socialProofImages }: Props) {
     return `https://www.google.com/maps/search/?api=1&query=${q}`;
   }, []);
 
+  const marqueeRows = useMemo(() => {
+    const primary = socialProofImages.length > 0 ? socialProofImages : [...C4L_GALLERY_IMAGES];
+    const rowOne = primary.filter((_, i) => i % 2 === 0);
+    const rowTwo = primary.filter((_, i) => i % 2 === 1);
+    return [rowOne.length ? rowOne : primary, rowTwo.length ? rowTwo : primary];
+  }, [socialProofImages]);
+
   const onChange = (
     key: keyof FormState,
     value: string
@@ -140,6 +166,12 @@ export default function C4LLandingClient({ socialProofImages }: Props) {
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] text-white">
+      <style jsx global>{`
+        footer {
+          display: none !important;
+        }
+      `}</style>
+
       <div className="sticky top-0 z-20 border-b border-white/10 bg-[#0a0a0f]/90 backdrop-blur">
         <p className="mx-auto max-w-7xl px-4 py-3 text-center text-xs font-semibold tracking-wide text-white/90 sm:text-sm">
           In partnership with Cabinets4Less – Tempe Showroom (Powered by Vulpine Homes)
@@ -382,6 +414,22 @@ export default function C4LLandingClient({ socialProofImages }: Props) {
                 <p>{STORE_HOURS}</p>
                 <p>{PARKING_NOTE}</p>
               </div>
+              <div className="mt-5 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-white/85">
+                <p className="font-semibold text-white">{DANIEL_NAME}</p>
+                <p className="text-white/70">{DANIEL_TITLE}</p>
+                <p className="mt-2">
+                  Cell:{" "}
+                  <a href={`tel:${DANIEL_CELL_TEL}`} className="font-semibold text-[#FFB347] hover:underline">
+                    {DANIEL_CELL_DISPLAY}
+                  </a>
+                </p>
+                <p>
+                  Email:{" "}
+                  <a href={`mailto:${DANIEL_EMAIL}`} className="text-[#FFB347] hover:underline">
+                    {DANIEL_EMAIL}
+                  </a>
+                </p>
+              </div>
             </div>
             <a
               href={mapsUrl}
@@ -398,40 +446,54 @@ export default function C4LLandingClient({ socialProofImages }: Props) {
       <section className="border-b border-white/10 bg-[#0a0a0f]">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-white sm:text-3xl">Designed by Daniel Cruz – Vulpine Homes</h2>
-
-          {socialProofImages.length > 0 ? (
-            <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3">
-              {socialProofImages.map((src, index) => (
+          <div className="mt-6 space-y-4 overflow-hidden">
+            {marqueeRows.map((row, rowIndex) => (
+              <div key={`row-${rowIndex}`} className="relative overflow-hidden">
+                <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[#0a0a0f] to-transparent sm:w-20" />
+                <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[#0a0a0f] to-transparent sm:w-20" />
                 <div
-                  key={src}
-                  className="overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+                  className={[
+                    "flex w-max animate-marquee-reverse gap-4",
+                    rowIndex === 1 ? "translate-x-[-8%]" : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
+                  style={{
+                    animationDuration: rowIndex === 0 ? "34s" : "48s",
+                  }}
                 >
-                  <Image
-                    src={src}
-                    alt={`Cabinet project example ${index + 1}`}
-                    width={1200}
-                    height={900}
-                    className="h-40 w-full object-cover sm:h-52"
-                  />
+                  {[...row, ...row].map((src, index) => (
+                    <div
+                      key={`${src}-${index}`}
+                      className="overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+                    >
+                      <Image
+                        src={src}
+                        alt={`Cabinets4Less showroom gallery ${index + 1}`}
+                        width={1200}
+                        height={900}
+                        className="h-36 w-56 object-cover sm:h-44 sm:w-72"
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                <p className="text-sm text-white/60">Placeholder testimonial</p>
-                <p className="mt-2 text-white/85">
-                  “Placeholder: The showroom appointment made cabinet pricing simple and fast.”
-                </p>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-                <p className="text-sm text-white/60">Placeholder testimonial</p>
-                <p className="mt-2 text-white/85">
-                  “Placeholder: We saw samples in person, got a layout, and left with a clear quote.”
-                </p>
-              </div>
+            ))}
+          </div>
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <p className="text-sm text-white/60">Placeholder testimonial</p>
+              <p className="mt-2 text-white/85">
+                “Placeholder: The showroom appointment made cabinet pricing simple and fast.”
+              </p>
             </div>
-          )}
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <p className="text-sm text-white/60">Placeholder testimonial</p>
+              <p className="mt-2 text-white/85">
+                “Placeholder: We saw samples in person, got a layout, and left with a clear quote.”
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -448,6 +510,21 @@ export default function C4LLandingClient({ socialProofImages }: Props) {
           >
             Book Your Showroom Design Session
           </button>
+        </div>
+      </section>
+
+      <section className="border-t border-white/10 bg-[#08080c]">
+        <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-3 sm:p-4">
+            <Image
+              src={C4L_FOOTER_BANNER}
+              alt="Cabinets4Less x Vulpine Homes"
+              width={1200}
+              height={373}
+              className="h-auto w-full"
+              priority={false}
+            />
+          </div>
         </div>
       </section>
     </main>
