@@ -185,6 +185,16 @@ export default function C4LLandingClient({ socialProofImages }: Props) {
             <div className="mb-4 inline-flex items-center rounded-full border border-[#FF8A3D]/30 bg-[#FF8A3D]/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#FFB347]">
               Tempe Showroom Promo
             </div>
+            <div className="mb-5 overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-2 sm:p-3">
+              <Image
+                src={C4L_FOOTER_BANNER}
+                alt="Cabinets4Less x Vulpine Homes"
+                width={1200}
+                height={373}
+                className="h-auto w-full"
+                priority
+              />
+            </div>
             <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl">
               Tempe Homeowners: Save on New Kitchen Cabinets
             </h1>
@@ -479,20 +489,6 @@ export default function C4LLandingClient({ socialProofImages }: Props) {
                 </div>
               </div>
             ))}
-          </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-              <p className="text-sm text-white/60">Placeholder testimonial</p>
-              <p className="mt-2 text-white/85">
-                “Placeholder: The showroom appointment made cabinet pricing simple and fast.”
-              </p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
-              <p className="text-sm text-white/60">Placeholder testimonial</p>
-              <p className="mt-2 text-white/85">
-                “Placeholder: We saw samples in person, got a layout, and left with a clear quote.”
-              </p>
-            </div>
           </div>
         </div>
       </section>
