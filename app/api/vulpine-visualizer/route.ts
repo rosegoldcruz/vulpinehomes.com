@@ -30,11 +30,59 @@ const VULPINE_COLORS: Record<string, { hex: string; name: string }> = {
 async function normalizeImageOrientation(file: File): Promise<Buffer> {
   const arrayBuffer = await file.arrayBuffer();
   const buffer = Buffer.from(arrayBuffer);
-  const normalized = await sharp(buffer)
-    .rotate() // Auto-rotate based on EXIF
-    .jpeg({ quality: 92 })
-    .toBuffer();
-  return normalized;
+
+  try {
+    // First, try to get metadata to check if the format is supported
+    const metadata = await sharp(buffer).metadata();
+    console.log(`📊 Image metadata: format=${metadata.format}, width=${metadata.width}, height=${metadata.height}`);
+
+    // For HEIF format (which includes HEIC), Sharp might not have the decoder built in
+    // Convert to a more compatible format first
+    if (metadata.format === 'heif') {
+      console.log(`⚠️ HEIF/HEIC format detected, attempting conversion...`);
+      // Try to convert with ensureAlpha false and specific options
+      const normalized = await sharp(buffer, { failOnError: false })
+        .toFormat('jpeg', { quality: 92, mozjpeg: true })
+        .rotate() // Auto-rotate based on EXIF after conversion
+        .toBuffer();
+      return normalized;
+    }
+
+    // For other formats, use standard processing
+    const normalized = await sharp(buffer)
+      .rotate() // Auto-rotate based on EXIF
+      .jpeg({ quality: 92 })
+      .toBuffer();
+    return normalized;
+
+  } catch (error) {
+    // If Sharp fails completely (e.g., HEIF decoder not available),
+    // try a fallback approach: force format conversion without reading metadata
+    console.error(`⚠️ Sharp processing failed, attempting fallback conversion:`, error);
+
+    try {
+      // Attempt to force-convert to JPEG without metadata check
+      const fallbackNormalized = await sharp(buffer, {
+        failOnError: false,
+        unlimited: true
+      })
+        .toFormat('jpeg', { quality: 92 })
+        .toBuffer();
+
+      console.log(`✅ Fallback conversion successful`);
+      return fallbackNormalized;
+
+    } catch (fallbackError) {
+      // If even the fallback fails, return the original buffer
+      // This will likely fail downstream but provides better error context
+      console.error(`❌ All Sharp conversion attempts failed:`, fallbackError);
+      throw new Error(
+        `Unsupported image format or corrupted file. ` +
+        `Original error: ${error instanceof Error ? error.message : String(error)}. ` +
+        `Please try uploading a standard JPEG or PNG file.`
+      );
+    }
+  }
 }
 
 async function uploadToSupabase(bucket: string, path: string, data: Buffer, contentType: string) {

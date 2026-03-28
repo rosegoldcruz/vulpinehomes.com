@@ -119,10 +119,22 @@ export default function KitchenVisualizer({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      // Check file type - warn for HEIF/HEIC but allow upload with notice
+      const fileType = file.type.toLowerCase();
+      const fileName = file.name.toLowerCase();
+
+      if (fileType.includes('heif') || fileType.includes('heic') ||
+          fileName.endsWith('.heif') || fileName.endsWith('.heic')) {
+        console.warn('⚠️ HEIF/HEIC file detected:', file.name);
+        // Show a warning but allow upload - backend will handle conversion
+        setError('Note: HEIC/HEIF files may take longer to process. For best results, use JPEG or PNG format.');
+      } else {
+        setError(null);
+      }
+
       setUploadedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
       setStage("configure");
-      setError(null);
     }
   };
 
@@ -287,14 +299,14 @@ export default function KitchenVisualizer({
           <div className="text-center">
             <div className="text-5xl mb-4">📸</div>
             <p className="text-white font-medium mb-2">Click to upload your kitchen photo</p>
-            <p className="text-slate-400 text-sm">JPG, PNG up to 10MB</p>
+            <p className="text-slate-400 text-sm">JPG, PNG recommended (HEIC/HEIF supported but may be slower) • Up to 10MB</p>
           </div>
         </div>
 
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/jpg,image/png,image/heic,image/heif,image/*"
           onChange={handleFileChange}
           className="hidden"
         />
