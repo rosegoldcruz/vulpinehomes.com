@@ -5,11 +5,15 @@ import Link from "next/link";
 import Image from "next/image";
 import ServiceSchema from "../components/schemas/ServiceSchema";
 import { CTAButton } from "../components/CTAButton";
+import { CITY_LANDING_DATA, FINAL_CITY_KEYS } from "../cabinet-refacing-city-data";
 
 export const metadata: Metadata = {
   title: "Kitchen Cabinet Refacing | Custom Doors & Drawers | Vulpine Homes",
-  description: "Transform your kitchen with professional cabinet refacing. Custom doors, drawer fronts, and hardware. Fast 2-5 day installation. Save thousands vs replacement. Free quote!",
+  description: "Transform your kitchen with professional cabinet refacing. Custom doors, drawer fronts, and hardware. Fast 3-5 day installation. Save 40-60% vs replacement. Serving Greater Phoenix.",
   keywords: "kitchen cabinet refacing, cabinet refacing, refacing kitchen cabinets, cabinet door replacement, kitchen remodel",
+  alternates: {
+    canonical: "/kitchen-cabinet-refacing",
+  },
 };
 
 export default function KitchenCabinetRefacingPage() {
@@ -139,30 +143,48 @@ export default function KitchenCabinetRefacingPage() {
           </div>
         </section>
 
-        {/* Related Pages */}
+        {/* Cities We Serve */}
         <section className="py-20 bg-[#0f0f18]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-12 text-white">
-              Learn More About Cabinet Refacing
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4">
+              <span className="text-white">Cities We </span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35]">Serve</span>
             </h2>
+            <p className="text-center text-white/60 mb-12 max-w-xl mx-auto">
+              Cabinet refacing across Greater Phoenix. Select your city for local project examples and scheduling.
+            </p>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { title: "Cabinet Refacing Phoenix AZ", link: "/cabinet-refacing-phoenix-az" },
-                { title: "Installation Areas", link: "/areas-served" },
-                { title: "Door Styles", link: "/products" },
-                { title: "Visualizer", link: "/visualizer" }
-              ].map((page) => (
-                <Link
-                  key={page.link}
-                  href={page.link}
-                  className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-[#FF8A3D] transition-all group"
-                >
-                  <h3 className="text-lg font-bold text-white group-hover:text-[#FF8A3D] transition-colors">
-                    {page.title} →
-                  </h3>
-                </Link>
-              ))}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-10">
+              {FINAL_CITY_KEYS.map((key) => {
+                const c = CITY_LANDING_DATA[key];
+                return (
+                  <Link
+                    key={key}
+                    href={c.route}
+                    className="bg-white/5 rounded-xl p-5 border border-white/10 hover:border-[#FF8A3D] transition-all group"
+                  >
+                    <p className="font-semibold text-white group-hover:text-[#FF8A3D] transition-colors">
+                      Cabinet Refacing {c.city}
+                    </p>
+                    <p className="text-white/45 text-sm mt-1">{c.heroKicker}</p>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              <Link href="/areas-served" className="text-[#FF8A3D] font-semibold hover:underline">
+                View full service map →
+              </Link>
+              <Link href="/products" className="text-white/60 hover:text-white transition-colors">
+                Door Styles
+              </Link>
+              <Link href="/visualizer" className="text-white/60 hover:text-white transition-colors">
+                Kitchen Visualizer
+              </Link>
+              <Link href="/get-quote" className="text-white/60 hover:text-white transition-colors">
+                Get a Quote
+              </Link>
             </div>
           </div>
         </section>
