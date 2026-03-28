@@ -36,9 +36,9 @@ async function normalizeImageOrientation(file: File): Promise<Buffer> {
     const metadata = await sharp(buffer).metadata();
     console.log(`📊 Image metadata: format=${metadata.format}, width=${metadata.width}, height=${metadata.height}`);
 
-    // For HEIF/HEIC formats, Sharp might not have the decoder built in
+    // For HEIF format (which includes HEIC), Sharp might not have the decoder built in
     // Convert to a more compatible format first
-    if (metadata.format === 'heif' || metadata.format === 'heic') {
+    if (metadata.format === 'heif') {
       console.log(`⚠️ HEIF/HEIC format detected, attempting conversion...`);
       // Try to convert with ensureAlpha false and specific options
       const normalized = await sharp(buffer, { failOnError: false })
