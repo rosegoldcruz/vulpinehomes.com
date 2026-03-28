@@ -313,7 +313,24 @@ const getAllImages = () => {
   return images;
 };
 
-export default function PullsSelector() {
+export interface HardwareSelection {
+  /** e.g. "arch" */
+  styleId: string;
+  styleName: string;
+  /** e.g. "rosegold" or "rose_gold" — raw key from pullStyles */
+  finishId: string;
+  finishName: string;
+  finishHex: string;
+  /** Main preview image path */
+  mainImage: string;
+}
+
+interface PullsSelectorProps {
+  /** Called on mount (with initial selection) and on every user pick. */
+  onSelectionChange?: (selection: HardwareSelection) => void;
+}
+
+export default function PullsSelector({ onSelectionChange }: PullsSelectorProps = {}) {
   const [selectedStyle, setSelectedStyle] = useState<keyof typeof pullStyles>("arch");
   const [selectedFinish, setSelectedFinish] = useState("rosegold");
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -324,7 +341,18 @@ export default function PullsSelector() {
       const img = new window.Image();
       img.src = src;
     });
-  }, []);
+    // Report initial selection so the parent knows the default
+    const initStyle = pullStyles["arch"];
+    const initFinish = initStyle.finishes["rosegold" as keyof typeof initStyle.finishes] as { name: string; hex: string; mainImage: string };
+    onSelectionChange?.({
+      styleId: "arch",
+      styleName: initStyle.name,
+      finishId: "rosegold",
+      finishName: initFinish.name,
+      finishHex: initFinish.hex,
+      mainImage: initFinish.mainImage,
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const currentStyle = pullStyles[selectedStyle];
   const finishes = currentStyle.finishes as Record<string, { name: string; hex: string; mainImage: string; images: string[] }>;
@@ -334,15 +362,22 @@ export default function PullsSelector() {
   // Reset to first finish when style changes
   const handleStyleChange = (style: keyof typeof pullStyles) => {
     setSelectedStyle(style);
-    const firstFinish = Object.keys(pullStyles[style].finishes)[0];
-    setSelectedFinish(firstFinish);
+    const firstFinishId = Object.keys(pullStyles[style].finishes)[0];
+    setSelectedFinish(firstFinishId);
     setSelectedImageIndex(0);
+    const s = pullStyles[style];
+    const f = (s.finishes as Record<string, { name: string; hex: string; mainImage: string }>)[firstFinishId];
+    onSelectionChange?.({ styleId: style, styleName: s.name, finishId: firstFinishId, finishName: f.name, finishHex: f.hex, mainImage: f.mainImage });
   };
 
   // Handle finish change
   const handleFinishChange = (finish: string) => {
     setSelectedFinish(finish);
     setSelectedImageIndex(0);
+    const f = finishes[finish];
+    if (f) {
+      onSelectionChange?.({ styleId: selectedStyle, styleName: currentStyle.name, finishId: finish, finishName: f.name, finishHex: f.hex, mainImage: f.mainImage });
+    }
   };
 
   return (

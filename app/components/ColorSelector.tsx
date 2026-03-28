@@ -73,7 +73,22 @@ const doorStyleColors: Record<string, { color: string; image: string }[]> = {
 // Get all unique images for preloading
 const allImages = Object.values(doorStyleColors).flat().map(item => item.image);
 
-export default function ColorSelector() {
+export interface ColorSelection {
+  /** e.g. "SHAKER CLASSIC" */
+  styleKey: string;
+  /** e.g. "Flour" */
+  colorKey: string;
+  /** Display name, e.g. "Flour" */
+  colorName: string;
+  hex: string;
+}
+
+interface ColorSelectorProps {
+  /** Called on mount (with initial selection) and on every user pick. */
+  onSelectionChange?: (selection: ColorSelection) => void;
+}
+
+export default function ColorSelector({ onSelectionChange }: ColorSelectorProps = {}) {
   const [selectedStyle, setSelectedStyle] = useState("SHAKER CLASSIC");
   const [selectedColor, setSelectedColor] = useState("Flour");
   const [currentImage, setCurrentImage] = useState("/cabs_clean/kitchens/Flour-Shaker_Kitchen.jpg");
@@ -86,13 +101,18 @@ export default function ColorSelector() {
       img.src = src;
     });
     setIsLoaded(true);
-  }, []);
+    // Report initial selection so the parent knows the default
+    const swatch = colorSwatches["Flour"];
+    onSelectionChange?.({ styleKey: "SHAKER CLASSIC", colorKey: "Flour", colorName: swatch.name, hex: swatch.hex });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Handle color click - instant image switch
   const handleColorClick = (style: string, color: string, image: string) => {
     setSelectedStyle(style);
     setSelectedColor(color);
     setCurrentImage(image);
+    const swatch = colorSwatches[color];
+    onSelectionChange?.({ styleKey: style, colorKey: color, colorName: swatch?.name ?? color, hex: swatch?.hex ?? "#888" });
   };
 
   // Get current color info

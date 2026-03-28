@@ -15,6 +15,7 @@ import MicrosoftClarity from "./components/MicrosoftClarity";
 import Navigation from "./components/Navigation";
 import MobileNav from "./components/MobileNav";
 import Footer from "./components/Footer";
+import { VisualizerProvider } from "./components/VisualizerProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://vulpinehomes.com"),
@@ -52,13 +53,15 @@ export default function RootLayout({
         <MicrosoftClarity />
       </head>
       <body>
-        <Navigation />
-        <MobileNav />
-        <Analytics />
-        {children}
-        <VercelAnalytics />
-        <SpeedInsights />
-        <Footer />
+        <VisualizerProvider>
+          <Navigation />
+          <MobileNav />
+          <Analytics />
+          {children}
+          <VercelAnalytics />
+          <SpeedInsights />
+          <Footer />
+        </VisualizerProvider>
       </body>
     </html>
   );
