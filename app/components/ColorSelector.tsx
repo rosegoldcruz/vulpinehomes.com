@@ -76,12 +76,26 @@ const allImages = Object.values(doorStyleColors).flat().map(item => item.image);
 export interface ColorSelection {
   /** e.g. "SHAKER CLASSIC" */
   styleKey: string;
+  /** Normalised API door style id — this IS the door selection */
+  doorStyleId: string;
+  /** Human label, e.g. "Shaker Classic" */
+  doorStyleLabel: string;
   /** e.g. "Flour" */
   colorKey: string;
-  /** Display name, e.g. "Flour" */
   colorName: string;
   hex: string;
+  /** The kitchen preview image currently shown — used as thumbnail in DesignSummary */
+  kitchenImageUrl: string;
 }
+
+/** Maps ColorSelector style headings → API door style ids */
+const STYLE_KEY_TO_API: Record<string, { id: string; label: string }> = {
+  "SHAKER CLASSIC": { id: "shaker",        label: "Shaker Classic"  },
+  "SHAKER SLIDE":   { id: "shaker-slide",  label: "Shaker Slide"    },
+  "FUSION SHAKER":  { id: "fusion-shaker", label: "Fusion Shaker"   },
+  "FUSION SLIDE":   { id: "fusion-slide",  label: "Fusion Slide"    },
+  "SLAB":           { id: "slab",          label: "Slab"            },
+};
 
 interface ColorSelectorProps {
   /** Called on mount (with initial selection) and on every user pick. */
@@ -103,16 +117,38 @@ export default function ColorSelector({ onSelectionChange }: ColorSelectorProps 
     setIsLoaded(true);
     // Report initial selection so the parent knows the default
     const swatch = colorSwatches["Flour"];
-    onSelectionChange?.({ styleKey: "SHAKER CLASSIC", colorKey: "Flour", colorName: swatch.name, hex: swatch.hex });
+    const styleInfo = STYLE_KEY_TO_API["SHAKER CLASSIC"];
+    const initImage = "/cabs_clean/kitchens/Flour-Shaker_Kitchen.jpg";
+    onSelectionChange?.({
+      styleKey: "SHAKER CLASSIC",
+      doorStyleId: styleInfo.id,
+      doorStyleLabel: styleInfo.label,
+      colorKey: "Flour",
+      colorName: swatch.name,
+      hex: swatch.hex,
+      kitchenImageUrl: initImage,
+    });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Handle color click - instant image switch
+  // Handle color click — this is the canonical selection for BOTH door style AND color
   const handleColorClick = (style: string, color: string, image: string) => {
     setSelectedStyle(style);
     setSelectedColor(color);
     setCurrentImage(image);
     const swatch = colorSwatches[color];
-    onSelectionChange?.({ styleKey: style, colorKey: color, colorName: swatch?.name ?? color, hex: swatch?.hex ?? "#888" });
+    const styleInfo = STYLE_KEY_TO_API[style] ?? {
+      id: style.toLowerCase().replace(/\s+/g, "-"),
+      label: style.charAt(0) + style.slice(1).toLowerCase(),
+    };
+    onSelectionChange?.({
+      styleKey: style,
+      doorStyleId: styleInfo.id,
+      doorStyleLabel: styleInfo.label,
+      colorKey: color,
+      colorName: swatch?.name ?? color,
+      hex: swatch?.hex ?? "#888",
+      kitchenImageUrl: image,
+    });
   };
 
   // Get current color info

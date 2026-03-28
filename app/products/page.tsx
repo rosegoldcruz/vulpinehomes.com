@@ -10,7 +10,6 @@ import { CTAButton } from "../components/CTAButton";
 import { ProductListSchema } from "../components/schemas/ProductListSchema";
 import {
   saveActiveConfig,
-  normalizeApiDoorStyleId,
   normalizeApiFinishId,
 } from "../lib/visualizerStore";
 
@@ -57,27 +56,12 @@ const doorStyles = [
   },
 ];
 
-function DoorStyleCircle({
-  door,
-  isSelected,
-  onClick,
-}: {
-  door: (typeof doorStyles)[0];
-  isSelected: boolean;
-  onClick: () => void;
-}) {
+/** Display-only — showcases the door style, does NOT affect the active config.
+ *  The ColorSelector swatches below are the real selection mechanism. */
+function DoorStyleShowcase({ door }: { door: (typeof doorStyles)[0] }) {
   return (
-    <button
-      onClick={onClick}
-      className={`flex flex-col items-center group transition-all ${isSelected ? "scale-105" : ""}`}
-    >
-      <div
-        className={`relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 transition-all ${
-          isSelected
-            ? "border-[#FF8A3D] shadow-lg shadow-[#FF8A3D]/30"
-            : "border-white/20 group-hover:border-[#FF8A3D]/50"
-        }`}
-      >
+    <div className="flex flex-col items-center">
+      <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-full overflow-hidden border-4 border-white/20">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center p-4">
           <Image
             src={door.circleImage}
@@ -88,29 +72,25 @@ function DoorStyleCircle({
           />
         </div>
       </div>
-      <h3
-        className={`mt-3 text-lg font-bold transition-colors ${
-          isSelected ? "text-[#FF8A3D]" : "text-white group-hover:text-[#FF8A3D]"
-        }`}
-      >
-        {door.name}
-      </h3>
-    </button>
+      <h3 className="mt-3 text-lg font-bold text-white">{door.name}</h3>
+    </div>
   );
 }
 
 export default function ProductsPage() {
   const router = useRouter();
 
-  // ── Selection state (all three buckets) ──────────────────────────────────
-  const [selectedDoor, setSelectedDoor] = useState(doorStyles[0]);
-
-  // Defaults match what ColorSelector and PullsSelector initialize with
+  // ── Selection state ───────────────────────────────────────────────────────
+  // colorSel is the canonical source for BOTH door style AND color.
+  // The 5 showcase circles above are display-only and do not affect this state.
   const [colorSel, setColorSel] = useState<ColorSelection>({
     styleKey: "SHAKER CLASSIC",
+    doorStyleId: "shaker",
+    doorStyleLabel: "Shaker Classic",
     colorKey: "Flour",
     colorName: "Flour",
     hex: "#f5f5f0",
+    kitchenImageUrl: "/cabs_clean/kitchens/Flour-Shaker_Kitchen.jpg",
   });
 
   const [hwSel, setHwSel] = useState<HardwareSelection>({
@@ -125,12 +105,13 @@ export default function ProductsPage() {
   const handleColorChange = useCallback((sel: ColorSelection) => setColorSel(sel), []);
   const handleHwChange = useCallback((sel: HardwareSelection) => setHwSel(sel), []);
 
-  // ── Save config and go to visualizer ────────────────────────────────────
+  // ── Save config and go to visualizer ─────────────────────────────────────
+  // Door style + color come exclusively from colorSel (the ColorSelector swatches).
   const handleVisualize = () => {
     saveActiveConfig({
-      doorStyleId: normalizeApiDoorStyleId(selectedDoor.id),
-      doorStyleLabel: selectedDoor.name,
-      doorStyleImage: selectedDoor.circleImage,
+      doorStyleId: colorSel.doorStyleId,
+      doorStyleLabel: colorSel.doorStyleLabel,
+      doorStyleImage: colorSel.kitchenImageUrl,
       colorName: colorSel.colorName,
       colorHex: colorSel.hex,
       hardwareStyleId: hwSel.styleId,
@@ -215,27 +196,25 @@ export default function ProductsPage() {
             </h2>
           </div>
 
-          {/* Circular Door Style Selector */}
-          <div className="flex flex-wrap justify-center gap-8 md:gap-12 mb-12">
+          {/* Door style showcase — display only, not selection inputs */}
+          <div className="flex flex-wrap justify-center gap-8 md:gap-12 mb-8">
             {doorStyles.map((door) => (
-              <DoorStyleCircle
-                key={door.id}
-                door={door}
-                isSelected={selectedDoor.id === door.id}
-                onClick={() => setSelectedDoor(door)}
-              />
+              <DoorStyleShowcase key={door.id} door={door} />
             ))}
           </div>
 
-          {/* Selected Door Details */}
-          <div className="max-w-2xl mx-auto text-center bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10">
-            <h3 className="text-2xl md:text-3xl font-bold text-[#FF8A3D] mb-3">{selectedDoor.name}</h3>
-            <p className="text-white/80 text-lg leading-relaxed mb-6">{selectedDoor.detailedDescription}</p>
+          <div className="text-center mb-4">
+            <p className="text-white/45 text-sm">
+              Select your style & color in the swatches below — the kitchen preview updates instantly.
+            </p>
+          </div>
+
+          <div className="text-center">
             <Link
               href="#door-colors"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#FF8A3D] to-[#FF6B35] text-white font-semibold rounded-full transition-all hover:shadow-lg hover:shadow-[#FF8A3D]/30"
             >
-              View Color Options
+              Choose Your Color →
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
@@ -265,8 +244,8 @@ export default function ProductsPage() {
           <p className="text-white/50 text-sm uppercase tracking-widest mb-3">Your current selection</p>
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-white/80">
-              <Image src={selectedDoor.circleImage} alt="" width={24} height={24} className="rounded-full object-contain bg-white/10" />
-              {selectedDoor.name}
+              <img src={colorSel.kitchenImageUrl} alt="" className="w-6 h-6 rounded object-cover" />
+              {colorSel.doorStyleLabel}
             </span>
             <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-sm text-white/80">
               <span className="w-5 h-5 rounded-full inline-block border border-white/20" style={{ backgroundColor: colorSel.hex }} />
