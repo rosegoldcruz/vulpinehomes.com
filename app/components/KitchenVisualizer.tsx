@@ -35,12 +35,12 @@ interface KitchenVisualizerProps {
 }
 
 // ============ DOOR STYLE OPTIONS ============
-const DOOR_STYLES: { id: DoorStyle; label: string; description: string }[] = [
-  { id: "shaker", label: "Shaker Classic", description: "Timeless recessed panel design" },
-  { id: "shaker-slide", label: "Shaker Slide", description: "Modern horizontal lines" },
-  { id: "slab", label: "Slab", description: "Clean flat contemporary look" },
-  { id: "fusion-shaker", label: "Fusion Shaker", description: "Modern take on classic shaker" },
-  { id: "fusion-slide", label: "Fusion Slide", description: "Sleek modern panels" },
+const DOOR_STYLES: { id: DoorStyle; label: string; description: string; image: string }[] = [
+  { id: "shaker", label: "Shaker Classic", description: "Timeless recessed panel design", image: "/cabs_clean/doors/shaker_classic/shaker-classic-flour.png" },
+  { id: "shaker-slide", label: "Shaker Slide", description: "Modern horizontal lines", image: "/cabs_clean/doors/shaker_slide/shaker-slide-flour.png" },
+  { id: "slab", label: "Slab", description: "Clean flat contemporary look", image: "/cabs_clean/doors/slab/slab-flour.png" },
+  { id: "fusion-shaker", label: "Fusion Shaker", description: "Modern take on classic shaker", image: "/cabs_clean/doors/fusion_in_shaker/Fusion-Shaker-flour.png" },
+  { id: "fusion-slide", label: "Fusion Slide", description: "Sleek modern panels", image: "/cabs_clean/doors/fusion_in_slide/Fusion-Slide-flour.png" },
 ];
 
 // ============ COLOR OPTIONS ============
@@ -61,22 +61,23 @@ const COLOR_OPTIONS: { id: string; name: string; hex: string }[] = [
 ];
 
 // ============ HARDWARE OPTIONS ============
-const HARDWARE_STYLES: { id: HardwareStyle; label: string }[] = [
-  { id: "loft", label: "Loft" },
-  { id: "bar", label: "Bar" },
-  { id: "arch", label: "Arch" },
-  { id: "artisan", label: "Artisan" },
-  { id: "cottage", label: "Cottage" },
-  { id: "square", label: "Square" },
+const HARDWARE_STYLES: { id: HardwareStyle; label: string; image: string }[] = [
+  { id: "loft", label: "Loft", image: "/cabs_clean/hardware/loft/Loft_SatinNickel.png" },
+  { id: "bar", label: "Bar", image: "/cabs_clean/hardware/bar/BarPull_SatinNickel.png" },
+  { id: "arch", label: "Arch", image: "/cabs_clean/hardware/arch/Arch_SatinNickel.png" },
+  { id: "artisan", label: "Artisan", image: "/cabs_clean/hardware/artisan/Artisan_SatinNickel.png" },
+  { id: "cottage", label: "Cottage", image: "/cabs_clean/hardware/cottage/Cottage__SatinNickel.png" },
+  { id: "square", label: "Square", image: "/cabs_clean/hardware/square/Square_SatinNickel.png" },
 ];
 
-const HARDWARE_FINISHES: { id: HardwareFinish; label: string }[] = [
-  { id: "satinnickel", label: "Satin Nickel" },
-  { id: "chrome", label: "Chrome" },
-  { id: "black", label: "Matte Black" },
-  { id: "rose_gold", label: "Rose Gold" },
-  { id: "gold", label: "Gold" },
-  { id: "bronze", label: "Bronze" },
+// image = hardware product shot showing that finish; swatch = CSS gradient for finishes without images
+const HARDWARE_FINISHES: { id: HardwareFinish; label: string; image?: string; swatch?: string }[] = [
+  { id: "satinnickel", label: "Satin Nickel", image: "/cabs_clean/hardware/artisan/Artisan_SatinNickel.png" },
+  { id: "chrome", label: "Chrome", image: "/cabs_clean/hardware/artisan/Artisan_Chrome.png" },
+  { id: "black", label: "Matte Black", image: "/cabs_clean/hardware/artisan/Artisan_MatteBlack.png" },
+  { id: "rose_gold", label: "Rose Gold", image: "/cabs_clean/hardware/artisan/Artisan_RoseGold.png" },
+  { id: "gold", label: "Gold", swatch: "linear-gradient(135deg, #b8860b, #ffd700, #cfb53b)" },
+  { id: "bronze", label: "Bronze", swatch: "linear-gradient(135deg, #6b4c2a, #cd7f32, #8c6239)" },
 ];
 
 // ============ MAIN COMPONENT ============
@@ -341,19 +342,38 @@ export default function KitchenVisualizer({
             <div>
               <label className="text-white font-medium text-sm mb-2 block">Door Style</label>
               <div className="grid grid-cols-2 gap-2">
-                {DOOR_STYLES.map((style) => (
-                  <button
-                    key={style.id}
-                    onClick={() => setConfig((prev) => ({ ...prev, doorStyle: style.id }))}
-                    className={`p-3 rounded-xl text-left transition-all ${config.doorStyle === style.id
-                      ? "bg-orange-500 text-white"
-                      : "bg-slate-900 text-slate-200 hover:bg-slate-800"
+                {DOOR_STYLES.map((style) => {
+                  const isSelected = config.doorStyle === style.id;
+                  return (
+                    <button
+                      key={style.id}
+                      onClick={() => setConfig((prev) => ({ ...prev, doorStyle: style.id }))}
+                      className={`rounded-xl overflow-hidden border-2 text-left transition-all ${
+                        isSelected ? "border-orange-500" : "border-slate-800 hover:border-slate-600"
                       }`}
-                  >
-                    <div className="font-medium text-sm">{style.label}</div>
-                    <div className="text-xs opacity-70">{style.description}</div>
-                  </button>
-                ))}
+                    >
+                      <div className="aspect-[4/3] bg-slate-900 overflow-hidden relative">
+                        <img
+                          src={style.image}
+                          alt={style.label}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                        />
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-orange-500/20" />
+                        )}
+                      </div>
+                      <div className={`px-2 py-1.5 ${isSelected ? "bg-orange-500" : "bg-slate-900"}`}>
+                        <p className={`text-xs font-semibold leading-tight ${isSelected ? "text-white" : "text-slate-200"}`}>
+                          {style.label}
+                        </p>
+                        <p className={`text-xs leading-tight ${isSelected ? "text-orange-100" : "text-slate-400"}`}>
+                          {style.description}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -380,38 +400,79 @@ export default function KitchenVisualizer({
             {/* Hardware Style */}
             <div>
               <label className="text-white font-medium text-sm mb-2 block">Hardware Style</label>
-              <div className="flex flex-wrap gap-2">
-                {HARDWARE_STYLES.map((hw) => (
-                  <button
-                    key={hw.id}
-                    onClick={() => setConfig((prev) => ({ ...prev, hardwareStyle: hw.id }))}
-                    className={`px-4 py-2 rounded-full text-sm transition-all ${config.hardwareStyle === hw.id
-                      ? "bg-orange-500 text-white"
-                      : "bg-slate-900 text-slate-200 hover:bg-slate-800"
+              <div className="grid grid-cols-3 gap-2">
+                {HARDWARE_STYLES.map((hw) => {
+                  const isSelected = config.hardwareStyle === hw.id;
+                  return (
+                    <button
+                      key={hw.id}
+                      onClick={() => setConfig((prev) => ({ ...prev, hardwareStyle: hw.id }))}
+                      className={`rounded-xl overflow-hidden border-2 transition-all ${
+                        isSelected ? "border-orange-500" : "border-slate-800 hover:border-slate-600"
                       }`}
-                  >
-                    {hw.label}
-                  </button>
-                ))}
+                    >
+                      <div className="aspect-square bg-slate-100 overflow-hidden relative flex items-center justify-center">
+                        <img
+                          src={hw.image}
+                          alt={hw.label}
+                          className="w-full h-full object-contain p-2"
+                          loading="lazy"
+                        />
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-orange-500/15" />
+                        )}
+                      </div>
+                      <div className={`py-1.5 text-center text-xs font-semibold ${
+                        isSelected ? "bg-orange-500 text-white" : "bg-slate-900 text-slate-300"
+                      }`}>
+                        {hw.label}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
             {/* Hardware Finish */}
             <div>
               <label className="text-white font-medium text-sm mb-2 block">Hardware Finish</label>
-              <div className="flex flex-wrap gap-2">
-                {HARDWARE_FINISHES.map((finish) => (
-                  <button
-                    key={finish.id}
-                    onClick={() => setConfig((prev) => ({ ...prev, hardwareFinish: finish.id }))}
-                    className={`px-4 py-2 rounded-full text-sm transition-all ${config.hardwareFinish === finish.id
-                      ? "bg-orange-500 text-white"
-                      : "bg-slate-900 text-slate-200 hover:bg-slate-800"
+              <div className="grid grid-cols-3 gap-2">
+                {HARDWARE_FINISHES.map((finish) => {
+                  const isSelected = config.hardwareFinish === finish.id;
+                  return (
+                    <button
+                      key={finish.id}
+                      onClick={() => setConfig((prev) => ({ ...prev, hardwareFinish: finish.id }))}
+                      className={`rounded-xl overflow-hidden border-2 transition-all ${
+                        isSelected ? "border-orange-500" : "border-slate-800 hover:border-slate-600"
                       }`}
-                  >
-                    {finish.label}
-                  </button>
-                ))}
+                    >
+                      <div className="aspect-square overflow-hidden relative flex items-center justify-center bg-slate-100">
+                        {finish.image ? (
+                          <img
+                            src={finish.image}
+                            alt={finish.label}
+                            className="w-full h-full object-contain p-2"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div
+                            className="w-10 h-10 rounded-full border-2 border-white/30 shadow-inner"
+                            style={{ background: finish.swatch }}
+                          />
+                        )}
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-orange-500/15" />
+                        )}
+                      </div>
+                      <div className={`py-1.5 text-center text-xs font-semibold ${
+                        isSelected ? "bg-orange-500 text-white" : "bg-slate-900 text-slate-300"
+                      }`}>
+                        {finish.label}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
