@@ -14,6 +14,28 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/kitchen-cabinet-refacing",
   },
+  openGraph: {
+    title: "Kitchen Cabinet Refacing | Custom Doors & Drawers | Vulpine Homes",
+    description:
+      "Transform your kitchen with professional cabinet refacing. Custom doors, drawer fronts, and hardware. Fast 3-5 day installation. Save 40-60% vs replacement. Serving Greater Phoenix.",
+    url: "https://www.vulpinehomes.com/kitchen-cabinet-refacing",
+    type: "website",
+    images: [
+      {
+        url: "https://www.vulpinehomes.com/marketing/Storm-Fusion-Shaker_Kitchen.jpg",
+        width: 1920,
+        height: 1080,
+        alt: "Kitchen cabinet refacing project with modern shaker doors",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kitchen Cabinet Refacing | Custom Doors & Drawers | Vulpine Homes",
+    description:
+      "Transform your kitchen with professional cabinet refacing. Custom doors, drawer fronts, and hardware. Fast 3-5 day installation. Save 40-60% vs replacement.",
+    images: ["https://www.vulpinehomes.com/marketing/Storm-Fusion-Shaker_Kitchen.jpg"],
+  },
 };
 
 export default function KitchenCabinetRefacingPage() {
