@@ -7,6 +7,28 @@ export const metadata: Metadata = {
   title: "Cabinet Installation Services Phoenix | Door Installation & Refinishing",
   description:
     "Our team installs cabinet doors, drawer fronts, and refinishes cabinet boxes in Phoenix. 3-5 day installation. Get your installation quote today.",
+  openGraph: {
+    title: "Cabinet Installation Services Phoenix | Door Installation & Refinishing",
+    description:
+      "Our team installs cabinet doors, drawer fronts, and refinishes cabinet boxes in Phoenix. 3-5 day installation. Get your installation quote today.",
+    url: "https://www.vulpinehomes.com/services",
+    type: "website",
+    images: [
+      {
+        url: "https://www.vulpinehomes.com/marketing/recab.png",
+        width: 1200,
+        height: 900,
+        alt: "Finished kitchen cabinets installed by Vulpine Homes",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cabinet Installation Services Phoenix | Door Installation & Refinishing",
+    description:
+      "Our team installs cabinet doors, drawer fronts, and refinishes cabinet boxes in Phoenix. 3-5 day installation. Get your installation quote today.",
+    images: ["https://www.vulpinehomes.com/marketing/recab.png"],
+  },
 };
 
 export default function ServicesPage() {

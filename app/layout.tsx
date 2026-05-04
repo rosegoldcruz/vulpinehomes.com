@@ -26,10 +26,25 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Vulpine Homes | Get a brand new kitchen 50% off!",
     description: "Cabinet Refacing & Kitchen Remodeling in Phoenix. Save 50% vs full remodel. Quotes in 24 hours. 5-Star Rated.",
-    url: "https://vulpinehomes.com",
+    url: "https://www.vulpinehomes.com/",
     siteName: "Vulpine Homes",
     locale: "en_US",
     type: "website",
+    images: [
+      {
+        url: "https://www.vulpinehomes.com/marketing/1200%20x%20900.png",
+        width: 1200,
+        height: 900,
+        alt: "Modern finished kitchen cabinet refacing by Vulpine Homes",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vulpine Homes | Get a brand new kitchen 50% off!",
+    description:
+      "Cabinet Refacing & Kitchen Remodeling in Phoenix. Save 50% vs full remodel. Quotes in 24 hours. 5-Star Rated.",
+    images: ["https://www.vulpinehomes.com/marketing/1200%20x%20900.png"],
   },
   icons: {
     icon: "/logos/favicon-fox/favi (192 x 192 px).png",
