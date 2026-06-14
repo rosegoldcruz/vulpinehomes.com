@@ -1,0 +1,512 @@
+{
+  "package": "vulpine-legacy-features",
+  "generated": "2026-06-14",
+  "source_repo": "rosegoldcruz/vulpinehomes.com",
+  "source_branch": "main",
+  "architecture": "Next.js 14 App Router, TypeScript 5, Tailwind 3, Supabase 2",
+  "features": [
+    {
+      "name": "cabinet_refacing",
+      "label": "Cabinet Refacing / City Landing Pages",
+      "risk_level": "low",
+      "source_files": [
+        "app/cabinet-refacing-city-data.ts",
+        "app/city-landing-content.json",
+        "app/components/city/CityLandingPage.tsx",
+        "app/components/city/BeforeAfterSlider.tsx",
+        "app/cabinet-refacing-anthem/page.tsx",
+        "app/cabinet-refacing-buckeye/page.tsx",
+        "app/cabinet-refacing-chandler/page.tsx",
+        "app/cabinet-refacing-gilbert/page.tsx",
+        "app/cabinet-refacing-glendale/page.tsx",
+        "app/cabinet-refacing-goodyear/page.tsx",
+        "app/cabinet-refacing-mesa/page.tsx",
+        "app/cabinet-refacing-peoria/page.tsx",
+        "app/cabinet-refacing-phoenix-az/page.tsx",
+        "app/cabinet-refacing-scottsdale/page.tsx",
+        "app/cabinet-refacing-surprise/page.tsx",
+        "app/cabinet-refacing-tempe/page.tsx",
+        "app/kitchen-cabinet-refacing/page.tsx"
+      ],
+      "shared_dependencies": [
+        "app/components/Navigation.tsx",
+        "app/components/CTAButton.tsx",
+        "app/components/schemas/ServiceSchema.tsx",
+        "app/components/schemas/FAQSchema.tsx",
+        "app/components/linking/InternalLinking.tsx",
+        "app/config/internal-linking.ts",
+        "lib/navigation.ts",
+        "app/components/ui/tabs.tsx"
+      ],
+      "assets": {
+        "included": [
+          "public/before-after/before4.jpg",
+          "public/before-after/after4.jpg",
+          "public/before-after/before6.jpg",
+          "public/before-after/after6.jpg",
+          "public/before-after/before7.jpg",
+          "public/before-after/after7.jpg",
+          "public/before-after/before9.jpg",
+          "public/before-after/after9.jpg",
+          "public/before-after/before12.jpg",
+          "public/before-after/after12.jpg",
+          "public/before-after/before15.jpg",
+          "public/before-after/after15.jpg"
+        ],
+        "not_included": []
+      },
+      "api_endpoints": [],
+      "env_vars": [],
+      "database_tables": [],
+      "npm_packages": ["next", "react", "tailwindcss", "typescript"],
+      "migration_notes": "Lowest risk. No API routes, no external services. Only requires before-after image assets and the city-landing-content.json data file. Run static builds after porting to verify SSG works (all city pages use force-static).",
+      "recommended_migration_order": 2,
+      "missing_or_unresolved_dependencies": []
+    },
+    {
+      "name": "product_configurator",
+      "label": "Product Configurator",
+      "risk_level": "low",
+      "source_files": [
+        "app/products/page.tsx",
+        "app/products/layout.tsx",
+        "app/components/ColorSelector.tsx",
+        "app/components/PullsSelector.tsx",
+        "app/lib/visualizerStore.ts",
+        "app/components/CTAButton.tsx",
+        "app/components/schemas/ProductListSchema.tsx"
+      ],
+      "shared_dependencies": [
+        "app/globals.css",
+        "tailwind.config.ts",
+        "tsconfig.json"
+      ],
+      "assets": {
+        "included": [
+          "public/cabs_clean/dataset.json",
+          "public/product-menu-vulpine/1.png",
+          "public/product-menu-vulpine/2.png",
+          "public/product-menu-vulpine/3.png",
+          "public/product-menu-vulpine/4.png"
+        ],
+        "not_included": [
+          "public/cabs_clean/doors/** (all door preview images, ~69 MB total)",
+          "public/cabs_clean/hardware/** (all hardware preview images)",
+          "public/cabs_clean/kitchens/** (all kitchen preview images)"
+        ]
+      },
+      "api_endpoints": [],
+      "env_vars": [],
+      "database_tables": [],
+      "npm_packages": ["next", "react", "tailwindcss", "typescript"],
+      "migration_notes": "No API routes. State is stored in localStorage only (visualizerStore.ts). The entire public/cabs_clean/ directory (~69 MB) must be transferred from the source repo for images to render. The dataset.json catalog is included and drives ColorSelector/PullsSelector logic.",
+      "recommended_migration_order": 3,
+      "missing_or_unresolved_dependencies": [
+        {
+          "item": "public/cabs_clean/doors/**",
+          "reason": "Binary image assets not copied due to size (69 MB). Transfer manually from source repo.",
+          "impact": "ColorSelector will not render door preview images without these files."
+        },
+        {
+          "item": "public/cabs_clean/hardware/**",
+          "reason": "Binary image assets not copied due to size. Transfer manually from source repo.",
+          "impact": "PullsSelector will not render hardware preview images without these files."
+        },
+        {
+          "item": "public/cabs_clean/kitchens/**",
+          "reason": "Binary image assets not copied due to size. Transfer manually from source repo.",
+          "impact": "Kitchen style preview images will be missing."
+        }
+      ]
+    },
+    {
+      "name": "visualizer",
+      "label": "AI Kitchen Visualizer",
+      "risk_level": "high",
+      "source_files": [
+        "app/visualizer/page.tsx",
+        "app/visualizer/CabinetVisionPage.tsx",
+        "app/components/KitchenVisualizer.tsx",
+        "app/components/VisualizerProvider.tsx",
+        "app/api/vulpine-visualizer/route.ts",
+        "lib/visualizer/engine.ts",
+        "lib/visualizer/geminiService.ts",
+        "lib/supabaseServer.ts",
+        "lib/telegram.ts"
+      ],
+      "shared_dependencies": [
+        "app/components/GoogleAnalytics.tsx",
+        "app/lib/visualizerStore.ts"
+      ],
+      "assets": {
+        "included": [],
+        "not_included": [
+          "Supabase storage bucket: visualizations (must be created in new project)"
+        ]
+      },
+      "api_endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/vulpine-visualizer",
+          "content_type": "multipart/form-data",
+          "required_fields": ["image", "name", "phone", "email"],
+          "optional_fields": ["style", "color", "hardwareStyle", "hardwareColor", "prompt"],
+          "response": "{ success: boolean, result: { originalUrl, finalUrl, promptUsed } }",
+          "runtime": "nodejs"
+        },
+        {
+          "method": "GET",
+          "path": "/api/vulpine-visualizer",
+          "response": "{ status: 'ok', message: string }"
+        }
+      ],
+      "env_vars": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "REPLICATE_API_TOKEN",
+        "REPLICATE_MODEL",
+        "REPLICATE_STEPS",
+        "REPLICATE_GUIDANCE",
+        "TELEGRAM_BOT_TOKEN",
+        "TELEGRAM_CHAT_ID",
+        "GOOGLE_CLOUD_PROJECT",
+        "GOOGLE_CLOUD_LOCATION",
+        "GOOGLE_SERVICE_ACCOUNT_JSON_BASE64"
+      ],
+      "database_tables": [
+        {
+          "name": "kitchen_leads",
+          "operation": "INSERT",
+          "sql_file": "create_visualizer_v2.sql",
+          "columns_used": ["full_name", "phone", "email", "city", "room_type", "selected_style", "selected_color", "design_count", "custom_instructions", "original_images", "design_images", "source"]
+        }
+      ],
+      "storage_buckets": ["visualizations"],
+      "npm_packages": [
+        "next", "react", "typescript", "tailwindcss",
+        "@supabase/supabase-js", "replicate", "sharp",
+        "@google-cloud/vertexai"
+      ],
+      "migration_notes": "Highest risk feature. Requires Replicate API token and Supabase storage bucket to be configured before testing. The geminiService.ts (Vertex AI) is included but NOT currently wired into the route — it is dead code at time of extraction. engine.ts pipeline logic is partially duplicated inside route.ts. Recommend consolidating to engine.ts during migration.",
+      "recommended_migration_order": 4,
+      "known_issues": [
+        "lib/visualizer/geminiService.ts is not imported by the API route — dead code",
+        "lib/visualizer/engine.ts duplicates VULPINE_COLORS and upload logic from the route — not imported by the route",
+        "app/visualizer/CabinetVisionPage.tsx is an alternate draft, not the active page"
+      ],
+      "missing_or_unresolved_dependencies": [
+        {
+          "item": "Supabase storage bucket 'visualizations'",
+          "reason": "Must be created in the new Supabase project. SQL is in create_visualizer_buckets.sql.",
+          "impact": "Image uploads will fail without this bucket."
+        },
+        {
+          "item": "GOOGLE_SERVICE_ACCOUNT_JSON_BASE64",
+          "reason": "Service account JSON for Vertex AI — must be obtained from Google Cloud Console and base64-encoded.",
+          "impact": "geminiService.ts will not function without this; currently not wired to the route."
+        }
+      ]
+    },
+    {
+      "name": "referral_program",
+      "label": "Referral Program",
+      "risk_level": "medium",
+      "source_files": [
+        "app/refer/page.tsx",
+        "app/refer/ReferralLinkGenerator.tsx",
+        "app/referral/route.ts",
+        "app/r/[code]/route.ts",
+        "app/api/referral/route.ts",
+        "app/api/referrals/create-link/route.ts",
+        "lib/referralProgram.ts",
+        "lib/referralStatus.ts",
+        "lib/phoneNormalizer.ts",
+        "lib/requestRateLimit.ts",
+        "lib/supabaseServer.ts",
+        "lib/telegram.ts",
+        "create_referral_program_v1.sql",
+        "add_referral_clicks_affiliate.sql",
+        "supabase-fixes.sql",
+        "scripts/verify-referral-v1.mjs",
+        "scripts/smoke-referral-submit.mjs",
+        "scripts/smoke-test-all.mjs"
+      ],
+      "shared_dependencies": [],
+      "assets": {
+        "included": [],
+        "not_included": []
+      },
+      "api_endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/referral",
+          "content_type": "application/json",
+          "required_fields": ["name", "phone", "email"],
+          "optional_fields": ["referralCode", "city"],
+          "response": "{ success: boolean, submissionId?: string, message?: string }",
+          "runtime": "nodejs"
+        },
+        {
+          "method": "POST",
+          "path": "/api/referrals/create-link",
+          "content_type": "application/json",
+          "required_fields": ["name", "email"],
+          "optional_fields": ["phone"],
+          "response": "{ code: string, shareUrl: string }",
+          "runtime": "nodejs"
+        },
+        {
+          "method": "GET",
+          "path": "/r/[code]",
+          "description": "Tracks referral click, increments counter, redirects to homepage with UTM params"
+        },
+        {
+          "method": "GET",
+          "path": "/referral",
+          "description": "Legacy redirect to /refer"
+        }
+      ],
+      "env_vars": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "TELEGRAM_BOT_TOKEN",
+        "TELEGRAM_CHAT_ID",
+        "NEXT_PUBLIC_SITE_URL"
+      ],
+      "database_tables": [
+        {
+          "name": "referral_codes",
+          "operation": "SELECT, INSERT, UPDATE",
+          "sql_file": "create_referral_program_v1.sql"
+        },
+        {
+          "name": "referral_submissions",
+          "operation": "SELECT, INSERT",
+          "sql_file": "create_referral_program_v1.sql"
+        }
+      ],
+      "storage_buckets": [],
+      "npm_packages": [
+        "next", "react", "typescript",
+        "@supabase/supabase-js"
+      ],
+      "migration_notes": "Apply SQL migrations before running API routes. Rate limiting is in-memory (resets on cold start) — consider Redis for production. The /referral route is a legacy redirect for backward compatibility. Update base URL in smoke scripts before running.",
+      "recommended_migration_order": 1,
+      "known_issues": [
+        "In-memory rate limiter (lib/requestRateLimit.ts) resets on serverless cold starts",
+        "smoke-test-all.mjs hardcodes https://www.vulpinehomes.com — update before running"
+      ],
+      "missing_or_unresolved_dependencies": []
+    },
+    {
+      "name": "kitchen_quote",
+      "label": "Kitchen Quote / Contact Form",
+      "risk_level": "medium",
+      "source_files": [
+        "app/vulpine/kitchen-quote/page.tsx",
+        "app/vulpine/kitchen-quote/Testimonials.tsx",
+        "app/api/vulpine-kitchen-quote/route.ts",
+        "lib/supabaseServer.ts",
+        "lib/telegram.ts",
+        "lib/phoneNormalizer.ts",
+        "lib/referralProgram.ts"
+      ],
+      "shared_dependencies": [
+        "app/components/ui/Motion.tsx",
+        "app/components/GoogleAnalytics.tsx",
+        "lib/utils.ts"
+      ],
+      "assets": {
+        "included": [],
+        "not_included": []
+      },
+      "api_endpoints": [
+        {
+          "method": "POST",
+          "path": "/api/vulpine-kitchen-quote",
+          "content_type": "multipart/form-data",
+          "required_fields": ["name", "phone", "email"],
+          "optional_fields": ["photos (multiple files)", "referralCode", "city", "message"],
+          "response": "{ success: boolean, leadId?: string, message?: string }",
+          "runtime": "nodejs"
+        }
+      ],
+      "env_vars": [
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "TELEGRAM_BOT_TOKEN",
+        "TELEGRAM_CHAT_ID"
+      ],
+      "database_tables": [
+        {
+          "name": "kitchen_leads",
+          "operation": "SELECT, INSERT",
+          "sql_file": "create_visualizer_v2.sql",
+          "notes": "Deduplication: checks for recent lead by phone within 10-minute window"
+        },
+        {
+          "name": "leads",
+          "operation": "INSERT",
+          "sql_file": "supabase-fixes.sql",
+          "notes": "Mirror table; full schema may not be in provided SQL files"
+        }
+      ],
+      "storage_buckets": [
+        "visualizations",
+        "kitchen-photos",
+        "visualizer-inputs"
+      ],
+      "npm_packages": [
+        "next", "react", "typescript", "tailwindcss",
+        "@supabase/supabase-js", "framer-motion"
+      ],
+      "migration_notes": "The form uses a bucket fallback list — if visualizations bucket exists from the Visualizer feature, photo uploads will work automatically. The leads mirror table schema should be verified against supabase-fixes.sql before running.",
+      "recommended_migration_order": 5,
+      "known_issues": [
+        "Storage bucket 'kitchen-photos' may not exist in new project — route falls back to 'visualizations'",
+        "The 'leads' table schema is partially documented; verify all columns expected by INSERT in route.ts"
+      ],
+      "missing_or_unresolved_dependencies": [
+        {
+          "item": "Full schema for 'leads' table",
+          "reason": "The supabase-fixes.sql may only patch an existing table. The full CREATE TABLE statement may not be in this package.",
+          "impact": "INSERT into 'leads' may fail if table does not exist with expected columns."
+        }
+      ]
+    }
+  ],
+  "shared_files": {
+    "lib": [
+      "lib/supabaseServer.ts",
+      "lib/supabaseAdmin.ts",
+      "lib/telegram.ts",
+      "lib/phoneNormalizer.ts",
+      "lib/requestRateLimit.ts",
+      "lib/referralProgram.ts",
+      "lib/referralStatus.ts",
+      "lib/analytics.ts",
+      "lib/navigation.ts",
+      "lib/utils.ts",
+      "lib/twilio.ts"
+    ],
+    "components": [
+      "app/components/Navigation.tsx",
+      "app/components/CTAButton.tsx",
+      "app/components/GoogleAnalytics.tsx",
+      "app/components/CountUp.tsx",
+      "app/components/ui/Motion.tsx",
+      "app/components/ui/tabs.tsx",
+      "app/components/schemas/ServiceSchema.tsx",
+      "app/components/schemas/FAQSchema.tsx",
+      "app/components/schemas/EntitySchema.tsx",
+      "app/components/schemas/ProductListSchema.tsx",
+      "app/components/linking/InternalLinking.tsx"
+    ],
+    "config": [
+      "app/config/internal-linking.ts",
+      "app/globals.css",
+      "tailwind.config.ts",
+      "tsconfig.json",
+      "next.config.js",
+      "package.json"
+    ],
+    "sql_migrations": [
+      "create_referral_program_v1.sql",
+      "add_referral_clicks_affiliate.sql",
+      "create_visualizer_buckets.sql",
+      "create_visualizer_v2.sql",
+      "fix_visualizer_schema.sql",
+      "fix_visualizer_session_schema.sql",
+      "add_visualizer_columns.sql",
+      "supabase-fixes.sql"
+    ]
+  },
+  "all_env_vars": {
+    "NEXT_PUBLIC_SUPABASE_URL": "",
+    "SUPABASE_SERVICE_ROLE_KEY": "",
+    "REPLICATE_API_TOKEN": "",
+    "REPLICATE_MODEL": "",
+    "REPLICATE_STEPS": "",
+    "REPLICATE_GUIDANCE": "",
+    "TELEGRAM_BOT_TOKEN": "",
+    "TELEGRAM_CHAT_ID": "",
+    "TELEGRAM_API_TOKEN": "",
+    "TELEGRAM_BOT_API_KEY": "",
+    "TELEGRAM_TO_CHAT_ID": "",
+    "GOOGLE_CLOUD_PROJECT": "",
+    "GOOGLE_CLOUD_LOCATION": "",
+    "GOOGLE_SERVICE_ACCOUNT_JSON_BASE64": "",
+    "GOOGLE_APPLICATION_CREDENTIALS": "",
+    "NEXT_PUBLIC_SITE_URL": "",
+    "NEXT_PUBLIC_GA_ID": "",
+    "NEXT_PUBLIC_GA_MEASUREMENT_ID": "",
+    "GA_API_SECRET": "",
+    "NEXT_PUBLIC_FB_PIXEL_ID": "",
+    "FB_CONVERSIONS_API_TOKEN": "",
+    "META_PIXEL_ID": "",
+    "META_CONVERSIONS_API_TOKEN": "",
+    "META_TEST_EVENT_CODE": ""
+  },
+  "binary_assets_not_copied": [
+    {
+      "path": "public/cabs_clean/doors/**",
+      "size_approx": "part of 69 MB",
+      "reason": "Large binary image assets; transfer from source repo separately",
+      "required_by": ["app/components/ColorSelector.tsx"]
+    },
+    {
+      "path": "public/cabs_clean/hardware/**",
+      "size_approx": "part of 69 MB",
+      "reason": "Large binary image assets; transfer from source repo separately",
+      "required_by": ["app/components/PullsSelector.tsx"]
+    },
+    {
+      "path": "public/cabs_clean/kitchens/**",
+      "size_approx": "part of 69 MB",
+      "reason": "Large binary image assets; transfer from source repo separately",
+      "required_by": ["app/components/ColorSelector.tsx"]
+    },
+    {
+      "path": "public/vids/*.mp4",
+      "size_approx": "56 MB",
+      "reason": "Video assets not used by the 5 extracted features",
+      "required_by": []
+    }
+  ],
+  "recommended_migration_order": [
+    {
+      "step": 1,
+      "action": "Apply SQL schemas to new Supabase project",
+      "files": ["create_referral_program_v1.sql", "create_visualizer_v2.sql", "create_visualizer_buckets.sql", "supabase-fixes.sql", "add_referral_clicks_affiliate.sql"]
+    },
+    {
+      "step": 2,
+      "action": "Configure environment variables in new project"
+    },
+    {
+      "step": 3,
+      "feature": "referral_program",
+      "reason": "No AI deps, lowest blast radius"
+    },
+    {
+      "step": 4,
+      "feature": "cabinet_refacing",
+      "reason": "Static pages, no API, no external services"
+    },
+    {
+      "step": 5,
+      "feature": "product_configurator",
+      "reason": "Client-side only, depends on cabs_clean assets"
+    },
+    {
+      "step": 6,
+      "feature": "visualizer",
+      "reason": "Requires Replicate + Supabase storage; test thoroughly"
+    },
+    {
+      "step": 7,
+      "feature": "kitchen_quote",
+      "reason": "Depends on Supabase tables from visualizer step"
+    }
+  ]
+}
