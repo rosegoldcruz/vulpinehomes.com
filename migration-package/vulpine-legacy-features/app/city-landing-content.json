@@ -1,0 +1,326 @@
+{
+  "phoenix": {
+    "city": "Phoenix",
+    "route": "/cabinet-refacing-phoenix-az",
+    "heroKicker": "Desert Core",
+    "heroHeadline": "Phoenix Cabinet Refacing Built for Big Savings",
+    "heroSubheadline": "Cut kitchen upgrade costs without sacrificing finish quality or install speed.",
+    "primaryHook": "savings",
+    "uniqueStory": "Many Phoenix kitchens were built with sturdy cabinet boxes but dated doors, heavy oak faces, and worn finishes that make the whole room feel tired. Full replacement sounds attractive until the quotes include demolition, disposal, and extended downtime. Our refacing process is built for practical Phoenix homeowners who want the visual transformation without paying for waste. We keep the structural boxes, replace doors and drawer fronts, update visible surfaces, and install modern hardware that changes the entire room impression. Because the footprint stays in place, work moves fast and the mess stays controlled. Families in Arcadia, North Central, and Ahwatukee choose this approach when they want a high-value result while protecting remodeling budget for counters, lighting, or appliances. It is the most efficient way to make an older kitchen feel current.",
+    "localProof": [
+      "Frequently scheduled in Arcadia and North Central homes with older but solid cabinet layouts.",
+      "Regular installs near Ahwatukee Foothills and Desert Ridge where clients prioritize value.",
+      "Also serving nearby Paradise Valley-adjacent and Biltmore-area neighborhoods."
+    ],
+    "neighborhoods": ["Arcadia", "North Central", "Ahwatukee", "Desert Ridge", "Biltmore"],
+    "projects": [
+      {"title": "Arcadia Budget-Smart Refresh", "neighborhood": "Arcadia", "beforeImage": "/data_set/before1.jpg", "afterImage": "/data_set/after1.jpg"},
+      {"title": "North Central Surface Overhaul", "neighborhood": "North Central", "beforeImage": "/data_set/before2.jpg", "afterImage": "/data_set/after2.jpg"},
+      {"title": "Ahwatukee Bright Finish Upgrade", "neighborhood": "Ahwatukee", "beforeImage": "/data_set/before3.jpg", "afterImage": "/data_set/after3.jpg"}
+    ],
+    "faqs": [
+      {"question": "What drives cabinet refacing price most in Phoenix homes?", "answer": "Door profile, finish selection, and kitchen size have the biggest impact. Because we reuse your cabinet boxes, most Phoenix projects land far below full replacement pricing."},
+      {"question": "Can you reface cabinets in older Phoenix houses with uneven walls?", "answer": "Yes. We shim, align, and tune door reveals during install so older framing does not compromise final lines and function."},
+      {"question": "Do Phoenix homeowners usually pair refacing with new countertops?", "answer": "Often, yes. Refacing first gives you a clean visual baseline, then countertops and backsplash can be selected to match the new door color."},
+      {"question": "How quickly can I schedule a project in central Phoenix?", "answer": "After measurement and material confirmation, most installations are completed in a 3-5 day window with clear start and finish dates."}
+    ],
+    "metaDescription": "Cabinet refacing in Phoenix, AZ with 3-5 day installation and 40-60% savings vs replacement. Trusted in Arcadia, North Central, and Ahwatukee."
+  },
+  "scottsdale": {
+    "city": "Scottsdale",
+    "route": "/cabinet-refacing-scottsdale",
+    "heroKicker": "Refined",
+    "heroHeadline": "Scottsdale Kitchens, Luxury Finish Without Full Demo",
+    "heroSubheadline": "Elevate door style, color, and hardware detail while preserving your cabinet layout.",
+    "primaryHook": "luxury",
+    "uniqueStory": "Scottsdale clients usually care less about basic replacement and more about proportion, material feel, and finish consistency under strong natural light. Many existing kitchens already have functional layouts and premium appliances, but outdated cabinet fronts pull the whole design backward. Our refacing approach is ideal when the goal is a luxury visual upgrade without tearing apart a working kitchen. We help homeowners select profiles that fit desert contemporary, transitional, or clean modern interiors, then execute installation with disciplined alignment and hardware placement. The result feels intentional, not patched together. Homes in DC Ranch, Gainey Ranch, and Grayhawk often choose refacing to preserve workflow while moving aesthetics up to current market standards. It is a focused, design-driven approach that avoids unnecessary construction noise, protects surrounding finishes, and delivers a polished look on a tighter timeline than full replacement.",
+    "localProof": [
+      "Commonly installed in DC Ranch and Gainey Ranch homes where finish quality is the priority.",
+      "Strong demand across Grayhawk and McCormick Ranch for refined door style updates.",
+      "Also serving nearby Old Town-adjacent and North Scottsdale communities."
+    ],
+    "neighborhoods": ["DC Ranch", "McCormick Ranch", "Gainey Ranch", "Old Town", "Grayhawk"],
+    "projects": [
+      {"title": "DC Ranch Minimalist Reface", "neighborhood": "DC Ranch", "beforeImage": "/data_set/before4.jpg", "afterImage": "/data_set/after4.jpg"},
+      {"title": "Gainey Ranch Luxe Shaker Install", "neighborhood": "Gainey Ranch", "beforeImage": "/data_set/before5.jpg", "afterImage": "/data_set/after5.jpg"},
+      {"title": "Grayhawk Matte Finish Conversion", "neighborhood": "Grayhawk", "beforeImage": "/data_set/before6.jpg", "afterImage": "/data_set/after6.jpg"}
+    ],
+    "faqs": [
+      {"question": "Which cabinet finishes hold up best in bright Scottsdale light?", "answer": "Low-sheen and matte-finished surfaces typically hide glare and fingerprints better than high-gloss in sun-heavy Scottsdale kitchens."},
+      {"question": "Can refacing match premium appliance packages common in Scottsdale remodels?", "answer": "Yes. We coordinate door profile scale, color tone, and hardware finish so cabinetry complements built-in appliances and designer fixtures."},
+      {"question": "Do you offer style guidance for desert-modern versus transitional homes?", "answer": "We do. During selection, we narrow profiles and colorways based on your architecture, flooring, and countertop direction."},
+      {"question": "Is refacing still a luxury outcome if cabinet boxes are retained?", "answer": "Absolutely. The visible surfaces create the perceived quality, and precise installation determines whether the final kitchen feels high-end."}
+    ],
+    "metaDescription": "Cabinet refacing in Scottsdale, AZ with 3-5 day installation and 40-60% savings vs replacement. Ideal for DC Ranch, Gainey Ranch, and Grayhawk homes."
+  },
+  "tempe": {
+    "city": "Tempe",
+    "route": "/cabinet-refacing-tempe",
+    "heroKicker": "Fast",
+    "heroHeadline": "Tempe Turnarounds for Kitchens That Cannot Stay Offline",
+    "heroSubheadline": "Built for tight schedules, quick installs, and minimal disruption to daily routines.",
+    "primaryHook": "speed",
+    "uniqueStory": "Tempe homeowners often need upgrades done quickly because life is already moving at full speed. Between university traffic patterns, packed work calendars, and active rental or owner-occupied properties, long remodels are hard to tolerate. Cabinet refacing gives you a major visual reset without the timeline drag of full replacement. We preserve your existing cabinet structure, pre-plan measurements, and execute in a compact install window that keeps your kitchen functional sooner. That matters in neighborhoods like Maple-Ash and South Tempe where households rely on predictable routines. It also helps investors and owner-operators near ASU improve kitchen appeal without taking properties offline for extended periods. If your top priority is schedule control and a clean finish, refacing is the practical move. You get modern door fronts, updated hardware, and a sharper kitchen identity in days, not weeks.",
+    "localProof": [
+      "Frequent scheduling in Maple-Ash and Mitchell Park where quick project completion matters.",
+      "Installed throughout South Tempe and Warner Ranch with compressed install windows.",
+      "Also covering nearby ASU-adjacent and Downtown Tempe neighborhoods."
+    ],
+    "neighborhoods": ["Maple-Ash", "South Tempe", "Warner Ranch", "Mitchell Park", "Downtown Tempe"],
+    "projects": [
+      {"title": "Maple-Ash Rapid Refresh", "neighborhood": "Maple-Ash", "beforeImage": "/data_set/before7.jpg", "afterImage": "/data_set/after7.jpg"},
+      {"title": "South Tempe 5-Day Reface", "neighborhood": "South Tempe", "beforeImage": "/data_set/before8.jpg", "afterImage": "/data_set/after8.jpg"},
+      {"title": "Warner Ranch Fast Modernization", "neighborhood": "Warner Ranch", "beforeImage": "/data_set/before9.jpg", "afterImage": "/data_set/after9.jpg"}
+    ],
+    "faqs": [
+      {"question": "Can a Tempe install be timed around school or semester schedules?", "answer": "Yes. We sequence prep and installation to reduce conflict with school calendars and household traffic patterns."},
+      {"question": "How much kitchen downtime should I expect during a fast refacing project?", "answer": "Most of the heavy visual changes happen in a 3-5 day window, with daily cleanup to keep access manageable."},
+      {"question": "Is refacing a good fit for Tempe rental property upgrades?", "answer": "It is. Refacing improves appearance quickly and cost-effectively, which helps reduce vacancy pressure compared with full replacement timelines."},
+      {"question": "Do quick installs compromise quality?", "answer": "Not when measurement, prep, and sequencing are handled correctly. Speed comes from process discipline, not skipped steps."}
+    ],
+    "metaDescription": "Cabinet refacing in Tempe, AZ with 3-5 day installation and 40-60% savings vs replacement. Great for Maple-Ash, South Tempe, and Warner Ranch timelines."
+  },
+  "mesa": {
+    "city": "Mesa",
+    "route": "/cabinet-refacing-mesa",
+    "heroKicker": "Family First",
+    "heroHeadline": "Mesa Kitchen Upgrades Designed Around Family Routine",
+    "heroSubheadline": "Modern results with less noise, less mess, and a shorter disruption window.",
+    "primaryHook": "family/low disruption",
+    "uniqueStory": "Many Mesa households use the kitchen as command center for school mornings, evening meals, and multi-generational traffic throughout the day. Full replacement often means long disruption and limited kitchen access exactly when families need consistency. Cabinet refacing is a better fit when you want a visible transformation without tearing out functioning cabinet boxes. We handle precise measurement, door and drawer replacement, and finish alignment while keeping the project footprint controlled. That is why families in Eastmark, Dobson Ranch, and Las Sendas choose this path when they want a cleaner look without weeks of construction stress. You keep your layout, avoid major demolition, and still get a kitchen that feels updated and intentional. For busy Mesa homes, refacing balances practical scheduling with design impact and gives you room in the budget for complementary upgrades like counters, lighting, or flooring.",
+    "localProof": [
+      "Regular projects in Eastmark and Dobson Ranch where low-disruption scheduling is critical.",
+      "Consistent demand in Las Sendas and Red Mountain Ranch for practical family upgrades.",
+      "Also serving nearby Superstition Springs and East Mesa neighborhoods."
+    ],
+    "neighborhoods": ["Eastmark", "Las Sendas", "Dobson Ranch", "Red Mountain Ranch", "Superstition Springs"],
+    "projects": [
+      {"title": "Eastmark Family Kitchen Reset", "neighborhood": "Eastmark", "beforeImage": "/data_set/before10.jpg", "afterImage": "/data_set/after10.jpg"},
+      {"title": "Dobson Ranch Low-Mess Upgrade", "neighborhood": "Dobson Ranch", "beforeImage": "/data_set/before11.jpg", "afterImage": "/data_set/after11.jpg"},
+      {"title": "Las Sendas Soft-Neutral Reface", "neighborhood": "Las Sendas", "beforeImage": "/data_set/before12.jpg", "afterImage": "/data_set/after12.jpg"}
+    ],
+    "faqs": [
+      {"question": "How do you minimize disruption for Mesa households with children?", "answer": "We set a clear daily sequence, protect work zones, and keep cleanup tight so families can maintain routines during installation."},
+      {"question": "Can I keep my current kitchen layout and still modernize the look?", "answer": "Yes. Refacing is specifically built to keep layout and cabinet boxes while updating all visible surfaces."},
+      {"question": "Do you work with homeowners planning staged upgrades over time?", "answer": "Yes. Many Mesa clients reface first, then add countertops, backsplash, or lighting in a second phase."},
+      {"question": "Is refacing practical for older Mesa cabinets that still open well?", "answer": "If the boxes are structurally sound, refacing is usually the most efficient path to a major visual upgrade."}
+    ],
+    "metaDescription": "Cabinet refacing in Mesa, AZ with 3-5 day installation and 40-60% savings vs replacement. Family-friendly approach for Eastmark, Dobson Ranch, and Las Sendas."
+  },
+  "chandler": {
+    "city": "Chandler",
+    "route": "/cabinet-refacing-chandler",
+    "heroKicker": "Builder Upgrade",
+    "heroHeadline": "Chandler Refacing That Modernizes Builder-Grade Kitchens",
+    "heroSubheadline": "Upgrade plain door fronts into a cleaner, custom-feel design without full replacement.",
+    "primaryHook": "modernize builder-grade",
+    "uniqueStory": "A large share of Chandler homes were built with functional but visually basic cabinets that age quickly as tastes shift. The layout is often fine, but the fronts, finish quality, and hardware leave the kitchen feeling dated. Refacing solves that exact problem. Instead of replacing everything, we preserve the box structure and focus on the surfaces that define the look: doors, drawer fronts, and exposed finishes. In neighborhoods like Ocotillo and Fulton Ranch, homeowners use this path to move from builder-standard to design-forward without overspending on unnecessary demolition. The process also works well for owners planning phased upgrades because you can modernize cabinetry now and coordinate counters or backsplash afterward. If your goal is to make a Chandler kitchen feel intentionally designed, refacing provides the strongest visual change per dollar while keeping timeline and disruption manageable.",
+    "localProof": [
+      "Popular in Ocotillo and Fulton Ranch homes transitioning from original builder finishes.",
+      "Scheduled across Sun Groves and Cooper Commons for modern profile upgrades.",
+      "Also active in nearby Downtown Chandler and South Chandler communities."
+    ],
+    "neighborhoods": ["Ocotillo", "Fulton Ranch", "Sun Groves", "Cooper Commons", "Downtown Chandler"],
+    "projects": [
+      {"title": "Ocotillo Builder-Grade Reset", "neighborhood": "Ocotillo", "beforeImage": "/data_set/before13.jpg", "afterImage": "/data_set/after13.jpg"},
+      {"title": "Fulton Ranch Flat-Front Conversion", "neighborhood": "Fulton Ranch", "beforeImage": "/data_set/before14.jpg", "afterImage": "/data_set/after14.jpg"},
+      {"title": "Sun Groves Hardware + Door Update", "neighborhood": "Sun Groves", "beforeImage": "/data_set/before15.jpg", "afterImage": "/data_set/after15.jpg"}
+    ],
+    "faqs": [
+      {"question": "Can you make a standard Chandler builder kitchen look custom?", "answer": "Yes. Door profile choice, consistent finish tone, and upgraded hardware create a custom-feel result without replacing cabinet boxes."},
+      {"question": "What is the best profile style for modern Chandler interiors?", "answer": "Simple shaker and slim-frame profiles are common because they pair well with current flooring and countertop trends."},
+      {"question": "Do I need to replace countertops to get a good result?", "answer": "Not always. Many clients keep counters temporarily and still achieve a major visual lift through cabinet surface updates."},
+      {"question": "How does refacing compare to repainting original cabinets?", "answer": "Refacing replaces doors and fronts entirely, delivering a deeper transformation and longer-term appearance consistency than paint alone."}
+    ],
+    "metaDescription": "Cabinet refacing in Chandler, AZ with 3-5 day installation and 40-60% savings vs replacement. Perfect for modernizing builder-grade kitchens in Ocotillo and Fulton Ranch."
+  },
+  "gilbert": {
+    "city": "Gilbert",
+    "route": "/cabinet-refacing-gilbert",
+    "heroKicker": "Value Lift",
+    "heroHeadline": "Gilbert Refacing That Protects Resale While Improving Daily Use",
+    "heroSubheadline": "Choose high-impact cabinet updates that support both lifestyle and property value.",
+    "primaryHook": "resale/ROI",
+    "uniqueStory": "Gilbert homeowners often plan upgrades with two goals in mind: enjoy the kitchen now and preserve resale strength later. Full replacement can overshoot budget without delivering proportional return, especially when existing cabinet layouts already function well. Refacing targets the visual elements buyers notice immediately while avoiding unnecessary structural cost. We keep cabinet boxes, replace doors and drawer fronts, and tune finishes to match current market expectations in neighborhoods like Morrison Ranch, Val Vista Lakes, and Power Ranch. This creates a polished, move-in-ready impression that photographs well and feels upgraded in person. For homeowners staying long term, the same investment improves daily use and appearance without the stress of a full teardown. If you want smart ROI with real design impact, refacing gives Gilbert homes a strong middle path between cosmetic patchwork and expensive replacement.",
+    "localProof": [
+      "Consistent installs in Morrison Ranch and Val Vista Lakes where resale quality matters.",
+      "Frequent projects in Power Ranch and Seville focused on market-ready updates.",
+      "Also serving nearby Agritopia and South Gilbert neighborhoods."
+    ],
+    "neighborhoods": ["Val Vista Lakes", "Morrison Ranch", "Power Ranch", "Seville", "Agritopia"],
+    "projects": [
+      {"title": "Morrison Ranch ROI Reface", "neighborhood": "Morrison Ranch", "beforeImage": "/data_set/before16.jpg", "afterImage": "/data_set/after16.jpg"},
+      {"title": "Power Ranch Listing-Ready Upgrade", "neighborhood": "Power Ranch", "beforeImage": "/data_set/before17.jpg", "afterImage": "/data_set/after17.jpg"},
+      {"title": "Val Vista Lakes Refined Refresh", "neighborhood": "Val Vista Lakes", "beforeImage": "/data_set/before18.jpg", "afterImage": "/data_set/after18.jpg"}
+    ],
+    "faqs": [
+      {"question": "Does cabinet refacing improve perceived resale value in Gilbert?", "answer": "Updated cabinetry strongly affects first impressions, photos, and buyer confidence, especially when finishes are cohesive."},
+      {"question": "What finish choices age best for future resale?", "answer": "Neutral but warm tones with durable matte or low-sheen surfaces usually perform best across broad buyer preferences."},
+      {"question": "Should I reface before listing or after moving in?", "answer": "Both can make sense. Sellers use it for stronger presentation, and new owners use it to personalize without full remodel costs."},
+      {"question": "How quickly can a Gilbert reface be completed before listing photos?", "answer": "Most projects complete in 3-5 days once selections are finalized, making it viable for short pre-listing timelines."}
+    ],
+    "metaDescription": "Cabinet refacing in Gilbert, AZ with 3-5 day installation and 40-60% savings vs replacement. Great for resale-focused upgrades in Morrison Ranch, Power Ranch, and Val Vista Lakes."
+  },
+  "glendale": {
+    "city": "Glendale",
+    "route": "/cabinet-refacing-glendale",
+    "heroKicker": "Smart Spend",
+    "heroHeadline": "Glendale Cabinet Refacing with Maximum Visual Change Per Dollar",
+    "heroSubheadline": "A practical way to modernize older kitchens while keeping structural cabinetry in place.",
+    "primaryHook": "savings",
+    "uniqueStory": "Glendale homes span different eras, and many kitchens still have durable cabinet boxes beneath outdated finishes. Replacing everything can quickly become expensive, especially when layout changes are not truly needed. Refacing focuses budget where it counts visually: new doors, refreshed exposed surfaces, updated hardware, and clean installation alignment. Homeowners in Arrowhead Ranch and Historic Glendale often choose this route when they want a dramatic before-and-after without paying for full demolition. It is also a strong fit for value-conscious projects where owners want a premium look while preserving funds for other improvements. Because the structural footprint remains, the project stays tighter, faster, and easier to manage. If your Glendale kitchen needs a modern identity but not a complete rebuild, refacing gives you a disciplined, high-impact solution with lower cost and shorter disruption.",
+    "localProof": [
+      "Active in Arrowhead Ranch and Thunderbird Palms with value-focused upgrade plans.",
+      "Frequent work in Historic Glendale where existing box structure is often worth preserving.",
+      "Also serving nearby Westgate and Marshall Ranch neighborhoods."
+    ],
+    "neighborhoods": ["Arrowhead Ranch", "Westgate", "Marshall Ranch", "Historic Glendale", "Thunderbird Palms"],
+    "projects": [
+      {"title": "Arrowhead Ranch Cost-Efficient Reface", "neighborhood": "Arrowhead Ranch", "beforeImage": "/data_set/before19.jpg", "afterImage": "/data_set/after19.jpg"},
+      {"title": "Historic Glendale Style Reset", "neighborhood": "Historic Glendale", "beforeImage": "/data_set/before20.jpg", "afterImage": "/data_set/after20.jpg"},
+      {"title": "Westgate Contemporary Upgrade", "neighborhood": "Westgate", "beforeImage": "/data_set/before21.jpg", "afterImage": "/data_set/after21.jpg"}
+    ],
+    "faqs": [
+      {"question": "Will refacing work in older Glendale homes with non-standard cabinet openings?", "answer": "Yes. Custom measurement and alignment allow us to account for older construction quirks while delivering uniform front reveals."},
+      {"question": "How much can Glendale homeowners typically save versus replacement?", "answer": "Most projects come in 40-60% below full replacement because box structures are retained and demolition is avoided."},
+      {"question": "Can damaged hinge areas be corrected during refacing?", "answer": "In many cases, yes. We assess hinge locations and perform adjustment or reinforcement where needed as part of installation."},
+      {"question": "Is refacing worthwhile for homes that may be rented later?", "answer": "It is often ideal because it refreshes appearance significantly while controlling project spend and downtime."}
+    ],
+    "metaDescription": "Cabinet refacing in Glendale, AZ with 3-5 day installation and 40-60% savings vs replacement. High-value transformations in Arrowhead Ranch, Westgate, and Historic Glendale."
+  },
+  "peoria": {
+    "city": "Peoria",
+    "route": "/cabinet-refacing-peoria",
+    "heroKicker": "Return Focus",
+    "heroHeadline": "Peoria Kitchen Refacing Geared for Long-Term Home Value",
+    "heroSubheadline": "Upgrade cabinet appearance now with investment-friendly scope and controlled cost.",
+    "primaryHook": "resale/ROI",
+    "uniqueStory": "Peoria homeowners often think in longer time horizons, balancing immediate quality-of-life upgrades with future property value. Full replacement can consume budget quickly, even when existing cabinet boxes are still structurally sound. Refacing offers a better return profile for many of these kitchens because it dramatically updates appearance while keeping cost and timeline contained. In neighborhoods like Vistancia and Fletcher Heights, we see homeowners prioritize cleaner door styles, modern hardware, and cohesive finish tones that keep the kitchen competitive with newer homes. Seasonal residents also appreciate that the process is compact and easier to schedule around travel windows. If your goal is a smart, disciplined investment rather than unnecessary demolition, cabinet refacing provides a strong ROI pathway. You get a modernized kitchen impression that supports everyday enjoyment and future marketability.",
+    "localProof": [
+      "Strong adoption in Vistancia and Trilogy communities for value-preserving upgrades.",
+      "Commonly selected in Fletcher Heights and Westwing Mountain before resale prep.",
+      "Also serving nearby Terramar and North Peoria neighborhoods."
+    ],
+    "neighborhoods": ["Vistancia", "Westwing Mountain", "Fletcher Heights", "Terramar", "Trilogy at Vistancia"],
+    "projects": [
+      {"title": "Vistancia Long-Term Value Upgrade", "neighborhood": "Vistancia", "beforeImage": "/data_set/before1.jpg", "afterImage": "/data_set/after1.jpg"},
+      {"title": "Fletcher Heights Resale Prep", "neighborhood": "Fletcher Heights", "beforeImage": "/data_set/before7.jpg", "afterImage": "/data_set/after7.jpg"},
+      {"title": "Westwing Mountain Finish Lift", "neighborhood": "Westwing Mountain", "beforeImage": "/data_set/before13.jpg", "afterImage": "/data_set/after13.jpg"}
+    ],
+    "faqs": [
+      {"question": "Is cabinet refacing a good pre-listing strategy in Peoria?", "answer": "Yes. Updated cabinetry significantly improves first impressions while typically costing much less than full replacement."},
+      {"question": "Do finish choices matter for Peoria buyers?", "answer": "Very much. Balanced neutrals and modern hardware usually appeal to the broadest buyer range in local neighborhoods."},
+      {"question": "Can seasonal residents schedule projects while they are in town?", "answer": "Yes. We plan tightly around travel dates and execute in a compact 3-5 day installation window."},
+      {"question": "What if I want to stage additional upgrades later?", "answer": "Refacing works well as phase one, leaving budget and flexibility for counters, backsplash, or lighting after cabinetry is updated."}
+    ],
+    "metaDescription": "Cabinet refacing in Peoria, AZ with 3-5 day installation and 40-60% savings vs replacement. ROI-focused updates for Vistancia, Fletcher Heights, and Westwing Mountain."
+  },
+  "surprise": {
+    "city": "Surprise",
+    "route": "/cabinet-refacing-surprise",
+    "heroKicker": "Fresh Build",
+    "heroHeadline": "Surprise Refacing for Homes Ready to Move Past Builder Basics",
+    "heroSubheadline": "Turn standard cabinet fronts into a cleaner, more current kitchen identity.",
+    "primaryHook": "modernize builder-grade",
+    "uniqueStory": "Surprise has grown quickly, and many homeowners are living with original builder-grade kitchens that function fine but look generic. The cabinet layout often does not need replacement, but the visual style needs a clear upgrade. Refacing is the most direct way to accomplish that without paying for a full tear-out. We replace doors and drawer fronts, update exposed surfaces, and tune the finish package so the kitchen reads custom rather than stock. Communities like Marley Park and Asante frequently choose this route because it delivers a meaningful design jump while keeping timeline and cost under control. It is also a smart option for active households and retirement communities that prefer predictable scheduling. If your goal is to bring personality and polish to a Surprise kitchen that still feels builder-standard, refacing gives you an efficient path to a stronger final look.",
+    "localProof": [
+      "Regular installs in Marley Park and Asante where owners want a custom feel from standard layouts.",
+      "High activity in Sun City Grand and Rancho Gabriela for low-chaos modernization.",
+      "Also serving nearby Sierra Montana and North Surprise neighborhoods."
+    ],
+    "neighborhoods": ["Marley Park", "Asante", "Sun City Grand", "Rancho Gabriela", "Sierra Montana"],
+    "projects": [
+      {"title": "Marley Park Builder-Grade Upgrade", "neighborhood": "Marley Park", "beforeImage": "/data_set/before2.jpg", "afterImage": "/data_set/after2.jpg"},
+      {"title": "Asante Profile Modernization", "neighborhood": "Asante", "beforeImage": "/data_set/before8.jpg", "afterImage": "/data_set/after8.jpg"},
+      {"title": "Rancho Gabriela Contemporary Finish", "neighborhood": "Rancho Gabriela", "beforeImage": "/data_set/before14.jpg", "afterImage": "/data_set/after14.jpg"}
+    ],
+    "faqs": [
+      {"question": "Can refacing make a Surprise builder kitchen look less generic?", "answer": "Yes. New door styles and coordinated finish details create a more custom, intentional look without moving cabinet footprints."},
+      {"question": "Is this a good option for active-adult communities in Surprise?", "answer": "It is. The process is faster and less invasive than full replacement, which many homeowners prefer."},
+      {"question": "What if my cabinets are structurally fine but visually dated?", "answer": "That is exactly the sweet spot for refacing. We keep the strong structure and replace the visible components."},
+      {"question": "How soon can a completed look be achieved?", "answer": "Once materials are ready, installation generally completes in 3-5 days with clear daily milestones."}
+    ],
+    "metaDescription": "Cabinet refacing in Surprise, AZ with 3-5 day installation and 40-60% savings vs replacement. Ideal for modernizing builder-grade kitchens in Marley Park and Asante."
+  },
+  "goodyear": {
+    "city": "Goodyear",
+    "route": "/cabinet-refacing-goodyear",
+    "heroKicker": "Calm Flow",
+    "heroHeadline": "Goodyear Kitchen Refacing with Low Disruption Scheduling",
+    "heroSubheadline": "Designed for busy households that need a smoother remodel experience.",
+    "primaryHook": "family/low disruption",
+    "uniqueStory": "Goodyear families often juggle long commutes, school pickups, and packed weekends, so remodel disruption can become a bigger problem than budget alone. Cabinet refacing is a strong fit because it transforms the look of the kitchen while keeping the project compact and predictable. We retain cabinet boxes, replace door and drawer fronts, refresh visible surfaces, and complete installation in a disciplined sequence that limits day-to-day interruption. Homeowners in Estrella and Palm Valley use this approach when they want a meaningful update but cannot tolerate an open-ended construction timeline. The result is a kitchen that feels newer and more polished without dragging the household through weeks of teardown. If you need a practical path that respects routine, refacing gives Goodyear homes a cleaner visual reset with less chaos and better schedule control.",
+    "localProof": [
+      "Frequently booked in Estrella and Palm Valley for schedule-sensitive family upgrades.",
+      "Strong demand in Canyon Trails and PebbleCreek where disruption control is key.",
+      "Also serving nearby Wildflower Ranch and Litchfield corridor communities."
+    ],
+    "neighborhoods": ["Estrella", "Palm Valley", "Canyon Trails", "PebbleCreek", "Wildflower Ranch"],
+    "projects": [
+      {"title": "Estrella Family-Friendly Reface", "neighborhood": "Estrella", "beforeImage": "/data_set/before3.jpg", "afterImage": "/data_set/after3.jpg"},
+      {"title": "Palm Valley Low-Disruption Upgrade", "neighborhood": "Palm Valley", "beforeImage": "/data_set/before9.jpg", "afterImage": "/data_set/after9.jpg"},
+      {"title": "PebbleCreek Soft-Neutral Transformation", "neighborhood": "PebbleCreek", "beforeImage": "/data_set/before15.jpg", "afterImage": "/data_set/after15.jpg"}
+    ],
+    "faqs": [
+      {"question": "How do you keep Goodyear projects manageable for busy families?", "answer": "We stage work by zone, clean daily, and maintain a tight installation sequence so routine can continue with minimal friction."},
+      {"question": "Can refacing be done without a full kitchen shutdown for weeks?", "answer": "Yes. Most visible changes are completed in a 3-5 day window, far shorter than replacement timelines."},
+      {"question": "Is this practical for homes planning additional upgrades later?", "answer": "Yes. Refacing often becomes the first phase, leaving room for future countertop or flooring updates."},
+      {"question": "Do you coordinate around weekday work schedules?", "answer": "We do. Scheduling expectations are discussed up front so start and finish timing is predictable."}
+    ],
+    "metaDescription": "Cabinet refacing in Goodyear, AZ with 3-5 day installation and 40-60% savings vs replacement. Low-disruption upgrades for Estrella, Palm Valley, and Canyon Trails families."
+  },
+  "buckeye": {
+    "city": "Buckeye",
+    "route": "/cabinet-refacing-buckeye",
+    "heroKicker": "New Build",
+    "heroHeadline": "Buckeye Refacing for New Builds Ready for a Better Finish",
+    "heroSubheadline": "Upgrade entry-level cabinet fronts into a more personalized, elevated kitchen.",
+    "primaryHook": "modernize builder-grade",
+    "uniqueStory": "Buckeye growth has delivered many newer homes, and with that comes a common challenge: kitchens that are structurally new but visually basic. Builder packages often prioritize speed and cost over personality, leaving homeowners wanting a more refined look after move-in. Cabinet refacing solves that efficiently. Instead of replacing new box structures, we upgrade the surfaces that define style by installing better door and drawer fronts, refreshed exterior finishes, and updated hardware. Homeowners in Verrado, Sundance, and Tartesso use this strategy to bridge the gap between builder standard and custom feel without unnecessary waste. Because the layout and box skeleton remain, projects move quickly and avoid the expensive scope creep of full replacement. For Buckeye owners who like their floor plan but not the default cabinet look, refacing provides high-impact customization on a practical timeline.",
+    "localProof": [
+      "Frequent upgrades in Verrado and Sundance where owners want to outgrow standard builder finishes.",
+      "Regular projects in Tartesso and Festival Foothills focused on personalization.",
+      "Also serving nearby Blue Horizons and West Buckeye communities."
+    ],
+    "neighborhoods": ["Verrado", "Sundance", "Tartesso", "Festival Foothills", "Blue Horizons"],
+    "projects": [
+      {"title": "Verrado Builder-Package Upgrade", "neighborhood": "Verrado", "beforeImage": "/data_set/before4.jpg", "afterImage": "/data_set/after4.jpg"},
+      {"title": "Sundance Door Profile Modernization", "neighborhood": "Sundance", "beforeImage": "/data_set/before10.jpg", "afterImage": "/data_set/after10.jpg"},
+      {"title": "Tartesso Personalization Project", "neighborhood": "Tartesso", "beforeImage": "/data_set/before16.jpg", "afterImage": "/data_set/after16.jpg"}
+    ],
+    "faqs": [
+      {"question": "My Buckeye home is new. Why reface instead of replace?", "answer": "New homes usually have sound cabinet boxes, so replacing only the visible fronts is the most efficient way to upgrade aesthetics."},
+      {"question": "Can refacing remove the basic builder look quickly?", "answer": "Yes. Door profile, finish, and hardware changes create a much stronger design identity in a short install window."},
+      {"question": "Is refacing compatible with future pantry or island add-ons?", "answer": "Yes. We can plan finish direction now so future additions still feel cohesive."},
+      {"question": "How expensive is upgrading a newer Buckeye kitchen this way?", "answer": "Most homeowners save 40-60% compared with full cabinet replacement while still seeing dramatic visual improvement."}
+    ],
+    "metaDescription": "Cabinet refacing in Buckeye, AZ with 3-5 day installation and 40-60% savings vs replacement. Perfect for upgrading builder-grade kitchens in Verrado, Sundance, and Tartesso."
+  },
+  "anthem": {
+    "city": "Anthem",
+    "route": "/cabinet-refacing-anthem",
+    "heroKicker": "Disciplined",
+    "heroHeadline": "Anthem Projects Run on Schedule and Finish with Precision",
+    "heroSubheadline": "Structured install planning for HOA-aware neighborhoods and timing-sensitive households.",
+    "primaryHook": "speed",
+    "uniqueStory": "Anthem homeowners often value process control as much as final appearance. In gated and HOA-managed communities, schedule discipline, communication, and clean execution matter from day one. Cabinet refacing works well here because the scope is compact, the timeline is predictable, and the visual upgrade is substantial. We keep existing cabinet boxes, install upgraded door and drawer fronts, and run a tightly sequenced installation plan that respects access windows and neighborhood expectations. Residents in Anthem Country Club and Parkside regularly choose this route when they want a polished kitchen without long construction exposure. The approach also supports households that need clear start and finish dates for work travel, family events, or seasonal occupancy. If your priority is a controlled, high-quality kitchen transformation in Anthem, refacing gives you speed, structure, and premium-looking results without unnecessary demolition.",
+    "localProof": [
+      "Commonly scheduled in Anthem Country Club with strict timing and access coordination.",
+      "Strong demand across Parkside and Meridian Hills for disciplined installation flow.",
+      "Also serving nearby Desert Hills and North Valley foothill communities."
+    ],
+    "neighborhoods": ["Anthem Country Club", "Parkside", "Meridian Hills", "Anthem Parkside", "Desert Hills"],
+    "projects": [
+      {"title": "Anthem Country Club Precision Install", "neighborhood": "Anthem Country Club", "beforeImage": "/data_set/before5.jpg", "afterImage": "/data_set/after5.jpg"},
+      {"title": "Parkside Timeline-Controlled Refresh", "neighborhood": "Parkside", "beforeImage": "/data_set/before11.jpg", "afterImage": "/data_set/after11.jpg"},
+      {"title": "Meridian Hills Clean-Line Upgrade", "neighborhood": "Meridian Hills", "beforeImage": "/data_set/before17.jpg", "afterImage": "/data_set/after17.jpg"}
+    ],
+    "faqs": [
+      {"question": "Can your team work within Anthem HOA scheduling expectations?", "answer": "Yes. We coordinate timing, arrival windows, and daily cleanup standards that HOA-managed areas typically require."},
+      {"question": "How predictable is the project calendar from start to finish?", "answer": "After final measurement and material confirmation, installs are typically completed in 3-5 days with clear milestones."},
+      {"question": "Do gated-community logistics slow down installation?", "answer": "With proper pre-planning, access control does not need to delay execution. We account for those details up front."},
+      {"question": "Is refacing still premium enough for Anthem Country Club homes?", "answer": "Yes. With the right profile and finish package, refacing delivers a polished, high-end result while avoiding full demolition."}
+    ],
+    "metaDescription": "Cabinet refacing in Anthem, AZ with 3-5 day installation and 40-60% savings vs replacement. Structured scheduling and premium results for Anthem Country Club and Parkside homes."
+  }
+}
